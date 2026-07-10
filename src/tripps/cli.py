@@ -239,6 +239,45 @@ def _serve(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _canary(as_json: bool) -> int:
+    """Probe every live price source. Exits non-zero if any is DOWN, so cron can alert."""
+    from .interfaces import HealthState
+    from .monitoring import persist_canaries, run_canaries
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    results = await run_canaries(settings)
+
+    db = Database(settings.db_path)
+    persist_canaries(db, results)
+    db.close()
+
+    if as_json:
+        import json
+
+        print(
+            json.dumps(
+                [
+                    {"name": r.name, "state": r.state.value, "detail": r.detail, "latency_ms": r.latency_ms}
+                    for r in results
+                ],
+                ensure_ascii=False,
+            )
+        )
+    else:
+        for r in results:
+            print(r.line())
+
+    down = [r for r in results if r.state is HealthState.DOWN]
+    degraded = [r for r in results if r.state is HealthState.DEGRADED]
+    if down:
+        print(f"\n{len(down)} source(s) DOWN: {', '.join(r.name for r in down)}", file=sys.stderr)
+        return 1
+    if degraded:
+        print(f"\n{len(degraded)} source(s) degraded", file=sys.stderr)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="tripps", description=__doc__)
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -264,6 +303,9 @@ def main(argv: list[str] | None = None) -> int:
     sv.add_argument("--port", type=int, default=8000)
     sv.add_argument("--reload", action="store_true")
 
+    cn = sub.add_parser("canary", help="probe every live price source and report drift")
+    cn.add_argument("--json", action="store_true", dest="as_json")
+
     args = parser.parse_args(argv)
     _configure_logging(args.verbose)
 
@@ -275,6 +317,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_search(args))
     if args.command == "serve":
         return _serve(args)
+    if args.command == "canary":
+        return asyncio.run(_canary(args.as_json))
     return 1
 
 

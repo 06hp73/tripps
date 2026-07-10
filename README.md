@@ -133,8 +133,17 @@ uv pip install -e ".[dev,flights]"
 .venv/bin/tripps serve                            # web UI + JSON API on :8000
 ```
 
+```bash
+.venv/bin/tripps canary                           # probe every live price source, alert on drift
+```
+
 `--flights` enables the Google Flights scrape (slow, and gray under Google's ToS).
 Everything is configurable through `TRIPPS_*` environment variables; see `config.py`.
+
+`tripps canary` drives each real endpoint (FlixBus, SJ, Tora, Freerider, the GTFS feed) the
+way the planner does and asserts a price still comes back, exiting non-zero if any source is
+down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
+results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
 
 Endpoints: `GET /` (UI), `POST /search`, `GET /api/search`, `GET /api/stops`,
 `GET /api/freerider`, `GET /health`.

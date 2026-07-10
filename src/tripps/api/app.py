@@ -418,6 +418,10 @@ async def api_freerider(request: Request) -> JSONResponse:
 async def health(request: Request) -> JSONResponse:
     state = _state(request)
     violations = state.db.floor_violations()
+    all_health = state.db.get_health()
+    # Split the scheduled-canary rows out from the live per-request source health.
+    canaries = {k.removeprefix("canary:"): v for k, v in all_health.items() if k.startswith("canary:")}
+    sources = {k: v for k, v in all_health.items() if not k.startswith("canary:")}
     return JSONResponse(
         {
             "status": "ok" if not state.errors else "degraded",
@@ -427,10 +431,31 @@ async def health(request: Request) -> JSONResponse:
             "stops": state.current_timetable.num_stops if state.current_timetable else 0,
             "trips": state.current_timetable.num_trips if state.current_timetable else 0,
             "freerider_offers": len(state.freerider_offers),
-            "sources": state.db.get_health(),
+            "sources": sources,
+            "canaries": canaries,
             "flight_scraper": "available" if _fast_flights_available() else "not installed",
             # A floor above a real fare means the router may have pruned the cheapest trip.
             "price_floor_violations": len(violations),
+        }
+    )
+
+
+@app.get("/api/canary")
+async def api_canary(request: Request) -> JSONResponse:
+    """Probe every live price source now. Slow (hits real endpoints); for monitoring."""
+    from ..monitoring import persist_canaries, run_canaries
+
+    state = _state(request)
+    results = await run_canaries(state.settings)
+    persist_canaries(state.db, results)
+    worst = "down" if any(not r.ok for r in results) else "ok"
+    return JSONResponse(
+        {
+            "status": worst,
+            "results": [
+                {"name": r.name, "state": r.state.value, "detail": r.detail, "latency_ms": r.latency_ms}
+                for r in results
+            ],
         }
     )
 
