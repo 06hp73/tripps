@@ -106,36 +106,7 @@ class Planner:
     # --- place resolution -------------------------------------------------
 
     def resolve_stops(self, query: str, limit: int = 8) -> list[Stop]:
-        """Match a typed place name against timetable stops.
-
-        Exact match first, then prefix, then contains; within each class, the busiest stop
-        wins. Busyness matters: in the national feed "Stockholm" prefix-matches a dozen
-        ferry landings before it matches Stockholm Centralstation, and a traveller typing
-        "Stockholm" means the station. Route count is a decent stand-in for importance and
-        costs nothing, since the stop-to-route index already exists for the router.
-        """
-        needle = query.strip().casefold()
-        if not needle:
-            return []
-
-        buckets: list[list[tuple[int, Stop]]] = [[], [], []]
-        for index, stop in enumerate(self.timetable.stops):
-            name = stop.name.casefold()
-            if name == needle:
-                rank = 0
-            elif name.startswith(needle):
-                rank = 1
-            elif needle in name:
-                rank = 2
-            else:
-                continue
-            buckets[rank].append((len(self.timetable.stop_routes[index]), stop))
-
-        ordered: list[Stop] = []
-        for bucket in buckets:
-            bucket.sort(key=lambda pair: (-pair[0], pair[1].name))
-            ordered.extend(stop for _routes, stop in bucket)
-        return ordered[:limit]
+        return resolve_stops(self.timetable, query, limit)
 
     def _stop_group(self, anchor: Stop, radius_km: float = STOP_MATCH_RADIUS_KM) -> list[Stop]:
         """All stops that serve the same place, so a search is not tied to one platform.
@@ -413,6 +384,9 @@ class Planner:
         warnings = list(priced.warnings) + stats.notes
         if not candidates:
             warnings.append("No journey found on this date.")
+        warnings.extend(
+            self._freerider_suggestions(origin, destination, service_date, offers or [])
+        )
 
         return (
             SearchResponse(
@@ -425,6 +399,71 @@ class Planner:
             ),
             stats,
         )
+
+
+    def _freerider_suggestions(
+        self, origin: Stop, destination: Stop, service_date: date, offers: list[FreeriderOffer]
+    ) -> list[str]:
+        """Surface free cars on this route available on *other* nearby dates.
+
+        A date-specific search hides the killer feature: a car available three days later than
+        the one you searched. This peeks at the full inventory and mentions the soonest one or
+        two on the route that are not already on the searched date.
+        """
+        from .watcher import upcoming_cars_on_route
+
+        if not offers:
+            return []
+        on_route = upcoming_cars_on_route(
+            offers, origin.lat, origin.lon, destination.lat, destination.lon
+        )
+        # Skip cars whose window already covers the searched date - those are in the results.
+        other_dates = [
+            o for o in on_route if not (o.available_at.date() <= service_date <= o.latest_return.date())
+        ]
+        notes = []
+        for offer in other_dates[:2]:
+            notes.append(
+                f"Free Hertz car on this route: {offer.pickup.name} → {offer.dropoff.name}, "
+                f"available {offer.available_at:%b %d}. Book on hertzfreerider.se."
+            )
+        return notes
+
+
+def resolve_stops(timetable: Timetable, query: str, limit: int = 8) -> list[Stop]:
+    """Match a typed place name against timetable stops.
+
+    Exact match first, then prefix, then contains; within each class, the busiest stop wins.
+    Busyness matters: in the national feed "Stockholm" prefix-matches a dozen ferry landings
+    before it matches Stockholm Centralstation, and a traveller typing "Stockholm" means the
+    station. Route count is a decent stand-in for importance and costs nothing, since the
+    stop-to-route index already exists for the router.
+
+    A free function as well as a Planner method, so tools that hold only a timetable (the
+    Freerider watch CLI) can resolve a place without building a whole planner.
+    """
+    needle = query.strip().casefold()
+    if not needle:
+        return []
+
+    buckets: list[list[tuple[int, Stop]]] = [[], [], []]
+    for index, stop in enumerate(timetable.stops):
+        name = stop.name.casefold()
+        if name == needle:
+            rank = 0
+        elif name.startswith(needle):
+            rank = 1
+        elif needle in name:
+            rank = 2
+        else:
+            continue
+        buckets[rank].append((len(timetable.stop_routes[index]), stop))
+
+    ordered: list[Stop] = []
+    for bucket in buckets:
+        bucket.sort(key=lambda pair: (-pair[0], pair[1].name))
+        ordered.extend(stop for _routes, stop in bucket)
+    return ordered[:limit]
 
 
 def _airports_in(offers: list[FlightOffer]):

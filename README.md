@@ -135,6 +135,8 @@ uv pip install -e ".[dev,flights]"
 
 ```bash
 .venv/bin/tripps canary                           # probe every live price source, alert on drift
+.venv/bin/tripps watch add "Uppsala" "Arlanda"    # watch a Freerider route for free cars
+.venv/bin/tripps watch poll --interval 300        # …and announce new ones as they appear
 ```
 
 `--flights` enables the Google Flights scrape (slow, and gray under Google's ToS).
@@ -144,6 +146,15 @@ Everything is configurable through `TRIPPS_*` environment variables; see `config
 way the planner does and asserts a price still comes back, exiting non-zero if any source is
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
+
+`tripps watch` turns the perishable Freerider inventory into a standing interest. Free cars
+are first-come and vanish in minutes, so a date-specific search only finds one by luck.
+Register a route and the background poller (or `tripps watch poll`) matches new cars against
+it geographically — pickup within a radius of the origin, dropoff within a radius of the
+destination, since depots sit outside town — and announces each once (a webhook if
+configured, always the hit log). Every search also surfaces free cars on the route available
+on *other* nearby dates, so the killer feature shows up even when you didn't search its date.
+API: `POST/GET/DELETE /api/watch`.
 
 `tripps calibrate` closes the price-floor feedback loop. The router optimizes a price *lower
 bound* (`floors.py`), shipped with deliberately loose defaults; every phase-2 price is logged

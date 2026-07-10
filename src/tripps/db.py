@@ -83,6 +83,35 @@ CREATE TABLE IF NOT EXISTS reprice_delta (
     actual_ore  INTEGER NOT NULL
 );
 
+-- A user's standing interest in a Freerider route. The poller matches live inventory against
+-- these and records a hit the first time a matching free car appears.
+CREATE TABLE IF NOT EXISTS freerider_watch (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    origin      TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    origin_lat  REAL NOT NULL,
+    origin_lon  REAL NOT NULL,
+    dest_lat    REAL NOT NULL,
+    dest_lon    REAL NOT NULL,
+    radius_km   REAL NOT NULL,
+    webhook_url TEXT,
+    created_at  TEXT NOT NULL,
+    active      INTEGER NOT NULL DEFAULT 1
+);
+
+-- One row per (watch, car) so a car is announced once, not on every poll.
+CREATE TABLE IF NOT EXISTS freerider_hit (
+    watch_id     INTEGER NOT NULL,
+    route_id     INTEGER NOT NULL,
+    seen_at      TEXT NOT NULL,
+    pickup       TEXT,
+    dropoff      TEXT,
+    available_at TEXT,
+    car          TEXT,
+    PRIMARY KEY (watch_id, route_id)
+);
+CREATE INDEX IF NOT EXISTS idx_hit_seen ON freerider_hit(seen_at);
+
 -- Per-operator price floors calibrated from reprice_delta, replacing the hand-set defaults.
 -- These feed back into the router's price lower bound: tighter (but still safe) floors mean
 -- a smaller Pareto frontier and fewer upstream price calls per search.
@@ -380,6 +409,77 @@ class Database:
             return self._conn.execute(
                 "SELECT operator, mode, distance_km, actual_ore FROM reprice_delta "
                 "WHERE operator IS NOT NULL AND distance_km > 0 AND actual_ore > 0"
+            ).fetchall()
+
+    # --- freerider watches ------------------------------------------------
+
+    def add_watch(
+        self,
+        *,
+        origin: str,
+        destination: str,
+        origin_lat: float,
+        origin_lon: float,
+        dest_lat: float,
+        dest_lon: float,
+        radius_km: float,
+        webhook_url: str | None = None,
+    ) -> int:
+        with self._write() as conn:
+            cur = conn.execute(
+                """
+                INSERT INTO freerider_watch
+                    (origin, destination, origin_lat, origin_lon, dest_lat, dest_lon,
+                     radius_km, webhook_url, created_at, active)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                """,
+                (
+                    origin, destination, origin_lat, origin_lon, dest_lat, dest_lon,
+                    radius_km, webhook_url, datetime.now(UTC).isoformat(),
+                ),
+            )
+            return int(cur.lastrowid)
+
+    def list_watches(self, *, active_only: bool = True) -> list[sqlite3.Row]:
+        query = "SELECT * FROM freerider_watch"
+        if active_only:
+            query += " WHERE active = 1"
+        with self._lock:
+            return self._conn.execute(query + " ORDER BY created_at DESC").fetchall()
+
+    def deactivate_watch(self, watch_id: int) -> bool:
+        with self._write() as conn:
+            cur = conn.execute(
+                "UPDATE freerider_watch SET active = 0 WHERE id = ?", (watch_id,)
+            )
+            return cur.rowcount > 0
+
+    def record_hit(
+        self,
+        watch_id: int,
+        *,
+        route_id: int,
+        pickup: str,
+        dropoff: str,
+        available_at: str,
+        car: str,
+    ) -> bool:
+        """Record a matched car. Returns True only the first time this (watch, car) is seen."""
+        with self._write() as conn:
+            cur = conn.execute(
+                """
+                INSERT OR IGNORE INTO freerider_hit
+                    (watch_id, route_id, seen_at, pickup, dropoff, available_at, car)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (watch_id, route_id, datetime.now(UTC).isoformat(), pickup, dropoff, available_at, car),
+            )
+            return cur.rowcount > 0
+
+    def recent_hits(self, *, limit: int = 50) -> list[sqlite3.Row]:
+        with self._lock:
+            return self._conn.execute(
+                "SELECT * FROM freerider_hit ORDER BY seen_at DESC LIMIT ?", (limit,)
             ).fetchall()
 
     # --- calibrated floors ------------------------------------------------

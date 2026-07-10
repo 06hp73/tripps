@@ -241,6 +241,100 @@ def _serve(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _watch(args: argparse.Namespace) -> int:
+    from .watcher import (
+        DEFAULT_WATCH_RADIUS_KM,
+        Watch,
+        hit_payload,
+        match_watches,
+        notify_webhook,
+    )
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    db = Database(settings.db_path)
+
+    if args.watch_action == "add":
+        if not settings.gtfs_zip_path.exists():
+            print("error: no GTFS feed; run `tripps fetch-gtfs` first", file=sys.stderr)
+            db.close()
+            return 2
+        from .search import resolve_stops as resolve
+
+        print("resolving stations...", file=sys.stderr)
+        timetable, _ = load_timetable(settings.gtfs_zip_path, now_local().date(), GtfsConfig())
+        origins = resolve(timetable, args.origin, limit=1)
+        dests = resolve(timetable, args.destination, limit=1)
+        if not origins or not dests:
+            print("error: could not resolve origin or destination", file=sys.stderr)
+            db.close()
+            return 1
+        origin, dest = origins[0], dests[0]
+        watch_id = db.add_watch(
+            origin=origin.name,
+            destination=dest.name,
+            origin_lat=origin.lat,
+            origin_lon=origin.lon,
+            dest_lat=dest.lat,
+            dest_lon=dest.lon,
+            radius_km=args.radius or DEFAULT_WATCH_RADIUS_KM,
+            webhook_url=args.webhook,
+        )
+        print(f"watching #{watch_id}: {origin.name} -> {dest.name}")
+        db.close()
+        return 0
+
+    if args.watch_action == "list":
+        watches = db.list_watches(active_only=True)
+        print(f"{len(watches)} active watch(es):")
+        for w in watches:
+            print(f"  #{w['id']}  {w['origin']} -> {w['destination']}  (r={w['radius_km']:.0f} km)")
+        hits = db.recent_hits(limit=20)
+        if hits:
+            print(f"\n{len(hits)} recent match(es):")
+            for h in hits:
+                print(f"  {h['pickup']} -> {h['dropoff']}  from {h['available_at'][:16]}  {h['car'][:24]}")
+        db.close()
+        return 0
+
+    # poll
+    client = FreeriderClient(base_url=settings.freerider_base, user_agent=settings.user_agent)
+    print(f"polling every {args.interval}s; Ctrl-C to stop", file=sys.stderr)
+    try:
+        while True:
+            watches = [Watch.from_row(r) for r in db.list_watches(active_only=True)]
+            if not watches:
+                print("no active watches; add one with `tripps watch add`", file=sys.stderr)
+                break
+            try:
+                offers = only_within(parse_offers(await client.fetch_raw("SWEDEN")), "se")
+            except Exception as exc:  # noqa: BLE001
+                print(f"inventory fetch failed: {exc}", file=sys.stderr)
+                offers = []
+            new = 0
+            for watch, offer in match_watches(watches, offers):
+                if db.record_hit(
+                    watch.id, route_id=offer.route_id, pickup=offer.pickup.name,
+                    dropoff=offer.dropoff.name, available_at=offer.available_at.isoformat(),
+                    car=offer.car_model,
+                ):
+                    new += 1
+                    p = hit_payload(watch, offer)
+                    print(f"MATCH #{watch.id}: {p['pickup']} -> {p['dropoff']} "
+                          f"available {offer.available_at:%b %d %H:%M}  {offer.car_model}")
+                    if watch.webhook_url:
+                        await notify_webhook(watch.webhook_url, p)
+            if new == 0:
+                print(f"[{now_local():%H:%M}] no new cars", file=sys.stderr)
+            await asyncio.sleep(args.interval)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        await client.aclose()
+        db.close()
+    return 0
+
+
 def _calibrate(min_samples: int) -> int:
     """Recompute per-operator price floors from logged fares and persist them."""
     from .calibration import DEFAULT_FLOORS, run_calibration
@@ -343,6 +437,17 @@ def main(argv: list[str] | None = None) -> int:
     )
     cal.add_argument("--min-samples", type=int, default=8)
 
+    wa = sub.add_parser("watch", help="watch a Freerider route for free cars")
+    wa_sub = wa.add_subparsers(dest="watch_action", required=True)
+    wa_add = wa_sub.add_parser("add", help="register a route to watch")
+    wa_add.add_argument("origin")
+    wa_add.add_argument("destination")
+    wa_add.add_argument("--radius", type=float, default=None, help="match radius in km")
+    wa_add.add_argument("--webhook", default=None, help="POST matches to this URL")
+    wa_sub.add_parser("list", help="show watches and recently matched cars")
+    wa_poll = wa_sub.add_parser("poll", help="poll inventory and print new matches until stopped")
+    wa_poll.add_argument("--interval", type=int, default=300, help="seconds between polls")
+
     args = parser.parse_args(argv)
     _configure_logging(args.verbose)
 
@@ -358,6 +463,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_canary(args.as_json))
     if args.command == "calibrate":
         return _calibrate(args.min_samples)
+    if args.command == "watch":
+        return asyncio.run(_watch(args))
     return 1
 
 

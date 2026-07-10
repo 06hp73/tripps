@@ -46,6 +46,13 @@ from ..pricing.tora import ToraAdapter
 from ..routing.timetable import Timetable
 from ..search import Planner, SearchOptions, summarize
 from ..timeutil import now_local
+from ..watcher import (
+    DEFAULT_WATCH_RADIUS_KM,
+    Watch,
+    hit_payload,
+    match_watches,
+    notify_webhook,
+)
 
 log = logging.getLogger(__name__)
 
@@ -201,6 +208,39 @@ class AppState:
         self.freerider_offers = offers
         self.db.log_freerider_offers(offers_to_log_rows(offers, raw))
         log.info("freerider: %d offers within Sweden", len(offers))
+        await self.check_watches()
+
+    async def check_watches(self) -> int:
+        """Match the current inventory against active watches, announcing new cars once.
+
+        Runs after every inventory refresh. A car is announced the first time it matches a
+        watch (record_hit dedupes on (watch, car)), by webhook if one is configured and always
+        into the hit log the UI and CLI read.
+        """
+        watches = [Watch.from_row(r) for r in self.db.list_watches(active_only=True)]
+        if not watches:
+            return 0
+        new_hits = 0
+        for watch, offer in match_watches(watches, self.freerider_offers):
+            is_new = self.db.record_hit(
+                watch.id,
+                route_id=offer.route_id,
+                pickup=offer.pickup.name,
+                dropoff=offer.dropoff.name,
+                available_at=offer.available_at.isoformat(),
+                car=offer.car_model,
+            )
+            if not is_new:
+                continue
+            new_hits += 1
+            payload = hit_payload(watch, offer)
+            log.info(
+                "freerider watch %d matched: %s -> %s (%s)",
+                watch.id, offer.pickup.name, offer.dropoff.name, offer.car_model,
+            )
+            if watch.webhook_url:
+                await notify_webhook(watch.webhook_url, payload)
+        return new_hits
 
     async def warm_sj_key(self) -> None:
         """Resolve the SJ booking key ahead of the first search, tolerating failure."""
@@ -415,6 +455,77 @@ async def api_freerider(request: Request) -> JSONResponse:
             for o in state.freerider_offers
         ]
     )
+
+
+@app.post("/api/watch")
+async def api_watch_create(request: Request) -> JSONResponse:
+    """Register a Freerider route to watch. Matches are announced as inventory arrives."""
+    state = _state(request)
+    body = await request.json()
+    origin_q, dest_q = body.get("origin"), body.get("destination")
+    if not origin_q or not dest_q:
+        raise HTTPException(400, "origin and destination are required")
+
+    try:
+        planner = state.planner_for(state.timetable_date or now_local().date())
+    except FileNotFoundError as exc:
+        raise HTTPException(503, str(exc)) from exc
+    origins = planner.resolve_stops(origin_q, limit=1)
+    dests = planner.resolve_stops(dest_q, limit=1)
+    if not origins or not dests:
+        raise HTTPException(404, "could not resolve origin or destination")
+    origin, dest = origins[0], dests[0]
+
+    watch_id = state.db.add_watch(
+        origin=origin.name,
+        destination=dest.name,
+        origin_lat=origin.lat,
+        origin_lon=origin.lon,
+        dest_lat=dest.lat,
+        dest_lon=dest.lon,
+        radius_km=float(body.get("radius_km") or DEFAULT_WATCH_RADIUS_KM),
+        webhook_url=body.get("webhook_url"),
+    )
+    # Check the current inventory immediately, so a car that already exists is not missed.
+    await state.check_watches()
+    return JSONResponse({"id": watch_id, "origin": origin.name, "destination": dest.name})
+
+
+@app.get("/api/watch")
+async def api_watch_list(request: Request) -> JSONResponse:
+    state = _state(request)
+    return JSONResponse(
+        {
+            "watches": [
+                {
+                    "id": w["id"],
+                    "origin": w["origin"],
+                    "destination": w["destination"],
+                    "radius_km": w["radius_km"],
+                }
+                for w in state.db.list_watches(active_only=True)
+            ],
+            "recent_hits": [
+                {
+                    "watch_id": h["watch_id"],
+                    "pickup": h["pickup"],
+                    "dropoff": h["dropoff"],
+                    "available_at": h["available_at"],
+                    "car": h["car"],
+                    "seen_at": h["seen_at"],
+                }
+                for h in state.db.recent_hits(limit=50)
+            ],
+        }
+    )
+
+
+@app.delete("/api/watch/{watch_id}")
+async def api_watch_delete(request: Request, watch_id: int) -> JSONResponse:
+    state = _state(request)
+    if not state.db.deactivate_watch(watch_id):
+        raise HTTPException(404, f"no watch {watch_id}")
+    return JSONResponse({"deactivated": watch_id})
 
 
 @app.get("/health")
