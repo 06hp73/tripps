@@ -7,6 +7,7 @@ the daily GTFS timetable per search, because their inventory is live and query-s
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -65,6 +66,8 @@ class SearchOptions:
     include_flights: bool = True
     #: How many airports near each endpoint to search. Each one is a page scrape.
     airports_per_endpoint: int = 2
+    #: Hide itineraries with an unpriced leg (unless that would leave no results at all).
+    require_priced: bool = True
 
 
 @dataclass(slots=True)
@@ -174,42 +177,55 @@ class Planner:
             destination.lat, destination.lon, limit=self.options.airports_per_endpoint
         )
 
+        pairs = [
+            (source, target)
+            for source in from_airports
+            for target in to_airports
+            if source.iata != target.iata
+        ]
+        # Each pair is an independent page scrape of several seconds. Run them concurrently:
+        # done sequentially, four airport pairs turn a search into a 15-second wait before
+        # routing even begins.
+        results = await asyncio.gather(
+            *(self._fetch_one_pair(s, t, service_date) for s, t in pairs)
+        )
         collected: list[FlightOffer] = []
-        for source in from_airports:
-            for target in to_airports:
-                if source.iata == target.iata:
-                    continue
-                key = cache_key(source, target, service_date)
-                if self.db is not None:
-                    hit = self.db.cache_get(key)
-                    if hit is not None:
-                        payload, _stale = hit
-                        collected.extend(FlightOffer.from_dict(x) for x in payload)
-                        continue
-                try:
-                    offers = await self.flight_provider.search(source, target, service_date)
-                except Exception as exc:  # noqa: BLE001 - a scraper must not kill the search
-                    log.warning("flight search %s-%s failed: %s", source.iata, target.iata, exc)
-                    notes.append(
-                        f"Flight prices for {source.iata}-{target.iata} are unavailable "
-                        f"({type(exc).__name__})."
-                    )
-                    if self.db is not None:
-                        stale = self.db.cache_get(key, allow_stale=True)
-                        if stale is not None:
-                            payload, _ = stale
-                            collected.extend(FlightOffer.from_dict(x) for x in payload)
-                            notes.append(
-                                f"Using cached {source.iata}-{target.iata} flight prices, "
-                                "which may be out of date."
-                            )
-                    continue
-                if self.db is not None:
-                    self.db.cache_put(
-                        key, [o.to_dict() for o in offers], FLIGHT_CACHE_TTL_SECONDS
-                    )
-                collected.extend(offers)
+        for offers, pair_notes in results:
+            collected.extend(offers)
+            notes.extend(pair_notes)
         return collected, notes
+
+    async def _fetch_one_pair(
+        self, source, target, service_date: date
+    ) -> tuple[list[FlightOffer], list[str]]:
+        notes: list[str] = []
+        key = cache_key(source, target, service_date)
+        if self.db is not None:
+            hit = self.db.cache_get(key)
+            if hit is not None:
+                payload, _stale = hit
+                return [FlightOffer.from_dict(x) for x in payload], notes
+        try:
+            offers = await self.flight_provider.search(source, target, service_date)
+        except Exception as exc:  # noqa: BLE001 - a scraper must not kill the search
+            log.warning("flight search %s-%s failed: %s", source.iata, target.iata, exc)
+            notes.append(
+                f"Flight prices for {source.iata}-{target.iata} are unavailable "
+                f"({type(exc).__name__})."
+            )
+            if self.db is not None:
+                stale = self.db.cache_get(key, allow_stale=True)
+                if stale is not None:
+                    payload, _ = stale
+                    notes.append(
+                        f"Using cached {source.iata}-{target.iata} flight prices, "
+                        "which may be out of date."
+                    )
+                    return [FlightOffer.from_dict(x) for x in payload], notes
+            return [], notes
+        if self.db is not None:
+            self.db.cache_put(key, [o.to_dict() for o in offers], FLIGHT_CACHE_TTL_SECONDS)
+        return offers, notes
 
     def _flight_additions(
         self, offers: list[FlightOffer], service_date: date
@@ -386,7 +402,10 @@ class Planner:
             candidates = [c for c in candidates if c.departure >= depart_at]
 
         priced = await self.orchestrator.price(
-            candidates, constraints, max_results=self.options.max_results
+            candidates,
+            constraints,
+            max_results=self.options.max_results,
+            require_priced=self.options.require_priced,
         )
         stats.priced = len(priced.itineraries)
         stats.upstream_calls = priced.calls_made

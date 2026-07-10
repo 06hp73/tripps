@@ -162,10 +162,12 @@ class GoogleFlightsProvider:
 
         try:
             results = parse(html)
-        except (IndexError, AttributeError, ValueError) as exc:
+        except (IndexError, AttributeError, ValueError, TypeError, KeyError) as exc:
             # `fast-flights` indexes into the parsed markup without checking. An airport pair
-            # with no service at all - Bromma to Landvetter, since Bromma's network closed -
-            # is an empty page, not an error, so it must not surface as a broken scraper.
+            # with no service at all - Malmo to Bromma, since Bromma's network shrank - yields
+            # a payload whose flight slot is null, and the library raises whatever the missing
+            # index happens to be (TypeError on payload[3][0], IndexError elsewhere). None of
+            # these mean "broken scraper"; they mean "no flights", so they return an empty list.
             log.info("no parseable flights for %s-%s: %s", origin.iata, destination.iata, exc)
             return []
 

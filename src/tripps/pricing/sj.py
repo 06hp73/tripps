@@ -153,7 +153,9 @@ class SJAdapter(HttpPriceAdapter):
         client: httpx.AsyncClient | None = None,
         user_agent: str = "tripps/0.1",
         timeout: float = 20.0,
-        min_interval: float = 0.35,
+        # SJ's booking backend is production infrastructure serving real ticket sales, so a
+        # short interval is well within what it handles; pricing a journey is a few calls.
+        min_interval: float = 0.12,
         day_cache_ttl: float = DAY_CACHE_TTL_SECONDS,
     ) -> None:
         super().__init__(

@@ -30,8 +30,19 @@
     padding: 1.25rem; display: grid; gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   }
+  form > div { position: relative; }
   label { display: block; font-size: .8rem; text-transform: uppercase;
           letter-spacing: .04em; color: var(--muted); margin-bottom: .35rem; }
+  .suggest {
+    position: absolute; z-index: 20; left: 0; right: 0; top: 100%; margin: .25rem 0 0;
+    list-style: none; padding: .25rem; background: var(--card); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    max-height: 16rem; overflow-y: auto;
+  }
+  .suggest li {
+    padding: .5rem .6rem; border-radius: 5px; cursor: pointer; font-size: .95rem;
+  }
+  .suggest li[aria-selected="true"], .suggest li:hover { background: var(--accent); color: #fff; }
   input[type=text], input[type=date], input[type=time], input[type=number] {
     width: 100%; padding: .55rem .65rem; border: 1px solid var(--line);
     border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit;
@@ -65,11 +76,15 @@
   <form id="search" method="post" action="/search">
     <div>
       <label for="origin">From</label>
-      <input type="text" id="origin" name="origin" required placeholder="Stockholm C" autocomplete="off">
+      <input type="text" id="origin" name="origin" required placeholder="Stockholm C"
+             autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list">
+      <ul class="suggest" id="origin-suggest" role="listbox" hidden></ul>
     </div>
     <div>
       <label for="destination">To</label>
-      <input type="text" id="destination" name="destination" required placeholder="Göteborg C" autocomplete="off">
+      <input type="text" id="destination" name="destination" required placeholder="Göteborg C"
+             autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list">
+      <ul class="suggest" id="destination-suggest" role="listbox" hidden></ul>
     </div>
     <div>
       <label for="date">Date</label>
@@ -113,6 +128,74 @@
   const results = document.getElementById("results");
   const button = document.getElementById("go");
   const status = document.getElementById("status");
+
+  // --- station autocomplete -------------------------------------------
+  // Backed by /api/stops, which resolves free text against the real timetable, so a user
+  // types "Stock" and picks the exact station id the router expects instead of guessing.
+  function attachAutocomplete(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    let items = [];
+    let active = -1;
+    let seq = 0;
+
+    const close = () => {
+      list.hidden = true; list.innerHTML = ""; active = -1;
+      input.setAttribute("aria-expanded", "false");
+    };
+
+    const render = () => {
+      list.innerHTML = "";
+      items.forEach((name, i) => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        li.setAttribute("role", "option");
+        li.setAttribute("aria-selected", i === active ? "true" : "false");
+        li.addEventListener("mousedown", (e) => { e.preventDefault(); choose(i); });
+        list.appendChild(li);
+      });
+      list.hidden = items.length === 0;
+      input.setAttribute("aria-expanded", items.length ? "true" : "false");
+    };
+
+    const choose = (i) => {
+      if (i < 0 || i >= items.length) return;
+      input.value = items[i];
+      close();
+    };
+
+    let timer = null;
+    input.addEventListener("input", () => {
+      const q = input.value.trim();
+      clearTimeout(timer);
+      if (q.length < 2) { close(); return; }
+      timer = setTimeout(async () => {
+        const mine = ++seq;
+        try {
+          const res = await fetch("/api/stops?q=" + encodeURIComponent(q));
+          if (!res.ok) return;
+          const data = await res.json();
+          if (mine !== seq) return; // a newer keystroke already fired
+          items = data.map((s) => s.name);
+          active = -1;
+          render();
+        } catch (_) { /* offline: no suggestions, typing still works */ }
+      }, 140);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (list.hidden) return;
+      if (e.key === "ArrowDown") { e.preventDefault(); active = Math.min(active + 1, items.length - 1); render(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); active = Math.max(active - 1, 0); render(); }
+      else if (e.key === "Enter" && active >= 0) { e.preventDefault(); choose(active); }
+      else if (e.key === "Escape") { close(); }
+    });
+
+    input.addEventListener("blur", () => setTimeout(close, 120));
+  }
+
+  attachAutocomplete("origin", "origin-suggest");
+  attachAutocomplete("destination", "destination-suggest");
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();

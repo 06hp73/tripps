@@ -152,6 +152,36 @@ def _iter_csv(zf: zipfile.ZipFile, name: str):
         yield from csv.DictReader(text)
 
 
+def _iter_columns(zf: zipfile.ZipFile, name: str, columns: list[str]):
+    """Stream a member as positional tuples for a fixed set of columns.
+
+    `csv.DictReader` builds a dict per row; on `stop_times.txt` that is 11 million dicts and
+    roughly half the whole feed-load time. Reading with `csv.reader` and pre-resolved column
+    indices is about twice as fast and is worth it only on the two giant files.
+
+    Yields `(row_values_for_columns)` tuples, or nothing if a requested column is absent.
+    """
+    if name not in zf.namelist():
+        return
+    with zf.open(name) as raw:
+        text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
+        reader = csv.reader(text)
+        try:
+            header = next(reader)
+        except StopIteration:
+            return
+        index = {col: i for i, col in enumerate(header)}
+        try:
+            positions = [index[col] for col in columns]
+        except KeyError:
+            return
+        width = len(header)
+        for row in reader:
+            if len(row) < width:
+                continue
+            yield tuple(row[p] for p in positions)
+
+
 def _parse_date(value: str) -> date:
     return datetime.strptime(value.strip(), "%Y%m%d").date()
 
@@ -239,31 +269,49 @@ def load_timetable(
         services = active_service_ids(zf, service_date)
 
         kept_trips: dict[str, tuple[str, str | None]] = {}
-        for row in _iter_csv(zf, "trips.txt"):
-            if row.get("route_id") not in kept_routes:
+        for route_id, service_id, trip_id, headsign in _iter_columns(
+            zf, "trips.txt", ["route_id", "service_id", "trip_id", "trip_headsign"]
+        ):
+            if route_id not in kept_routes or service_id not in services:
                 continue
-            if row.get("service_id") not in services:
-                continue
-            kept_trips[row["trip_id"]] = (row["route_id"], row.get("trip_headsign") or None)
+            kept_trips[trip_id] = (route_id, headsign or None)
 
         stops_by_id, alias = _load_stops(zf, config)
 
-        # Stream stop_times once, gathering only the trips we kept.
+        # Stream stop_times once, gathering only the trips we kept. This is 11M rows and the
+        # single most expensive part of loading the feed, so the loop is inlined and hand-
+        # tuned: reject on trip_id before touching any other column, since ~99.9% of rows
+        # belong to local-transit trips we dropped and building a tuple for them is pure waste.
         trip_times: dict[str, list[tuple[int, str, int, int]]] = defaultdict(list)
-        for row in _iter_csv(zf, "stop_times.txt"):
-            trip_id = row.get("trip_id")
-            if trip_id not in kept_trips:
-                continue
-            stop_id = alias.get(row["stop_id"], row["stop_id"])
-            if stop_id not in stops_by_id:
-                continue
-            try:
-                arrival = parse_gtfs_time(row["arrival_time"])
-                departure = parse_gtfs_time(row["departure_time"])
-                sequence = int(row["stop_sequence"])
-            except (KeyError, ValueError):
-                continue  # a stop_time without times is a non-timepoint; skip it
-            trip_times[trip_id].append((sequence, stop_id, arrival, departure))
+        if "stop_times.txt" in zf.namelist():
+            with zf.open("stop_times.txt") as raw:
+                text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
+                reader = csv.reader(text)
+                header = next(reader, None)
+                if header is not None:
+                    col = {c: i for i, c in enumerate(header)}
+                    ci_trip = col["trip_id"]
+                    ci_arr = col["arrival_time"]
+                    ci_dep = col["departure_time"]
+                    ci_stop = col["stop_id"]
+                    ci_seq = col["stop_sequence"]
+                    width = len(header)
+                    for row in reader:
+                        if len(row) < width:
+                            continue
+                        trip_id = row[ci_trip]
+                        if trip_id not in kept_trips:
+                            continue
+                        stop_id = alias.get(row[ci_stop], row[ci_stop])
+                        if stop_id not in stops_by_id:
+                            continue
+                        try:
+                            arrival = parse_gtfs_time(row[ci_arr])
+                            departure = parse_gtfs_time(row[ci_dep])
+                            sequence = int(row[ci_seq])
+                        except (KeyError, ValueError):
+                            continue  # a stop_time without times is a non-timepoint; skip it
+                        trip_times[trip_id].append((sequence, stop_id, arrival, departure))
 
         used_stops: set[str] = set()
         for entries in trip_times.values():

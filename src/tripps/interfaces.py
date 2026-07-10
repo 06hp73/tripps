@@ -46,6 +46,10 @@ class PriceAdapter(ABC):
     name: str
     #: Modes this adapter can price at all.
     modes: frozenset[TransportMode]
+    #: True if this adapter can return a real amount. A link-out adapter that only ever
+    #: yields UNAVAILABLE sets this False, so the orchestrator can tell "priced elsewhere or
+    #: not at all" apart from "reached the catch-all" without spending a call to find out.
+    provides_price: bool = True
 
     @abstractmethod
     def supports(self, leg: Leg) -> bool:

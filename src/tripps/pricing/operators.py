@@ -138,6 +138,8 @@ class DeeplinkAdapter(PriceAdapter):
     modes = frozenset(
         {TransportMode.TRAIN, TransportMode.BUS, TransportMode.FERRY, TransportMode.LOCAL_TRANSIT}
     )
+    #: This adapter never returns an amount, only a booking link.
+    provides_price = False
 
     def supports(self, leg: Leg) -> bool:
         return leg.mode in self.modes

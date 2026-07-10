@@ -145,7 +145,6 @@ async def _search(args: argparse.Namespace) -> int:
         ),
         SJAdapter(
             user_agent=settings.user_agent,
-            min_interval=settings.budget.min_interval_seconds,
         ),
         FreeriderAdapter(cost_model=FreeriderCostModel()),
         FlightAdapter(),

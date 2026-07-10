@@ -104,6 +104,16 @@ class PricingOrchestrator:
                 return adapter
         return None
 
+    def _leg_priceable(self, leg: Leg) -> bool:
+        """Can this leg get a real amount from some adapter (not just a booking link)?"""
+        if leg.mode is TransportMode.WALK:
+            return True
+        adapter = self._adapter_for(leg)
+        return adapter is not None and getattr(adapter, "provides_price", True)
+
+    def _itinerary_priceable(self, itin: Itinerary) -> bool:
+        return all(self._leg_priceable(leg) for leg in itin.legs)
+
     # --- one leg ----------------------------------------------------------
 
     async def _quote_leg(self, leg: Leg, ctx: _Context) -> Quote:
@@ -236,12 +246,37 @@ class PricingOrchestrator:
         constraints: SearchConstraints | None = None,
         *,
         max_results: int = 5,
+        require_priced: bool = True,
     ) -> PricingResult:
-        """Price the most promising candidates, then rank by true total price."""
+        """Price the most promising candidates, then rank by true total price.
+
+        With `require_priced`, itineraries containing a leg we could not price are dropped
+        rather than shown ranked below the priced ones: an option whose real cost is unknown
+        is not a "cheapest" answer, and a list full of "price unavailable" rows is noise. The
+        drop is not absolute - if it would leave nothing, the unpriced options come back with
+        a notice, because an empty result on a route we *can* route is worse than an honest
+        "we can't price this, here's the booking link".
+        """
         constraints = constraints or SearchConstraints()
         feasible = [itin for itin in candidates if constraints.permits(itin)]
         if not feasible:
             return PricingResult(itineraries=[], warnings=["No itinerary met the constraints."])
+
+        pre_warnings: list[str] = []
+        if require_priced:
+            # Drop itineraries with a leg no adapter can price *before* spending any calls.
+            # An itinerary that rides an operator with no price source (Skanetrafiken,
+            # Oresundstag) can never be fully priced, so pricing its other legs is wasted
+            # work - and on a route dominated by such operators, that waste is what makes the
+            # whole search time out. Structural filter first, runtime filter after.
+            priceable = [itin for itin in feasible if self._itinerary_priceable(itin)]
+            if priceable:
+                if len(priceable) < len(feasible):
+                    pre_warnings.append(
+                        f"{len(feasible) - len(priceable)} route(s) skipped: they use an "
+                        "operator with no available price source."
+                    )
+                feasible = priceable
 
         # The range query returns one itinerary per departure, so the same journey shape
         # appears many times. Sample each shape across the day before spending calls: the
@@ -254,7 +289,7 @@ class PricingOrchestrator:
             setter = getattr(adapter, "set_budget", None)
             if setter is not None:
                 setter(ctx.call_budget)
-        warnings: list[str] = []
+        warnings: list[str] = list(pre_warnings)
 
         try:
             async with asyncio.timeout(self.budget.phase2_timeout_seconds):
@@ -288,6 +323,22 @@ class PricingOrchestrator:
                 setter(None)
 
         ranked = sorted(collapse_equivalent(priced), key=_price_sort_key)
+
+        if require_priced:
+            fully = [itin for itin in ranked if itin.fully_priced]
+            if fully:
+                dropped = len(ranked) - len(fully)
+                ranked = fully
+                if dropped:
+                    warnings.append(
+                        f"{dropped} option(s) with at least one unpriced leg were hidden."
+                    )
+            else:
+                warnings.append(
+                    "No fully-priced route was found. Showing options with unpriced legs; "
+                    "check those fares on the operator's own site."
+                )
+
         status = {a.name: (await a.health()).state.value for a in self.adapters}
 
         return PricingResult(

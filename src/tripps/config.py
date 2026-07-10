@@ -37,8 +37,10 @@ class PricingBudget(BaseSettings):
     #: per departure; sampling several is how the cheap late-night coach gets discovered,
     #: while a cap stops sixteen pickup times of one free car eating the budget.
     max_departures_per_pattern: int = 6
-    #: Wall-clock ceiling for the whole phase-2 fan-out.
-    phase2_timeout_seconds: float = 20.0
+    #: Wall-clock ceiling for the whole phase-2 fan-out. Generous, because a cut-off here
+    #: now *drops* a route (it fails the fully-priced filter) rather than merely showing it
+    #: with a gap, so the ceiling must sit above a normal multi-operator pricing run.
+    phase2_timeout_seconds: float = 35.0
     #: Per-source politeness delay between calls, seconds.
     min_interval_seconds: float = 0.35
 

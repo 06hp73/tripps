@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections import OrderedDict
 from contextlib import asynccontextmanager
 from datetime import date, datetime
 from pathlib import Path
@@ -41,6 +42,7 @@ from ..pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from ..pricing.orchestrator import PricingOrchestrator
 from ..pricing.sj import SJAdapter
 from ..routing.floors import PriceFloorModel
+from ..routing.timetable import Timetable
 from ..search import Planner, SearchOptions, summarize
 from ..timeutil import now_local
 
@@ -52,10 +54,17 @@ TEMPLATES = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 class AppState:
     """Holds the things that are expensive to build and cheap to share."""
 
+    #: How many days' timetables to keep in memory. Loading one costs ~15 s of parsing the
+    #: 564 MB feed, so a user flipping between a few dates should pay it once each, not every
+    #: time. Each built timetable is tens of MB, so a handful is cheap to retain.
+    TIMETABLE_CACHE_SIZE = 6
+
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.db = Database(settings.db_path)
-        self.planner: Planner | None = None
+        self.orchestrator: PricingOrchestrator | None = None
+        self.flight_provider = None
+        self._timetables: OrderedDict[date, Timetable] = OrderedDict()
         self.timetable_date: date | None = None
         self.freerider_offers: list = []
         self.freerider_client = FreeriderClient(
@@ -66,7 +75,52 @@ class AppState:
 
     # --- timetable --------------------------------------------------------
 
-    def build_planner(self, service_date: date) -> Planner:
+    def _ensure_orchestrator(self) -> PricingOrchestrator:
+        """Build the pricing adapters once and share them across dates.
+
+        The adapters are date-independent and hold live state that must persist across
+        searches - the SJ subscription key, FlixBus's city and search caches, per-source
+        health. Rebuilding them per date would throw all of that away and re-warm it every
+        time the user changed the date.
+        """
+        if self.orchestrator is not None:
+            return self.orchestrator
+        self.flight_provider = (
+            GoogleFlightsProvider() if _fast_flights_available() else NullFlightProvider()
+        )
+        adapters = [
+            FlixBusAdapter(
+                base_url=self.settings.flixbus_base,
+                user_agent=self.settings.user_agent,
+                timeout=self.settings.http_timeout_seconds,
+                min_interval=self.settings.budget.min_interval_seconds,
+                db=self.db,
+            ),
+            SJAdapter(
+                user_agent=self.settings.user_agent,
+                timeout=self.settings.http_timeout_seconds,
+            ),
+            FreeriderAdapter(cost_model=FreeriderCostModel()),
+            FlightAdapter(),
+            _fare_table(self.settings),
+            # Last: anything a real price source could not answer becomes a booking link.
+            DeeplinkAdapter(),
+        ]
+        self.orchestrator = PricingOrchestrator(
+            adapters,
+            self.db,
+            budget=self.settings.budget,
+            ttl=self.settings.ttl,
+            floors=PriceFloorModel(),
+        )
+        return self.orchestrator
+
+    def _timetable_for(self, service_date: date) -> Timetable:
+        cached = self._timetables.get(service_date)
+        if cached is not None:
+            self._timetables.move_to_end(service_date)
+            return cached
+
         zip_path = self.settings.gtfs_zip_path
         if not zip_path.exists():
             raise FileNotFoundError(f"no GTFS feed at {zip_path}. Run `tripps fetch-gtfs` first.")
@@ -81,53 +135,38 @@ class AppState:
         if stats.problems:
             log.warning("gtfs problems: %s", stats.problems[:5])
 
-        flight_provider = (
-            GoogleFlightsProvider() if _fast_flights_available() else NullFlightProvider()
-        )
-        adapters = [
-            FlixBusAdapter(
-                base_url=self.settings.flixbus_base,
-                user_agent=self.settings.user_agent,
-                timeout=self.settings.http_timeout_seconds,
-                min_interval=self.settings.budget.min_interval_seconds,
-                db=self.db,
-            ),
-            SJAdapter(
-                user_agent=self.settings.user_agent,
-                timeout=self.settings.http_timeout_seconds,
-                min_interval=self.settings.budget.min_interval_seconds,
-            ),
-            FreeriderAdapter(cost_model=FreeriderCostModel()),
-            FlightAdapter(),
-            _fare_table(self.settings),
-            # Last: anything a real price source could not answer becomes a booking link.
-            DeeplinkAdapter(),
-        ]
-        orchestrator = PricingOrchestrator(
-            adapters,
-            self.db,
-            budget=self.settings.budget,
-            ttl=self.settings.ttl,
-            floors=PriceFloorModel(),
-        )
+        self._timetables[service_date] = timetable
+        self._timetables.move_to_end(service_date)
+        while len(self._timetables) > self.TIMETABLE_CACHE_SIZE:
+            self._timetables.popitem(last=False)
+        return timetable
+
+    @property
+    def current_timetable(self) -> Timetable | None:
+        """The most recently used timetable, for read-only introspection (health, stops)."""
+        if self.timetable_date in self._timetables:
+            return self._timetables[self.timetable_date]
+        if self._timetables:
+            return next(reversed(self._timetables.values()))
+        return None
+
+    def planner_for(self, service_date: date) -> Planner:
+        """A planner for one service date, reusing the shared adapters and cached timetable.
+
+        A GTFS feed encodes one calendar, so a query for tomorrow needs tomorrow's active
+        services; but the pricing adapters do not depend on the date, so only the timetable
+        varies. The timetable is cached per date (see `_timetable_for`) so switching dates
+        does not re-parse the feed each time.
+        """
+        timetable = self._timetable_for(service_date)
         self.timetable_date = service_date
         return Planner(
             timetable,
-            orchestrator,
+            self._ensure_orchestrator(),
             db=self.db,
             options=SearchOptions(),
-            flight_provider=flight_provider,
+            flight_provider=self.flight_provider,
         )
-
-    def planner_for(self, service_date: date) -> Planner:
-        """Rebuild the timetable when the requested service date changes.
-
-        A GTFS feed encodes one calendar; a query for tomorrow needs tomorrow's active
-        services, not today's.
-        """
-        if self.planner is None or self.timetable_date != service_date:
-            self.planner = self.build_planner(service_date)
-        return self.planner
 
     # --- freerider polling ------------------------------------------------
 
@@ -157,9 +196,9 @@ class AppState:
 
     async def warm_sj_key(self) -> None:
         """Resolve the SJ booking key ahead of the first search, tolerating failure."""
-        if self.planner is None:
+        if self.orchestrator is None:
             return
-        for adapter in self.planner.orchestrator.adapters:
+        for adapter in self.orchestrator.adapters:
             ensure = getattr(adapter, "ensure_key", None)
             if ensure is None:
                 continue
@@ -186,8 +225,8 @@ class AppState:
             except asyncio.CancelledError:
                 pass
         await self.freerider_client.aclose()
-        if self.planner is not None:
-            for adapter in self.planner.orchestrator.adapters:
+        if self.orchestrator is not None:
+            for adapter in self.orchestrator.adapters:
                 await adapter.aclose()
         self.db.close()
 
@@ -259,12 +298,16 @@ def _constraints(
     earliest: str | None,
     service_date: date,
 ) -> SearchConstraints:
-    allowed = frozenset(TransportMode)
     if modes:
         try:
             allowed = frozenset(TransportMode(m) for m in modes) | {TransportMode.WALK}
         except ValueError as exc:
             raise HTTPException(400, f"unknown mode: {exc}") from exc
+    else:
+        # Flights are opt-in: each domestic route is an ~8-second Google Flights scrape, so a
+        # default search that silently included them would always feel slow. A caller enables
+        # them explicitly with modes=flight.
+        allowed = frozenset(TransportMode) - {TransportMode.FLIGHT}
 
     earliest_dt = None
     if earliest:
@@ -335,9 +378,10 @@ async def api_search(
 @app.get("/api/stops")
 async def api_stops(request: Request, q: str = Query(..., min_length=2)) -> JSONResponse:
     state = _state(request)
-    planner = state.planner
-    if planner is None:
-        raise HTTPException(503, "timetable not loaded")
+    try:
+        planner = state.planner_for(state.timetable_date or now_local().date())
+    except FileNotFoundError as exc:
+        raise HTTPException(503, str(exc)) from exc
     return JSONResponse(
         [{"id": s.id, "name": s.name} for s in planner.resolve_stops(q, limit=8)]
     )
@@ -374,8 +418,9 @@ async def health(request: Request) -> JSONResponse:
             "status": "ok" if not state.errors else "degraded",
             "errors": state.errors,
             "timetable_date": state.timetable_date.isoformat() if state.timetable_date else None,
-            "stops": state.planner.timetable.num_stops if state.planner else 0,
-            "trips": state.planner.timetable.num_trips if state.planner else 0,
+            "timetable_dates_cached": [d.isoformat() for d in state._timetables],
+            "stops": state.current_timetable.num_stops if state.current_timetable else 0,
+            "trips": state.current_timetable.num_trips if state.current_timetable else 0,
             "freerider_offers": len(state.freerider_offers),
             "sources": state.db.get_health(),
             "flight_scraper": "available" if _fast_flights_available() else "not installed",

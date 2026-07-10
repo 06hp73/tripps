@@ -143,8 +143,8 @@ async def test_cheapest_wins_even_when_slower(db):
     assert stats.candidates == 2
 
 
-async def test_unpriced_itinerary_never_outranks_a_priced_one(db):
-    """A missing leg price must not read as free."""
+async def test_unpriced_itineraries_are_hidden_by_default(db):
+    """A route with an unpriceable leg is dropped, not shown as a 'price unavailable' row."""
     sto, gbg = _stop("STO", "Stockholm", 59.33, 18.06), _stop("GBG", "Goteborg", 57.71, 11.97)
     tt = _timetable_with(
         [
@@ -156,12 +156,50 @@ async def test_unpriced_itinerary_never_outranks_a_priced_one(db):
     planner = _planner(tt, [StubAdapter("stub", {"SJ": 89_500})], db)
     response, _ = await planner.search("Stockholm", "Goteborg", date(2026, 7, 8))
 
+    assert len(response.itineraries) == 1
+    assert response.itineraries[0].total_price_ore == 89_500
+    assert response.itineraries[0].fully_priced
+    assert any("no available price source" in w or "skipped" in w for w in response.warnings)
+
+
+async def test_unpriced_shown_but_ranked_below_when_not_required(db):
+    """With require_priced off, a missing leg price must still never read as free."""
+    sto, gbg = _stop("STO", "Stockholm", 59.33, 18.06), _stop("GBG", "Goteborg", 57.71, 11.97)
+    tt = _timetable_with(
+        [
+            ("A", TransportMode.TRAIN, "SJ", [sto, gbg], [(_hhmm(8), _hhmm(8)), (_hhmm(11), _hhmm(11))]),
+            ("B", TransportMode.BUS, "Ybuss", [sto, gbg], [(_hhmm(8), _hhmm(8)), (_hhmm(16), _hhmm(16))]),
+        ]
+    )
+    planner = _planner(
+        tt,
+        [StubAdapter("stub", {"SJ": 89_500})],
+        db,
+        options=SearchOptions(require_priced=False),
+    )
+    response, _ = await planner.search("Stockholm", "Goteborg", date(2026, 7, 8))
+
+    assert len(response.itineraries) == 2
     assert response.itineraries[0].total_price_ore == 89_500
     unpriced = response.itineraries[1]
     assert unpriced.total_price_ore is None
     assert not unpriced.fully_priced
     assert unpriced.price_confidence is PriceConfidence.UNAVAILABLE
-    assert any("Could not price" in w for w in response.warnings)
+
+
+async def test_unpriceable_only_route_falls_back_rather_than_empty(db):
+    """If every route has an unpriced leg, show them anyway with a notice, not a dead end."""
+    sto, gbg = _stop("STO", "Stockholm", 59.33, 18.06), _stop("GBG", "Goteborg", 57.71, 11.97)
+    tt = _timetable_with(
+        [("B", TransportMode.BUS, "Ybuss", [sto, gbg], [(_hhmm(8), _hhmm(8)), (_hhmm(16), _hhmm(16))])]
+    )
+    # No adapter can price Ybuss.
+    planner = _planner(tt, [StubAdapter("stub", {"SJ": 1})], db)
+    response, _ = await planner.search("Stockholm", "Goteborg", date(2026, 7, 8))
+
+    assert len(response.itineraries) == 1, "a routable trip must not vanish just because it is unpriced"
+    assert response.itineraries[0].total_price_ore is None
+    assert any("No fully-priced route" in w for w in response.warnings)
 
 
 async def test_adapter_exception_does_not_break_the_search(db):
