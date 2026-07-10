@@ -1,0 +1,748 @@
+{
+ "travels": [
+  {
+   "origin": {
+    "uicStationCode": "740000001",
+    "name": "Stockholm Central",
+    "shortName": "Sthlm Central"
+   },
+   "destination": {
+    "uicStationCode": "740000002",
+    "name": "Göteborg Central",
+    "shortName": "Göteborg C"
+   },
+   "direction": "OUTBOUND",
+   "departureDate": "2026-07-24",
+   "departures": [
+    {
+     "departureId": "fcce1d74-c3cb-32d7-b65e-2b775ed5dfe9",
+     "origin": {
+      "uicStationCode": "740000001",
+      "name": "Stockholm Central",
+      "shortName": "Sthlm Central"
+     },
+     "destination": {
+      "uicStationCode": "740000002",
+      "name": "Göteborg Central",
+      "shortName": "Göteborg C"
+     },
+     "direction": "OUTBOUND",
+     "departureDate": "2026-07-24",
+     "numberOfChanges": 1,
+     "producer": "SJ_AND_OTHER",
+     "numberOfOperators": 2,
+     "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+     "departureDateTime": "2026-07-24T05:09:00+02:00",
+     "duration": "PT4H41M",
+     "legs": [
+      {
+       "origin": {
+        "uicStationCode": "740000001",
+        "name": "Stockholm Central",
+        "shortName": "Sthlm Central"
+       },
+       "destination": {
+        "uicStationCode": "740000300",
+        "name": "Borås Central",
+        "shortName": "Borås C"
+       },
+       "departureDateTime": "2026-07-24T05:09:00+02:00",
+       "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+       "duration": "PT3H34M",
+       "changeTime": "PT12M",
+       "serviceName": "419",
+       "secondaryServiceName": null,
+       "publicServiceName": "419",
+       "serviceType": {
+        "code": "SJHIGH",
+        "name": "SJ Snabbtåg",
+        "modality": "HIGHSPEED_RAIL",
+        "brandCode": "ST",
+        "description": "SJ High-speed train",
+        "operatorName": "SJ",
+        "ricsCode": "74",
+        "externalReferences": {
+         "RESPLUS_OPERATOR": "true",
+         "TRANSFER_RULE_OPERATOR": "74",
+         "TTFILTERGROUP": "SJ_HIGH",
+         "TRANSFER_RULE_SERVICEGROUP": "HIGHSPEED_RAIL"
+        },
+        "translations": {}
+       },
+       "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+       "producer": "SJ_ONLY",
+       "serviceScheduleDate": "2026-07-24",
+       "transportMethod": "TRAIN",
+       "transportMethodDescription": "Train",
+       "vehicle": "X55",
+       "seatMapAvailable": true,
+       "earnSjPrioPoints": true,
+       "nightTrain": false,
+       "serviceBrandName": {
+        "code": "BRAND-SJ3000",
+        "description": "SJ 3000"
+       },
+       "serviceBrandNameDescription": "SJ 3000",
+       "serviceProperties": [
+        {
+         "code": "BRAND-SJ3000",
+         "description": "SJ 3000"
+        },
+        {
+         "code": "COMFORT-AB",
+         "description": "1 and 2 class"
+        },
+        {
+         "code": "COMFORT-CALM",
+         "description": "2 class Calm"
+        },
+        {
+         "code": "COMFORTINFO-1CLEXTRA",
+         "description": "Extra legroom"
+        },
+        {
+         "code": "COMFORTINFO-PHONE_SILENT",
+         "description": "Low speech volume and phones on silent"
+        },
+        {
+         "code": "COMFORTINFO-QUIET",
+         "description": "Low speech volume"
+        },
+        {
+         "code": "EVF-EUTRAIN",
+         "description": "EU regulation 2021/782: rights and obligations of rail passengers"
+        },
+        {
+         "code": "FOOD-1CLFREECOFFEE",
+         "description": "Coffee, tea and fruit in the carriage"
+        },
+        {
+         "code": "FOOD-BFAST_INCL_1",
+         "description": "Breakfast included"
+        },
+        {
+         "code": "FOOD-BFAST_INCL_2C",
+         "description": "Small breakfast included"
+        },
+        {
+         "code": "FOOD-BISTRO",
+         "description": "Bistro"
+        },
+        {
+         "code": "FOOD-CALM_COFFE",
+         "description": "Free coffee and tea in the bistro"
+        },
+        {
+         "code": "FOOD-MEAL_PLUS",
+         "description": "Pre-ordered food served at your seat"
+        },
+        {
+         "code": "PWD-WCHR_RESERV_RAMP",
+         "description": "Level boarding on the train"
+        },
+        {
+         "code": "RESERVATION-INCLUDED",
+         "description": "Seat reservation included"
+        },
+        {
+         "code": "SEATMAP-TRUE",
+         "description": "Show seat map"
+        },
+        {
+         "code": "SJPRIO-TRUE",
+         "description": "Earns SJ Prio points"
+        },
+        {
+         "code": "TRPMODE-TRAIN",
+         "description": "Train"
+        },
+        {
+         "code": "VEHICLE-X55",
+         "description": "Show image: X55"
+        },
+        {
+         "code": "WIFI-TRUE",
+         "description": "Wifi"
+        },
+        {
+         "code": "PWD-WHEELCHAIRLIFT",
+         "description": "Wheelchair lift"
+        }
+       ],
+       "travelInformationMessages": [],
+       "international": false,
+       "pathWay": false,
+       "unavailableReasons": [],
+       "vehicleImage": "X55"
+      },
+      {
+       "origin": {
+        "uicStationCode": "740000300",
+        "name": "Borås Central",
+        "shortName": "Borås C"
+       },
+       "destination": {
+        "uicStationCode": "740020490",
+        "name": "Göteborg Åkareplatsen",
+        "shortName": "Åkareplatsen"
+       },
+       "departureDateTime": "2026-07-24T08:55:00+02:00",
+       "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+       "duration": "PT55M",
+       "changeTime": null,
+       "serviceName": "100",
+       "secondaryServiceName": null,
+       "publicServiceName": "100",
+       "serviceType": {
+        "code": "XPTA_O_BUS",
+        "name": "Västtrafik buss",
+        "modality": "BUS",
+        "brandCode": "LT",
+        "description": "Västtrafik",
+        "operatorName": "Västtrafik",
+        "ricsCode": "279",
+        "externalReferences": {
+         "RESPLUS_OPERATOR": "true",
+         "TRANSFER_RULE_OPERATOR": "279",
+         "TTFILTERGROUP": "X_PTA",
+         "TRANSFER_RULE_SERVICEGROUP": "BUS"
+        },
+        "translations": {}
+       },
+       "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+       "producer": "OTHER_ONLY",
+       "serviceScheduleDate": "2026-07-24",
+       "transportMethod": "BUS",
+       "transportMethodDescription": "Bus",
+       "vehicle": null,
+       "seatMapAvailable": false,
+       "earnSjPrioPoints": false,
+       "nightTrain": false,
+       "serviceBrandName": null,
+       "serviceBrandNameDescription": null,
+       "serviceProperties": [
+        {
+         "code": "EVF-SWLAW",
+         "description": "Swedish Act 2015:953: rights of public transport passengers"
+        },
+        {
+         "code": "TRPMODE-BUS",
+         "description": "Bus"
+        }
+       ],
+       "travelInformationMessages": [],
+       "international": false,
+       "pathWay": false,
+       "unavailableReasons": [],
+       "vehicleImage": "BUS"
+      }
+     ],
+     "unavailableReasons": [],
+     "resplus": true
+    },
+    {
+     "departureId": "0d501026-8851-343b-be8d-b953ec5b562d",
+     "origin": {
+      "uicStationCode": "740000001",
+      "name": "Stockholm Central",
+      "shortName": "Sthlm Central"
+     },
+     "destination": {
+      "uicStationCode": "740000002",
+      "name": "Göteborg Central",
+      "shortName": "Göteborg C"
+     },
+     "direction": "OUTBOUND",
+     "departureDate": "2026-07-24",
+     "numberOfChanges": 0,
+     "producer": "SJ_ONLY",
+     "numberOfOperators": 1,
+     "arrivalDateTime": "2026-07-24T10:00:00+02:00",
+     "departureDateTime": "2026-07-24T05:09:00+02:00",
+     "duration": "PT4H51M",
+     "legs": [
+      {
+       "origin": {
+        "uicStationCode": "740000001",
+        "name": "Stockholm Central",
+        "shortName": "Sthlm Central"
+       },
+       "destination": {
+        "uicStationCode": "740000002",
+        "name": "Göteborg Central",
+        "shortName": "Göteborg C"
+       },
+       "departureDateTime": "2026-07-24T05:09:00+02:00",
+       "arrivalDateTime": "2026-07-24T10:00:00+02:00",
+       "duration": "PT4H51M",
+       "changeTime": null,
+       "serviceName": "419",
+       "secondaryServiceName": null,
+       "publicServiceName": "419",
+       "serviceType": {
+        "code": "SJHIGH",
+        "name": "SJ Snabbtåg",
+        "modality": "HIGHSPEED_RAIL",
+        "brandCode": "ST",
+        "description": "SJ High-speed train",
+        "operatorName": "SJ",
+        "ricsCode": "74",
+        "externalReferences": {
+         "RESPLUS_OPERATOR": "true",
+         "TRANSFER_RULE_OPERATOR": "74",
+         "TTFILTERGROUP": "SJ_HIGH",
+         "TRANSFER_RULE_SERVICEGROUP": "HIGHSPEED_RAIL"
+        },
+        "translations": {}
+       },
+       "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMJQHIYDA7BXGQYDAMBQGAYDC7BXGQYDAMBQGAYDE",
+       "producer": "SJ_ONLY",
+       "serviceScheduleDate": "2026-07-24",
+       "transportMethod": "TRAIN",
+       "transportMethodDescription": "Train",
+       "vehicle": "X55",
+       "seatMapAvailable": true,
+       "earnSjPrioPoints": true,
+       "nightTrain": false,
+       "serviceBrandName": {
+        "code": "BRAND-SJ3000",
+        "description": "SJ 3000"
+       },
+       "serviceBrandNameDescription": "SJ 3000",
+       "serviceProperties": [
+        {
+         "code": "BRAND-SJ3000",
+         "description": "SJ 3000"
+        },
+        {
+         "code": "COMFORT-AB",
+         "description": "1 and 2 class"
+        },
+        {
+         "code": "COMFORT-CALM",
+         "description": "2 class Calm"
+        },
+        {
+         "code": "COMFORTINFO-1CLEXTRA",
+         "description": "Extra legroom"
+        },
+        {
+         "code": "COMFORTINFO-PHONE_SILENT",
+         "description": "Low speech volume and phones on silent"
+        },
+        {
+         "code": "COMFORTINFO-QUIET",
+         "description": "Low speech volume"
+        },
+        {
+         "code": "EVF-EUTRAIN",
+         "description": "EU regulation 2021/782: rights and obligations of rail passengers"
+        },
+        {
+         "code": "FOOD-1CLFREECOFFEE",
+         "description": "Coffee, tea and fruit in the carriage"
+        },
+        {
+         "code": "FOOD-BFAST_INCL_1",
+         "description": "Breakfast included"
+        },
+        {
+         "code": "FOOD-BFAST_INCL_2C",
+         "description": "Small breakfast included"
+        },
+        {
+         "code": "FOOD-BISTRO",
+         "description": "Bistro"
+        },
+        {
+         "code": "FOOD-CALM_COFFE",
+         "description": "Free coffee and tea in the bistro"
+        },
+        {
+         "code": "FOOD-MEAL_PLUS",
+         "description": "Pre-ordered food served at your seat"
+        },
+        {
+         "code": "PWD-WCHR_RESERV_RAMP",
+         "description": "Level boarding on the train"
+        },
+        {
+         "code": "RESERVATION-INCLUDED",
+         "description": "Seat reservation included"
+        },
+        {
+         "code": "SEATMAP-TRUE",
+         "description": "Show seat map"
+        },
+        {
+         "code": "SJPRIO-TRUE",
+         "description": "Earns SJ Prio points"
+        },
+        {
+         "code": "TRPMODE-TRAIN",
+         "description": "Train"
+        },
+        {
+         "code": "VEHICLE-X55",
+         "description": "Show image: X55"
+        },
+        {
+         "code": "WIFI-TRUE",
+         "description": "Wifi"
+        },
+        {
+         "code": "PWD-WHEELCHAIRLIFT",
+         "description": "Wheelchair lift"
+        }
+       ],
+       "travelInformationMessages": [],
+       "international": false,
+       "pathWay": false,
+       "unavailableReasons": [],
+       "vehicleImage": "X55"
+      }
+     ],
+     "unavailableReasons": [],
+     "resplus": false
+    },
+    {
+     "departureId": "178012f0-03c4-310e-a880-b04b1535a374",
+     "origin": {
+      "uicStationCode": "740000001",
+      "name": "Stockholm Central",
+      "shortName": "Sthlm Central"
+     },
+     "destination": {
+      "uicStationCode": "740000002",
+      "name": "Göteborg Central",
+      "shortName": "Göteborg C"
+     },
+     "direction": "OUTBOUND",
+     "departureDate": "2026-07-24",
+     "numberOfChanges": 2,
+     "producer": "SJ_ONLY",
+     "numberOfOperators": 1,
+     "arrivalDateTime": "2026-07-24T10:58:00+02:00",
+     "departureDateTime": "2026-07-24T05:46:00+02:00",
+     "duration": "PT5H12M",
+     "legs": [
+      {
+       "origin": {
+        "uicStationCode": "740000001",
+        "name": "Stockholm Central",
+        "shortName": "Sthlm Central"
+       },
+       "destination": {
+        "uicStationCode": "740000077",
+        "name": "Hallsberg station",
+        "shortName": "Hallsberg stn"
+       },
+       "departureDateTime": "2026-07-24T05:46:00+02:00",
+       "arrivalDateTime": "2026-07-24T07:23:00+02:00",
+       "duration": "PT1H37M",
+       "changeTime": "PT35M",
+       "serviceName": "621",
+       "secondaryServiceName": null,
+       "publicServiceName": "621",
+       "serviceType": {
+        "code": "SJHIGH",
+        "name": "SJ Snabbtåg",
+        "modality": "HIGHSPEED_RAIL",
+        "brandCode": "ST",
+        "description": "SJ High-speed train",
+        "operatorName": "SJ",
+        "ricsCode": "74",
+        "externalReferences": {
+         "RESPLUS_OPERATOR": "true",
+         "TRANSFER_RULE_OPERATOR": "74",
+         "TTFILTERGROUP": "SJ_HIGH",
+         "TRANSFER_RULE_SERVICEGROUP": "HIGHSPEED_RAIL"
+        },
+        "translations": {}
+       },
+       "serviceIdentifier": "GA5FERCBJ5CHYNRSGF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORUGZ6DEMBSGYWTANZNGI2FIMBXHIZDG7BXGQYDAMBQGAYDC7BXGQYDAMBQGA3TO",
+       "producer": "SJ_ONLY",
+       "serviceScheduleDate": "2026-07-24",
+       "transportMethod": "TRAIN",
+       "transportMethodDescription": "Train",
+       "vehicle": "X55",
+       "seatMapAvailable": true,
+       "earnSjPrioPoints": true,
+       "nightTrain": false,
+       "serviceBrandName": {
+        "code": "BRAND-SJ3000",
+        "description": "SJ 3000"
+       },
+       "serviceBrandNameDescription": "SJ 3000",
+       "serviceProperties": [
+        {
+         "code": "BRAND-SJ3000",
+         "description": "SJ 3000"
+        },
+        {
+         "code": "COMFORT-AB",
+         "description": "1 and 2 class"
+        },
+        {
+         "code": "COMFORT-CALM",
+         "description": "2 class Calm"
+        },
+        {
+         "code": "COMFORTINFO-1CLEXTRA",
+         "description": "Extra legroom"
+        },
+        {
+         "code": "COMFORTINFO-PHONE_SILENT",
+         "description": "Low speech volume and phones on silent"
+        },
+        {
+         "code": "COMFORTINFO-QUIET",
+         "description": "Low speech volume"
+        },
+        {
+         "code": "EVF-EUTRAIN",
+         "description": "EU regulation 2021/782: rights and obligations of rail passengers"
+        },
+        {
+         "code": "FOOD-1CLFREECOFFEE",
+         "description": "Coffee, tea and fruit in the carriage"
+        },
+        {
+         "code": "FOOD-BFAST_INCL_1",
+         "description": "Breakfast included"
+        },
+        {
+         "code": "FOOD-BFAST_INCL_2C",
+         "description": "Small breakfast included"
+        },
+        {
+         "code": "FOOD-BISTRO",
+         "description": "Bistro"
+        },
+        {
+         "code": "FOOD-CALM_COFFE",
+         "description": "Free coffee and tea in the bistro"
+        },
+        {
+         "code": "FOOD-MEAL_PLUS",
+         "description": "Pre-ordered food served at your seat"
+        },
+        {
+         "code": "PWD-WCHR_RESERV_RAMP",
+         "description": "Level boarding on the train"
+        },
+        {
+         "code": "RESERVATION-INCLUDED",
+         "description": "Seat reservation included"
+        },
+        {
+         "code": "SEATMAP-TRUE",
+         "description": "Show seat map"
+        },
+        {
+         "code": "SJPRIO-TRUE",
+         "description": "Earns SJ Prio points"
+        },
+        {
+         "code": "TRPMODE-TRAIN",
+         "description": "Train"
+        },
+        {
+         "code": "VEHICLE-X55",
+         "description": "Show image: X55"
+        },
+        {
+         "code": "WIFI-TRUE",
+         "description": "Wifi"
+        },
+        {
+         "code": "PWD-WHEELCHAIRLIFT",
+         "description": "Wheelchair lift"
+        }
+       ],
+       "travelInformationMessages": [],
+       "international": false,
+       "pathWay": false,
+       "unavailableReasons": [],
+       "vehicleImage": "X55"
+      },
+      {
+       "origin": {
+        "uicStationCode": "740000077",
+        "name": "Hallsberg station",
+        "shortName": "Hallsberg stn"
+       },
+       "destination": {
+        "uicStationCode": "740000569",
+        "name": "Vårgårda station",
+        "shortName": "Vårgårda stn"
+       },
+       "departureDateTime": "2026-07-24T07:58:00+02:00",
+       "arrivalDateTime": "2026-07-24T09:36:00+02:00",
+       "duration": "PT1H38M",
+       "changeTime": "PT12M",
+       "serviceName": "159",
+       "secondaryServiceName": null,
+       "publicServiceName": "159",
+       "serviceType": {
+        "code": "SJREG",
+        "name": "SJ Regional",
+        "modality": "REGIONAL_RAIL_SERVICE",
+        "brandCode": "RE",
+        "description": "SJ Regional",
+        "operatorName": "SJ",
+        "ricsCode": "74",
+        "externalReferences": {
+         "RESPLUS_OPERATOR": "true",
+         "TRANSFER_RULE_OPERATOR": "74",
+         "TTFILTERGROUP": "SJ_REG",
+         "TRANSFER_RULE_SERVICEGROUP": "STANDARD_RAIL"
+        },
+        "translations": {}
+       },
+       "serviceIdentifier": "GA5FERCBJ5CHYMJVHF6FGSSSIVDXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA3TUNJYPQZDAMRWFUYDOLJSGRKDAOJ2GM3HYNZUGAYDAMBQG43XYNZUGAYDAMBVGY4Q",
+       "producer": "SJ_ONLY",
+       "serviceScheduleDate": "2026-07-24",
+       "transportMethod": "TRAIN",
+       "transportMethodDescription": "Train",
+       "vehicle": "X40",
+       "seatMapAvailable": false,
+       "earnSjPrioPoints": true,
+       "nightTrain": false,
+       "serviceBrandName": null,
+       "serviceBrandNameDescription": null,
+       "serviceProperties": [
+        {
+         "code": "COMFORT-AB",
+         "description": "1 and 2 class"
+        },
+        {
+         "code": "EVF-EUTRAIN",
+         "description": "EU regulation 2021/782: rights and obligations of rail passengers"
+        },
+        {
+         "code": "FOOD-NO",
+         "description": "No catering"
+        },
+        {
+         "code": "PWD-WCHR_RESERV_RAMP",
+         "description": "Level boarding on the train"
+        },
+        {
+         "code": "RESERVATION-INCLUDED",
+         "description": "Seat reservation included"
+        },
+        {
+         "code": "SJPRIO-TRUE",
+         "description": "Earns SJ Prio points"
+        },
+        {
+         "code": "TRPMODE-TRAIN",
+         "description": "Train"
+        },
+        {
+         "code": "VEHICLE-X40",
+         "description": "Show image: X40"
+        },
+        {
+         "code": "WIFI-TRUE",
+         "description": "Wifi"
+        },
+        {
+         "code": "PWD-WHEELCHAIRLIFT",
+         "description": "Wheelchair lift"
+        }
+       ],
+       "travelInformationMessages": [],
+       "international": false,
+       "pathWay": false,
+       "unavailableReasons": [],
+       "vehicleImage": "X40"
+      },
+      {
+       "origin": {
+        "uicStationCode": "740000569",
+        "name": "Vårgårda station",
+        "shortName": "Vårgårda stn"
+       },
+       "destination": {
+        "uicStationCode": "740020483",
+        "name": "Göteborg Nils Ericsonterminal",
+        "shortName": "Göteborg Nils E"
+       },
+       "departureDateTime": "2026-07-24T09:48:00+02:00",
+       "arrivalDateTime": "2026-07-24T10:58:00+02:00",
+       "duration": "PT1H10M",
+       "changeTime": null,
+       "serviceName": "70159",
+       "secondaryServiceName": null,
+       "publicServiceName": "70159",
+       "serviceType": {
+        "code": "SJREPLBUS",
+        "name": "SJ Ersättningsbuss",
+        "modality": "COACH_SERVICE",
+        "brandCode": "RB",
+        "description": "SJ Replacement bus",
+        "operatorName": "SJ",
+        "ricsCode": "74",
+        "externalReferences": {
+         "RESPLUS_OPERATOR": "true",
+         "TRANSFER_RULE_OPERATOR": "74",
+         "TTFILTERGROUP": "SJ_REPLBUS",
+         "TRANSFER_RULE_SERVICEGROUP": "COACH_SERVICE"
+        },
+        "translations": {}
+       },
+       "serviceIdentifier": "GA5FERCBJ5CHYNZQGE2TS7CTJJJEKUCMIJKVG7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDSORUHB6DEMBSGYWTANZNGI2FIMJQHI2TQ7BXGQYDAMBQGU3DS7BXGQYDAMRQGQ4DG",
+       "producer": "SJ_ONLY",
+       "serviceScheduleDate": "2026-07-24",
+       "transportMethod": "REPLBUS",
+       "transportMethodDescription": "Replacement bus",
+       "vehicle": null,
+       "seatMapAvailable": false,
+       "earnSjPrioPoints": true,
+       "nightTrain": false,
+       "serviceBrandName": null,
+       "serviceBrandNameDescription": null,
+       "serviceProperties": [
+        {
+         "code": "COMFORT-B",
+         "description": "2 class only"
+        },
+        {
+         "code": "EVF-SWLAW",
+         "description": "Swedish Act 2015:953: rights of public transport passengers"
+        },
+        {
+         "code": "FOOD-NO",
+         "description": "No catering"
+        },
+        {
+         "code": "RESERVATION-NO",
+         "description": "No seat reservation"
+        },
+        {
+         "code": "SJPRIO-TRUE",
+         "description": "Earns SJ Prio points"
+        },
+        {
+         "code": "TRPMODE-REPLBUS",
+         "description": "Replacement bus"
+        }
+       ],
+       "travelInformationMessages": [],
+       "international": false,
+       "pathWay": false,
+       "unavailableReasons": [],
+       "vehicleImage": "REPLBUS"
+      }
+     ],
+     "unavailableReasons": [],
+     "resplus": false
+    }
+   ],
+   "showMore": []
+  }
+ ],
+ "onlyShowDeparturesValidForRebook": false
+}

@@ -1,0 +1,62 @@
+{
+ "departureSearchId": "ca584bdb-a127-3d80-be49-0f757c84bc66",
+ "returnDepartureSearchId": null,
+ "departureSearchExpires": "2026-07-10T11:09:01+02:00",
+ "returnDepartureSearchExpires": null,
+ "origin": {
+  "uicStationCode": "740000001",
+  "name": "Stockholm Central",
+  "shortName": "Sthlm Central"
+ },
+ "destination": {
+  "uicStationCode": "740000002",
+  "name": "Göteborg Central",
+  "shortName": "Göteborg C"
+ },
+ "passengerListId": "8091a01f-4f8b-4825-9d21-b79a45ee9a4c",
+ "passengerListExpires": "2026-07-10T13:04:01+02:00",
+ "passengers": [
+  {
+   "id": "passenger_1",
+   "firstName": null,
+   "lastName": null,
+   "passengerCategory": {
+    "type": "ADULT",
+    "age": null
+   },
+   "earnPrioPoints": false,
+   "customer": null,
+   "travelPass": null,
+   "specialNeed": "NO",
+   "childInLap": false,
+   "discountCards": [],
+   "personalInformationIsMasked": false
+  }
+ ],
+ "voucherBookingId": null,
+ "restrictionId": null,
+ "promoCodes": [],
+ "outboundAdditionalSearchFilters": {
+  "onlyDirectJourneys": null,
+  "allowedServiceTypes": null,
+  "excludedServiceTypes": null,
+  "departureDateTime": null,
+  "arrivalDateTime": null,
+  "viaStations": null,
+  "interchangeStations": null,
+  "minTransferTimeInMinutes": null,
+  "minTransferTime": null
+ },
+ "inboundAdditionalSearchFilters": {
+  "onlyDirectJourneys": null,
+  "allowedServiceTypes": null,
+  "excludedServiceTypes": null,
+  "departureDateTime": null,
+  "arrivalDateTime": null,
+  "viaStations": null,
+  "interchangeStations": null,
+  "minTransferTimeInMinutes": null,
+  "minTransferTime": null
+ },
+ "warnings": []
+}

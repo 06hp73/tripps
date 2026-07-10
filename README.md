@@ -62,14 +62,23 @@ maximized. See `tests/test_profile_query.py`, which locks this shut.
 |---|---|---|---|
 | GTFS Sweden (`api.resrobot.se/gtfs/sweden.zip`) | all national schedules, 49 operators | free, CC0, no key needed today | authoritative |
 | FlixBus (`global.api.flixbus.com`) | real coach fares | unofficial, unauthenticated | `exact` |
+| SJ (`prod-api.adp.sj.se`) | real train fares (yield-managed) | unofficial, key from site bundle | `exact` |
 | Hertz Freerider (`hertzfreerider.se/api/transport-routes/`) | free-car inventory | unofficial, unauthenticated | `estimated` |
 | Google Flights via `fast-flights` | domestic flight fares | scrape, needs EU consent cookie | `exact` |
-| SJ, Vy, Snälltåget, Mälartåg, … | — | no obtainable price API | `unavailable` + booking link |
+| Vy, Snälltåget, Mälartåg, Öresundståg, … | — | no obtainable price API | `unavailable` + booking link |
 
 Notes that cost real debugging time, preserved here so nobody repeats them:
 
 - FlixBus wants `departure_date` as `DD.MM.YYYY`; an ISO date returns HTTP 400. The price a
   passenger pays is `price.total_with_platform_fee`, not `price.total`.
+- SJ's booking backend authenticates with a subscription key baked into the site's JS
+  bundle next to `"Ocp-Apim-Subscription-Key"`; the adapter extracts every candidate and
+  keeps the one a probe call accepts, so a rotated key is picked up automatically. Its
+  station codes are UIC codes, which are exactly the GTFS stop ids (`740000001` is
+  Stockholm Central in both), so a routed leg's ids go straight into the API. Pricing is a
+  three-call chain: search, then departures, then per-departure offers; `priceFrom.price`
+  is the cheapest fare. Only direct (zero-change) departures are matched, since a routed
+  leg is a single train.
 - Freerider's `distance` is the **included mileage allowance** (measured at exactly 1.20 ×
   `originalDistance` across every live route), not the distance you drive. `originalDistance`
   is the drive. A contract test fails if that ratio ever drifts.
@@ -132,7 +141,7 @@ src/tripps/
     synthetic.py       Freerider offers -> scheduled trips. No algorithm changes needed.
     journey.py         labels -> itineraries; candidate spread and collapse.
   ingest/              gtfs, freerider, flights, airports (OurAirports-derived)
-  pricing/             flixbus, freerider, flights, operators (link-out), orchestrator
+  pricing/             flixbus, sj, freerider, flights, operators (link-out), orchestrator
   search.py            Planner: resolve, overlay, route, price, rank.
   api/                 FastAPI + a dependency-free web UI.
 ```
@@ -149,11 +158,12 @@ schema change upstream fails a contract test instead of quietly mispricing a leg
 
 ## Known gaps
 
-- **No rail prices.** SJ, Vy, Snälltåget, Mälartåg and Öresundståg legs are routed and shown,
-  never priced. The sanctioned channel (Samtrafiken ACCESS / OSDM, or SilverRail) needs a
-  reseller contract with no self-serve path; sj.se's internal price endpoint was not located,
-  and this project does not guess at endpoints. `StaticFareAdapter` exists to hold published
-  fixed fares and ships empty on purpose.
+- **Regional rail prices.** SJ and SJ Nord legs are priced live (see the data-source table).
+  Vy tåg, Snälltåget, Mälartåg and Öresundståg are still unpriced: they sell only through
+  their own channels, and the sanctioned cross-operator channel (Samtrafiken ACCESS / OSDM,
+  or SilverRail) needs a reseller contract with no self-serve path. Those legs are routed and
+  shown with a booking link. `StaticFareAdapter` exists to hold published fixed fares (the
+  regional operators charge non-dynamic O/D fares) and ships empty on purpose.
 - **Turnit-platform coaches** (Vy Bus4You, Y-buss, Härjedalingen, Masexpressen, Flygbussarna)
   are unpriced for the same reason.
 - Local-transit legs are scheduled but never priced, and say so.

@@ -28,6 +28,7 @@ from .pricing.flixbus import FlixBusAdapter
 from .pricing.freerider import FreeriderAdapter
 from .pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from .pricing.orchestrator import PricingOrchestrator
+from .pricing.sj import SJAdapter
 from .routing.floors import PriceFloorModel
 from .search import Planner, SearchOptions, summarize
 from .timeutil import now_local
@@ -141,6 +142,10 @@ async def _search(args: argparse.Namespace) -> int:
             user_agent=settings.user_agent,
             min_interval=settings.budget.min_interval_seconds,
             db=db,
+        ),
+        SJAdapter(
+            user_agent=settings.user_agent,
+            min_interval=settings.budget.min_interval_seconds,
         ),
         FreeriderAdapter(cost_model=FreeriderCostModel()),
         FlightAdapter(),

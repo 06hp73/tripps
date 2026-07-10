@@ -39,6 +39,7 @@ from ..pricing.flixbus import FlixBusAdapter
 from ..pricing.freerider import FreeriderAdapter
 from ..pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from ..pricing.orchestrator import PricingOrchestrator
+from ..pricing.sj import SJAdapter
 from ..routing.floors import PriceFloorModel
 from ..search import Planner, SearchOptions, summarize
 from ..timeutil import now_local
@@ -90,6 +91,11 @@ class AppState:
                 timeout=self.settings.http_timeout_seconds,
                 min_interval=self.settings.budget.min_interval_seconds,
                 db=self.db,
+            ),
+            SJAdapter(
+                user_agent=self.settings.user_agent,
+                timeout=self.settings.http_timeout_seconds,
+                min_interval=self.settings.budget.min_interval_seconds,
             ),
             FreeriderAdapter(cost_model=FreeriderCostModel()),
             FlightAdapter(),
@@ -149,6 +155,19 @@ class AppState:
         self.db.log_freerider_offers(offers_to_log_rows(offers, raw))
         log.info("freerider: %d offers within Sweden", len(offers))
 
+    async def warm_sj_key(self) -> None:
+        """Resolve the SJ booking key ahead of the first search, tolerating failure."""
+        if self.planner is None:
+            return
+        for adapter in self.planner.orchestrator.adapters:
+            ensure = getattr(adapter, "ensure_key", None)
+            if ensure is None:
+                continue
+            try:
+                await ensure()
+            except Exception as exc:  # noqa: BLE001 - the app must still serve
+                log.warning("SJ key warm-up failed: %s", exc)
+
     async def _poll_loop(self) -> None:
         while True:
             await asyncio.sleep(self.settings.freerider_poll_seconds)
@@ -206,6 +225,9 @@ async def lifespan(app: FastAPI):
     # Load the car inventory before serving: a search that runs in the gap before the first
     # poll would report "no Freerider offers" and quietly drop the cheapest itineraries.
     await state.refresh_freerider()
+    # Resolve the SJ subscription key now, so the first search does not pay for extracting
+    # it from the site bundle mid-request.
+    await state.warm_sj_key()
     state.start_polling()
     try:
         yield

@@ -1,0 +1,2489 @@
+{
+ "departureId": "fcce1d74-c3cb-32d7-b65e-2b775ed5dfe9",
+ "seatOffers": {
+  "offers": {
+   "SECOND": {
+    "genderTypeRequired": false,
+    "flexibilities": {
+     "FULLFLEX": {
+      "offerId": "addba637-9618-3967-ae25-ff05f4780832",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "913",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "913",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "913",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": {
+       "pointPrice": {
+        "amount": "13200"
+       },
+       "originalPointPrice": {
+        "amount": "13200"
+       },
+       "price": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasFamilyDiscount": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false
+      },
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "FULLFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "775",
+           "currency": "SEK"
+          },
+          "pointPrice": {
+           "amount": "13200"
+          }
+         }
+        ],
+        "productName": "2 class, Refundable",
+        "productCode": "JREF_2_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": true,
+      "mixedComfort": false,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     },
+     "NOFLEX": {
+      "offerId": "6481d15d-6b10-3aff-8403-388e362663e1",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "663",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "663",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "663",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": {
+       "pointPrice": {
+        "amount": "9000"
+       },
+       "originalPointPrice": {
+        "amount": "9000"
+       },
+       "price": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasFamilyDiscount": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false
+      },
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "525",
+           "currency": "SEK"
+          },
+          "pointPrice": {
+           "amount": "9000"
+          }
+         }
+        ],
+        "productName": "2 class, Non-rebookable",
+        "productCode": "JNON_2_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": false,
+      "mixedComfort": false,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     },
+     "SEMIFLEX": {
+      "offerId": "e1ce73cf-0613-3cac-a9e4-cdc16b55dbb5",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "763",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "763",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "763",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": null,
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "SEMIFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "625",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Rebookable",
+        "productCode": "JREB_2_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": true,
+      "mixedComfort": false,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     }
+    },
+    "priceFrom": {
+     "price": "663",
+     "currency": "SEK",
+     "fareClass": "SECOND",
+     "originalPrice": "663",
+     "totalPriceToBePaid": "663",
+     "refundAmount": null,
+     "feeAmount": null,
+     "repriceAmount": null,
+     "flexibility": "NOFLEX",
+     "contract": false,
+     "hasTravelPassDiscount": false,
+     "hasEmployeeTravelPassDiscount": false,
+     "hasPromotionDiscount": false,
+     "hasPromotionNonDiscount": false,
+     "hasCampaignDiscount": false,
+     "hasPossiblePromotionPriceOnAddon": false,
+     "hasFamilyDiscount": false,
+     "hasPersonalAssistantDiscount": false,
+     "hasAccompanyingPersonDiscount": false,
+     "hasServiceDogDiscount": false,
+     "disruptionRebook": false,
+     "hasLastMinute": false,
+     "hasInterRail": false,
+     "hasRepricedFreePrice": false
+    },
+    "pointPriceFrom": {
+     "price": "138.0",
+     "currency": "SEK",
+     "pointPrice": "9000",
+     "fareClass": "SECOND",
+     "flexibility": "NOFLEX",
+     "contract": false,
+     "hasTravelPassDiscount": false,
+     "hasEmployeeTravelPassDiscount": false,
+     "hasPromotionDiscount": false,
+     "hasPromotionNonDiscount": false,
+     "hasCampaignDiscount": false,
+     "hasPossiblePromotionPriceOnAddon": false,
+     "disruptionRebook": false,
+     "hasFamilyDiscount": false,
+     "hasLastMinute": false,
+     "hasInterRail": false,
+     "hasPersonalAssistantDiscount": false,
+     "hasAccompanyingPersonDiscount": false,
+     "hasServiceDogDiscount": false
+    },
+    "salesCategoryUsps": [],
+    "compartmentInformationType": null,
+    "disruptionRebook": false,
+    "available": true,
+    "hasContractPrice": false,
+    "hasPromotionPrice": false,
+    "hasPromotionNonDiscount": false,
+    "hasCampaignPrice": false,
+    "hasPossiblePromotionPriceOnAddon": false,
+    "hasFamilyDiscountPrice": false,
+    "hasInterRailPrice": false,
+    "hasLastMinutePrice": false,
+    "hasPersonalAssistantPrice": false,
+    "hasAccompanyingPersonPrice": false,
+    "hasServiceDogPrice": false,
+    "hasChangedDepartureForFree": false
+   },
+   "SECOND_CALM": {
+    "genderTypeRequired": false,
+    "flexibilities": {
+     "FULLFLEX": {
+      "offerId": "e0bbe347-caf5-3113-97f8-a8bbc988f3c6",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "1003",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "1003",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "1003",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": {
+       "pointPrice": {
+        "amount": "14800"
+       },
+       "originalPointPrice": {
+        "amount": "14800"
+       },
+       "price": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasFamilyDiscount": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false
+      },
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND_CALM",
+        "salesCategoryFlexibility": "FULLFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "865",
+           "currency": "SEK"
+          },
+          "pointPrice": {
+           "amount": "14800"
+          }
+         }
+        ],
+        "productName": "2 class Calm, Refundable",
+        "productCode": "JREF_2CALM_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": true,
+      "mixedComfort": true,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     },
+     "NOFLEX": {
+      "offerId": "f2b1394f-a6d5-3303-b334-d39cb4ec82ae",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "753",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "753",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "753",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": {
+       "pointPrice": {
+        "amount": "10500"
+       },
+       "originalPointPrice": {
+        "amount": "10500"
+       },
+       "price": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasFamilyDiscount": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false
+      },
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND_CALM",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "615",
+           "currency": "SEK"
+          },
+          "pointPrice": {
+           "amount": "10500"
+          }
+         }
+        ],
+        "productName": "2 class Calm, Non-rebookable",
+        "productCode": "JNON_2CALM_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": false,
+      "mixedComfort": true,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     },
+     "SEMIFLEX": {
+      "offerId": "8a061809-5e73-3ced-9236-17f113ebf409",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "853",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "853",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "853",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": null,
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND_CALM",
+        "salesCategoryFlexibility": "SEMIFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "715",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class Calm, Rebookable",
+        "productCode": "JREB_2CALM_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": true,
+      "mixedComfort": true,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     }
+    },
+    "priceFrom": {
+     "price": "753",
+     "currency": "SEK",
+     "fareClass": "SECOND_CALM",
+     "originalPrice": "753",
+     "totalPriceToBePaid": "753",
+     "refundAmount": null,
+     "feeAmount": null,
+     "repriceAmount": null,
+     "flexibility": "NOFLEX",
+     "contract": false,
+     "hasTravelPassDiscount": false,
+     "hasEmployeeTravelPassDiscount": false,
+     "hasPromotionDiscount": false,
+     "hasPromotionNonDiscount": false,
+     "hasCampaignDiscount": false,
+     "hasPossiblePromotionPriceOnAddon": false,
+     "hasFamilyDiscount": false,
+     "hasPersonalAssistantDiscount": false,
+     "hasAccompanyingPersonDiscount": false,
+     "hasServiceDogDiscount": false,
+     "disruptionRebook": false,
+     "hasLastMinute": false,
+     "hasInterRail": false,
+     "hasRepricedFreePrice": false
+    },
+    "pointPriceFrom": {
+     "price": "138.0",
+     "currency": "SEK",
+     "pointPrice": "10500",
+     "fareClass": "SECOND_CALM",
+     "flexibility": "NOFLEX",
+     "contract": false,
+     "hasTravelPassDiscount": false,
+     "hasEmployeeTravelPassDiscount": false,
+     "hasPromotionDiscount": false,
+     "hasPromotionNonDiscount": false,
+     "hasCampaignDiscount": false,
+     "hasPossiblePromotionPriceOnAddon": false,
+     "disruptionRebook": false,
+     "hasFamilyDiscount": false,
+     "hasLastMinute": false,
+     "hasInterRail": false,
+     "hasPersonalAssistantDiscount": false,
+     "hasAccompanyingPersonDiscount": false,
+     "hasServiceDogDiscount": false
+    },
+    "salesCategoryUsps": [],
+    "compartmentInformationType": null,
+    "disruptionRebook": false,
+    "available": true,
+    "hasContractPrice": false,
+    "hasPromotionPrice": false,
+    "hasPromotionNonDiscount": false,
+    "hasCampaignPrice": false,
+    "hasPossiblePromotionPriceOnAddon": false,
+    "hasFamilyDiscountPrice": false,
+    "hasInterRailPrice": false,
+    "hasLastMinutePrice": false,
+    "hasPersonalAssistantPrice": false,
+    "hasAccompanyingPersonPrice": false,
+    "hasServiceDogPrice": false,
+    "hasChangedDepartureForFree": false
+   },
+   "FIRST": {
+    "genderTypeRequired": false,
+    "flexibilities": {
+     "FULLFLEX": {
+      "offerId": "84df3086-62d9-3848-b021-1201ce4885d9",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "1123",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "1123",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "1123",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": {
+       "pointPrice": {
+        "amount": "16800"
+       },
+       "originalPointPrice": {
+        "amount": "16800"
+       },
+       "price": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasFamilyDiscount": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false
+      },
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "FIRST",
+        "salesCategoryFlexibility": "FULLFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "985",
+           "currency": "SEK"
+          },
+          "pointPrice": {
+           "amount": "16800"
+          }
+         }
+        ],
+        "productName": "1 class, Refundable",
+        "productCode": "JREF_1_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": true,
+      "mixedComfort": true,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     },
+     "NOFLEX": {
+      "offerId": "347f737a-dbaf-3676-a961-5c647515514e",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "873",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "873",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "873",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": {
+       "pointPrice": {
+        "amount": "12500"
+       },
+       "originalPointPrice": {
+        "amount": "12500"
+       },
+       "price": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "138",
+        "currency": "SEK"
+       },
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasFamilyDiscount": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false
+      },
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "FIRST",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "735",
+           "currency": "SEK"
+          },
+          "pointPrice": {
+           "amount": "12500"
+          }
+         }
+        ],
+        "productName": "1 class, Non-rebookable",
+        "productCode": "JNON_1_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": false,
+      "mixedComfort": true,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     },
+     "SEMIFLEX": {
+      "offerId": "7f2f4843-5fed-3358-9548-2354aa979b6e",
+      "expires": "2026-07-10T11:25:23+02:00",
+      "available": true,
+      "journeyPrices": {
+       "price": {
+        "amount": "973",
+        "currency": "SEK"
+       },
+       "originalPrice": {
+        "amount": "973",
+        "currency": "SEK"
+       },
+       "totalPriceToBePaid": {
+        "amount": "973",
+        "currency": "SEK"
+       },
+       "refundAmount": null,
+       "feeAmount": null,
+       "repriceAmount": null,
+       "corporate": false,
+       "hasTravelPassDiscount": false,
+       "hasEmployeeTravelPassDiscount": false,
+       "hasPromotionDiscount": false,
+       "hasPromotionNonDiscount": false,
+       "hasCampaignDiscount": false,
+       "hasPossiblePromotionPriceOnAddon": false,
+       "hasPersonalAssistantDiscount": false,
+       "hasAccompanyingPersonDiscount": false,
+       "hasServiceDogDiscount": false,
+       "hasFamilyDiscount": false,
+       "hasLastMinute": false,
+       "hasInterRail": false,
+       "hasRepricedFreePrice": false
+      },
+      "journeyPointPrices": null,
+      "containsBedProduct": false,
+      "offerInformation": [
+       {
+        "departureStation": {
+         "uicStationCode": "740000001",
+         "name": "Stockholm Central",
+         "shortName": "Sthlm Central"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "departureDateTime": "2026-07-24T05:09:00+02:00",
+        "arrivalDateTime": "2026-07-24T08:43:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+        "serviceName": "419",
+        "secondaryServiceName": null,
+        "publicServiceName": "419",
+        "ricsCode": "74",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "FIRST",
+        "salesCategoryFlexibility": "SEMIFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "835",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "1 class, Rebookable",
+        "productCode": "JREB_1_H",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "129",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "2 class, Non rebookable",
+        "productCode": "XPTA_JNON_2",
+        "nightTrain": false
+       },
+       {
+        "departureStation": {
+         "uicStationCode": "740000300",
+         "name": "Borås Central",
+         "shortName": "Borås C"
+        },
+        "arrivalStation": {
+         "uicStationCode": "740020490",
+         "name": "Göteborg Åkareplatsen",
+         "shortName": "Åkareplatsen"
+        },
+        "departureDateTime": "2026-07-24T08:55:00+02:00",
+        "arrivalDateTime": "2026-07-24T09:50:00+02:00",
+        "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+        "serviceName": "100",
+        "secondaryServiceName": null,
+        "publicServiceName": "100",
+        "ricsCode": "279",
+        "salesCategoryComfortType": "UNKNOWN",
+        "salesCategoryComfort": "SECOND",
+        "salesCategoryFlexibility": "NOFLEX",
+        "genderTypeRequired": false,
+        "passengerOffers": [
+         {
+          "passengerId": "passenger_1",
+          "discounts": [],
+          "travelPassDiscount": null,
+          "price": {
+           "amount": "9",
+           "currency": "SEK"
+          },
+          "pointPrice": null
+         }
+        ],
+        "productName": "Booking fee",
+        "productCode": "FBOOKING_3PI",
+        "nightTrain": false
+       }
+      ],
+      "salesCategoryUsps": [],
+      "compartmentSize": null,
+      "disruptionRebook": false,
+      "mixedFlex": true,
+      "mixedComfort": true,
+      "mixedComfortType": false,
+      "mixedOperator": true
+     }
+    },
+    "priceFrom": {
+     "price": "873",
+     "currency": "SEK",
+     "fareClass": "FIRST",
+     "originalPrice": "873",
+     "totalPriceToBePaid": "873",
+     "refundAmount": null,
+     "feeAmount": null,
+     "repriceAmount": null,
+     "flexibility": "NOFLEX",
+     "contract": false,
+     "hasTravelPassDiscount": false,
+     "hasEmployeeTravelPassDiscount": false,
+     "hasPromotionDiscount": false,
+     "hasPromotionNonDiscount": false,
+     "hasCampaignDiscount": false,
+     "hasPossiblePromotionPriceOnAddon": false,
+     "hasFamilyDiscount": false,
+     "hasPersonalAssistantDiscount": false,
+     "hasAccompanyingPersonDiscount": false,
+     "hasServiceDogDiscount": false,
+     "disruptionRebook": false,
+     "hasLastMinute": false,
+     "hasInterRail": false,
+     "hasRepricedFreePrice": false
+    },
+    "pointPriceFrom": {
+     "price": "138.0",
+     "currency": "SEK",
+     "pointPrice": "12500",
+     "fareClass": "FIRST",
+     "flexibility": "NOFLEX",
+     "contract": false,
+     "hasTravelPassDiscount": false,
+     "hasEmployeeTravelPassDiscount": false,
+     "hasPromotionDiscount": false,
+     "hasPromotionNonDiscount": false,
+     "hasCampaignDiscount": false,
+     "hasPossiblePromotionPriceOnAddon": false,
+     "disruptionRebook": false,
+     "hasFamilyDiscount": false,
+     "hasLastMinute": false,
+     "hasInterRail": false,
+     "hasPersonalAssistantDiscount": false,
+     "hasAccompanyingPersonDiscount": false,
+     "hasServiceDogDiscount": false
+    },
+    "salesCategoryUsps": [],
+    "compartmentInformationType": null,
+    "disruptionRebook": false,
+    "available": true,
+    "hasContractPrice": false,
+    "hasPromotionPrice": false,
+    "hasPromotionNonDiscount": false,
+    "hasCampaignPrice": false,
+    "hasPossiblePromotionPriceOnAddon": false,
+    "hasFamilyDiscountPrice": false,
+    "hasInterRailPrice": false,
+    "hasLastMinutePrice": false,
+    "hasPersonalAssistantPrice": false,
+    "hasAccompanyingPersonPrice": false,
+    "hasServiceDogPrice": false,
+    "hasChangedDepartureForFree": false
+   }
+  },
+  "priceFrom": {
+   "price": "663",
+   "currency": "SEK",
+   "fareClass": "SECOND",
+   "originalPrice": "663",
+   "totalPriceToBePaid": "663",
+   "refundAmount": null,
+   "feeAmount": null,
+   "repriceAmount": null,
+   "flexibility": "NOFLEX",
+   "contract": false,
+   "hasTravelPassDiscount": false,
+   "hasEmployeeTravelPassDiscount": false,
+   "hasPromotionDiscount": false,
+   "hasPromotionNonDiscount": false,
+   "hasCampaignDiscount": false,
+   "hasPossiblePromotionPriceOnAddon": false,
+   "hasFamilyDiscount": false,
+   "hasPersonalAssistantDiscount": false,
+   "hasAccompanyingPersonDiscount": false,
+   "hasServiceDogDiscount": false,
+   "disruptionRebook": false,
+   "hasLastMinute": false,
+   "hasInterRail": false,
+   "hasRepricedFreePrice": false
+  },
+  "pointPriceFrom": {
+   "price": "138.0",
+   "currency": "SEK",
+   "pointPrice": "9000",
+   "fareClass": "SECOND",
+   "flexibility": "NOFLEX",
+   "contract": false,
+   "hasTravelPassDiscount": false,
+   "hasEmployeeTravelPassDiscount": false,
+   "hasPromotionDiscount": false,
+   "hasPromotionNonDiscount": false,
+   "hasCampaignDiscount": false,
+   "hasPossiblePromotionPriceOnAddon": false,
+   "disruptionRebook": false,
+   "hasFamilyDiscount": false,
+   "hasLastMinute": false,
+   "hasInterRail": false,
+   "hasPersonalAssistantDiscount": false,
+   "hasAccompanyingPersonDiscount": false,
+   "hasServiceDogDiscount": false
+  },
+  "available": true,
+  "hasChangedDepartureForFree": false,
+  "hasContractPrice": false,
+  "hasPromotionPrice": false,
+  "hasPromotionNonDiscount": false,
+  "hasCampaignPrice": false,
+  "hasPossiblePromotionPriceOnAddon": false,
+  "hasFamilyDiscountPrice": false,
+  "hasInterRailPrice": false,
+  "hasLastMinutePrice": false,
+  "hasDisruptionRebookPrice": false,
+  "hasPersonalAssistantPrice": false,
+  "hasAccompanyingPersonPrice": false,
+  "hasServiceDogPrice": false
+ },
+ "bedOffers": {
+  "offers": {
+   "COUCHETTE": {
+    "comfortTypes": {
+     "COUCHETTE_PRIVATE": {
+      "genderTypeRequired": false,
+      "flexibilities": {
+       "FULLFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "NOFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "SEMIFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       }
+      },
+      "priceFrom": null,
+      "pointPriceFrom": null,
+      "salesCategoryUsps": [],
+      "compartmentInformationType": null,
+      "disruptionRebook": false,
+      "available": false,
+      "hasContractPrice": false,
+      "hasPromotionPrice": false,
+      "hasPromotionNonDiscount": false,
+      "hasCampaignPrice": false,
+      "hasPossiblePromotionPriceOnAddon": false,
+      "hasFamilyDiscountPrice": false,
+      "hasInterRailPrice": false,
+      "hasLastMinutePrice": false,
+      "hasPersonalAssistantPrice": false,
+      "hasAccompanyingPersonPrice": false,
+      "hasServiceDogPrice": false,
+      "hasChangedDepartureForFree": false
+     },
+     "COUCHETTE_SHARED": {
+      "genderTypeRequired": true,
+      "flexibilities": {
+       "FULLFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "NOFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "SEMIFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       }
+      },
+      "priceFrom": null,
+      "pointPriceFrom": null,
+      "salesCategoryUsps": [],
+      "compartmentInformationType": null,
+      "disruptionRebook": false,
+      "available": false,
+      "hasContractPrice": false,
+      "hasPromotionPrice": false,
+      "hasPromotionNonDiscount": false,
+      "hasCampaignPrice": false,
+      "hasPossiblePromotionPriceOnAddon": false,
+      "hasFamilyDiscountPrice": false,
+      "hasInterRailPrice": false,
+      "hasLastMinutePrice": false,
+      "hasPersonalAssistantPrice": false,
+      "hasAccompanyingPersonPrice": false,
+      "hasServiceDogPrice": false,
+      "hasChangedDepartureForFree": false
+     }
+    },
+    "priceFrom": null,
+    "pointPriceFrom": null,
+    "available": false,
+    "hasContractPrice": false,
+    "hasPromotionPrice": false,
+    "hasPromotionNonDiscount": false,
+    "hasCampaignPrice": false,
+    "hasPossiblePromotionPriceOnAddon": false,
+    "hasDisruptionRebookPrice": false,
+    "hasFamilyDiscountPrice": false,
+    "hasInterRailPrice": false,
+    "hasLastMinutePrice": false,
+    "hasPersonalAssistantPrice": false,
+    "hasAccompanyingPersonPrice": false,
+    "hasServiceDogPrice": false,
+    "hasChangedDepartureForFree": false
+   },
+   "SLEEPER": {
+    "comfortTypes": {
+     "SLEEPER_SECOND_SHARED": {
+      "genderTypeRequired": true,
+      "flexibilities": {
+       "FULLFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "NOFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "SEMIFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       }
+      },
+      "priceFrom": null,
+      "pointPriceFrom": null,
+      "salesCategoryUsps": [],
+      "compartmentInformationType": null,
+      "disruptionRebook": false,
+      "available": false,
+      "hasContractPrice": false,
+      "hasPromotionPrice": false,
+      "hasPromotionNonDiscount": false,
+      "hasCampaignPrice": false,
+      "hasPossiblePromotionPriceOnAddon": false,
+      "hasFamilyDiscountPrice": false,
+      "hasInterRailPrice": false,
+      "hasLastMinutePrice": false,
+      "hasPersonalAssistantPrice": false,
+      "hasAccompanyingPersonPrice": false,
+      "hasServiceDogPrice": false,
+      "hasChangedDepartureForFree": false
+     },
+     "SLEEPER_SECOND_PRIVATE": {
+      "genderTypeRequired": false,
+      "flexibilities": {
+       "FULLFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "NOFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "SEMIFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       }
+      },
+      "priceFrom": null,
+      "pointPriceFrom": null,
+      "salesCategoryUsps": [],
+      "compartmentInformationType": null,
+      "disruptionRebook": false,
+      "available": false,
+      "hasContractPrice": false,
+      "hasPromotionPrice": false,
+      "hasPromotionNonDiscount": false,
+      "hasCampaignPrice": false,
+      "hasPossiblePromotionPriceOnAddon": false,
+      "hasFamilyDiscountPrice": false,
+      "hasInterRailPrice": false,
+      "hasLastMinutePrice": false,
+      "hasPersonalAssistantPrice": false,
+      "hasAccompanyingPersonPrice": false,
+      "hasServiceDogPrice": false,
+      "hasChangedDepartureForFree": false
+     },
+     "SLEEPER_FIRST_PRIVATE": {
+      "genderTypeRequired": false,
+      "flexibilities": {
+       "FULLFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "NOFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "SEMIFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       }
+      },
+      "priceFrom": null,
+      "pointPriceFrom": null,
+      "salesCategoryUsps": [],
+      "compartmentInformationType": null,
+      "disruptionRebook": false,
+      "available": false,
+      "hasContractPrice": false,
+      "hasPromotionPrice": false,
+      "hasPromotionNonDiscount": false,
+      "hasCampaignPrice": false,
+      "hasPossiblePromotionPriceOnAddon": false,
+      "hasFamilyDiscountPrice": false,
+      "hasInterRailPrice": false,
+      "hasLastMinutePrice": false,
+      "hasPersonalAssistantPrice": false,
+      "hasAccompanyingPersonPrice": false,
+      "hasServiceDogPrice": false,
+      "hasChangedDepartureForFree": false
+     },
+     "SLEEPER_FIRST_PRIVATE_SOLO": {
+      "genderTypeRequired": false,
+      "flexibilities": {
+       "FULLFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "NOFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       },
+       "SEMIFLEX": {
+        "offerId": null,
+        "expires": null,
+        "available": false,
+        "journeyPrices": null,
+        "journeyPointPrices": null,
+        "containsBedProduct": false,
+        "offerInformation": [],
+        "salesCategoryUsps": [],
+        "compartmentSize": null,
+        "disruptionRebook": false,
+        "mixedFlex": false,
+        "mixedComfort": false,
+        "mixedComfortType": false,
+        "mixedOperator": false
+       }
+      },
+      "priceFrom": null,
+      "pointPriceFrom": null,
+      "salesCategoryUsps": [],
+      "compartmentInformationType": null,
+      "disruptionRebook": false,
+      "available": false,
+      "hasContractPrice": false,
+      "hasPromotionPrice": false,
+      "hasPromotionNonDiscount": false,
+      "hasCampaignPrice": false,
+      "hasPossiblePromotionPriceOnAddon": false,
+      "hasFamilyDiscountPrice": false,
+      "hasInterRailPrice": false,
+      "hasLastMinutePrice": false,
+      "hasPersonalAssistantPrice": false,
+      "hasAccompanyingPersonPrice": false,
+      "hasServiceDogPrice": false,
+      "hasChangedDepartureForFree": false
+     }
+    },
+    "priceFrom": null,
+    "pointPriceFrom": null,
+    "available": false,
+    "hasContractPrice": false,
+    "hasPromotionPrice": false,
+    "hasPromotionNonDiscount": false,
+    "hasCampaignPrice": false,
+    "hasPossiblePromotionPriceOnAddon": false,
+    "hasDisruptionRebookPrice": false,
+    "hasFamilyDiscountPrice": false,
+    "hasInterRailPrice": false,
+    "hasLastMinutePrice": false,
+    "hasPersonalAssistantPrice": false,
+    "hasAccompanyingPersonPrice": false,
+    "hasServiceDogPrice": false,
+    "hasChangedDepartureForFree": false
+   }
+  },
+  "priceFrom": null,
+  "pointPriceFrom": null,
+  "available": false,
+  "hasChangedDepartureForFree": false,
+  "hasDisruptionRebookPrice": false,
+  "hasContractPrice": false,
+  "hasPromotionPrice": false,
+  "hasPromotionNonDiscount": false,
+  "hasCampaignPrice": false,
+  "hasPossiblePromotionPriceOnAddon": false,
+  "hasFamilyDiscountPrice": false,
+  "hasInterRailPrice": false,
+  "hasLastMinutePrice": false,
+  "hasPersonalAssistantPrice": false,
+  "hasAccompanyingPersonPrice": false,
+  "hasServiceDogPrice": false
+ },
+ "hasThroughfare": false,
+ "departureStatus": [
+  "AVAILABLE"
+ ],
+ "availabilities": [
+  {
+   "serviceIdentifier": "GA5FERCBJ5CHYNBRHF6FGSSIJFDUQ7BSGAZDMLJQG4WTEND4GIYDENRNGA3S2MRUKQYDKORQHF6DEMBSGYWTANZNGI2FIMBYHI2DG7BXGQYDAMBQGAYDC7BXGQYDAMBQGMYDA",
+   "throughCarriageServiceIdentifiers": [],
+   "availableSeats": {
+    "availableForComforts": {
+     "SECOND": {
+      "availableInOffer": true,
+      "availableSeats": true
+     },
+     "SECOND_CALM": {
+      "availableInOffer": true,
+      "availableSeats": true
+     },
+     "FIRST": {
+      "availableInOffer": true,
+      "availableSeats": true
+     }
+    }
+   },
+   "publicServiceName": "419"
+  },
+  {
+   "serviceIdentifier": "GA5FERCBJ5CHYMJQGB6FQUCUIFPU6X2CKVJXYMRQGI3C2MBXFUZDI7BSGAZDMLJQG4WTENCUGA4DUNJVPQZDAMRWFUYDOLJSGRKDAOJ2GUYHYNZUGAYDAMBTGAYHYNZUGAYDEMBUHEYA",
+   "throughCarriageServiceIdentifiers": [],
+   "availableSeats": {
+    "availableForComforts": {
+     "SECOND": {
+      "availableInOffer": true,
+      "availableSeats": null
+     }
+    }
+   },
+   "publicServiceName": "100"
+  }
+ ],
+ "promoCodesSentInRequest": [],
+ "priceFrom": {
+  "price": "663",
+  "currency": "SEK",
+  "fareClass": "SECOND",
+  "originalPrice": "663",
+  "totalPriceToBePaid": "663",
+  "refundAmount": null,
+  "feeAmount": null,
+  "repriceAmount": null,
+  "flexibility": "NOFLEX",
+  "contract": false,
+  "hasTravelPassDiscount": false,
+  "hasEmployeeTravelPassDiscount": false,
+  "hasPromotionDiscount": false,
+  "hasPromotionNonDiscount": false,
+  "hasCampaignDiscount": false,
+  "hasPossiblePromotionPriceOnAddon": false,
+  "hasFamilyDiscount": false,
+  "hasPersonalAssistantDiscount": false,
+  "hasAccompanyingPersonDiscount": false,
+  "hasServiceDogDiscount": false,
+  "disruptionRebook": false,
+  "hasLastMinute": false,
+  "hasInterRail": false,
+  "hasRepricedFreePrice": false
+ },
+ "pointPriceFrom": {
+  "price": "138.0",
+  "currency": "SEK",
+  "pointPrice": "9000",
+  "fareClass": "SECOND",
+  "flexibility": "NOFLEX",
+  "contract": false,
+  "hasTravelPassDiscount": false,
+  "hasEmployeeTravelPassDiscount": false,
+  "hasPromotionDiscount": false,
+  "hasPromotionNonDiscount": false,
+  "hasCampaignDiscount": false,
+  "hasPossiblePromotionPriceOnAddon": false,
+  "disruptionRebook": false,
+  "hasFamilyDiscount": false,
+  "hasLastMinute": false,
+  "hasInterRail": false,
+  "hasPersonalAssistantDiscount": false,
+  "hasAccompanyingPersonDiscount": false,
+  "hasServiceDogDiscount": false
+ },
+ "available": true,
+ "hasContractPrice": false,
+ "hasPromotionPrice": false,
+ "hasPromotionNonDiscount": false,
+ "hasCampaignPrice": false,
+ "hasPossiblePromotionPriceOnAddon": false,
+ "hasFamilyDiscountPrice": false,
+ "hasCompartmentPrice": false,
+ "hasLastMinutePrice": false,
+ "hasInterRailPrice": false,
+ "hasPersonalAssistantPrice": false,
+ "hasAccompanyingPersonPrice": false,
+ "hasServiceDogPrice": false,
+ "bookingsInConflictForDoubleBooking": []
+}
