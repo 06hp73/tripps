@@ -181,17 +181,45 @@ def _cli_planner_factory(settings, db, *, flights: bool, max_results: int):
     return factory, adapters
 
 
-def _cli_constraints(args) -> SearchConstraints:
-    allowed = {TransportMode.TRAIN, TransportMode.BUS, TransportMode.FERRY, TransportMode.WALK}
-    if not getattr(args, "no_freerider", False):
-        allowed.add(TransportMode.FREERIDER)
+def _wants_flights(args) -> bool:
+    """Flights are on if --flights is given, or --modes explicitly lists 'flight'."""
     if getattr(args, "flights", False):
-        allowed.add(TransportMode.FLIGHT)
+        return True
+    modes_arg = getattr(args, "modes", None)
+    return bool(modes_arg) and "flight" in {m.strip() for m in modes_arg.split(",")}
+
+
+def _wants_freerider(args) -> bool:
+    """Freerider is on unless --no-freerider, or --modes is given without 'freerider'."""
+    modes_arg = getattr(args, "modes", None)
+    if modes_arg:
+        return "freerider" in {m.strip() for m in modes_arg.split(",")}
+    return not getattr(args, "no_freerider", False)
+
+
+def _cli_constraints(args) -> SearchConstraints:
+    # Connective modes are always allowed; --modes (if given) chooses the travel modes,
+    # otherwise the defaults plus the --flights / --no-freerider switches decide.
+    allowed = {TransportMode.WALK, TransportMode.LOCAL_TRANSIT}
+    modes_arg = getattr(args, "modes", None)
+    if modes_arg:
+        try:
+            allowed |= {TransportMode(m.strip()) for m in modes_arg.split(",") if m.strip()}
+        except ValueError as exc:
+            raise SystemExit(f"unknown mode in --modes: {exc}") from exc
+        include_freerider = TransportMode.FREERIDER in allowed
+    else:
+        allowed |= {TransportMode.TRAIN, TransportMode.BUS, TransportMode.FERRY}
+        include_freerider = not getattr(args, "no_freerider", False)
+        if include_freerider:
+            allowed.add(TransportMode.FREERIDER)
+        if getattr(args, "flights", False):
+            allowed.add(TransportMode.FLIGHT)
     return SearchConstraints(
         allowed_modes=frozenset(allowed),
         max_transfers=getattr(args, "max_transfers", None),
         max_duration_seconds=int(args.max_hours * 3600) if getattr(args, "max_hours", None) else None,
-        include_freerider=not getattr(args, "no_freerider", False),
+        include_freerider=include_freerider,
     )
 
 
@@ -234,9 +262,9 @@ async def _search(args: argparse.Namespace) -> int:
         return 2
 
     service_date = date.fromisoformat(args.date) if args.date else now_local().date()
-    offers = await _fetch_freerider(settings, not args.no_freerider)
+    offers = await _fetch_freerider(settings, _wants_freerider(args))
     db = Database(settings.db_path)
-    factory, adapters = _cli_planner_factory(settings, db, flights=args.flights, max_results=args.limit)
+    factory, adapters = _cli_planner_factory(settings, db, flights=_wants_flights(args), max_results=args.limit)
     constraints = _cli_constraints(args)
 
     try:
@@ -285,9 +313,9 @@ async def _fares(args: argparse.Namespace) -> int:
         return 2
 
     start = date.fromisoformat(args.start) if args.start else now_local().date()
-    offers = await _fetch_freerider(settings, not args.no_freerider)
+    offers = await _fetch_freerider(settings, _wants_freerider(args))
     db = Database(settings.db_path)
-    factory, adapters = _cli_planner_factory(settings, db, flights=args.flights, max_results=3)
+    factory, adapters = _cli_planner_factory(settings, db, flights=_wants_flights(args), max_results=3)
     constraints = _cli_constraints(args)
 
     try:
@@ -504,6 +532,7 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("--limit", type=int, default=5)
     se.add_argument("--max-transfers", type=int, default=None)
     se.add_argument("--max-hours", type=float, default=None)
+    se.add_argument("--modes", help="comma list: train,bus,ferry,freerider,flight (overrides the two flags)")
     se.add_argument("--no-freerider", action="store_true")
     se.add_argument("--flights", action="store_true", help="also scrape domestic flight prices")
 
@@ -514,6 +543,7 @@ def main(argv: list[str] | None = None) -> int:
     fa.add_argument("--days", type=int, default=7)
     fa.add_argument("--max-transfers", type=int, default=None)
     fa.add_argument("--max-hours", type=float, default=None)
+    fa.add_argument("--modes", help="comma list of travel modes")
     fa.add_argument("--no-freerider", action="store_true")
     fa.add_argument("--flights", action="store_true")
 

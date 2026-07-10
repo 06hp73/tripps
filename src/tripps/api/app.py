@@ -702,20 +702,30 @@ async def ui_search(
     max_hours: float | None = Form(None),
     max_transfers: int | None = Form(None),
     earliest: str | None = Form(None),
-    include_freerider: bool = Form(False),
-    include_flights: bool = Form(False),
+    mode_train: bool = Form(False),
+    mode_bus: bool = Form(False),
+    mode_ferry: bool = Form(False),
+    mode_freerider: bool = Form(False),
+    mode_flight: bool = Form(False),
 ) -> HTMLResponse:
     state = _state(request)
     service_date = _parse_date(date_)
 
-    modes = ["train", "bus", "ferry", "local_transit"]
-    if include_freerider:
-        modes.append("freerider")
-    if include_flights:
-        modes.append("flight")
+    # local_transit is a connective mode (feeder legs), always allowed; the checkboxes
+    # choose the long-distance modes.
+    modes = ["local_transit"]
+    for enabled, name in (
+        (mode_train, "train"),
+        (mode_bus, "bus"),
+        (mode_ferry, "ferry"),
+        (mode_freerider, "freerider"),
+        (mode_flight, "flight"),
+    ):
+        if enabled:
+            modes.append(name)
 
     constraints = _constraints(
-        max_hours, max_transfers, include_freerider, modes, earliest, service_date
+        max_hours, max_transfers, mode_freerider, modes, earliest, service_date
     )
     try:
         response, stats = await _run_search(

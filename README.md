@@ -131,6 +131,7 @@ uv pip install -e ".[dev,flights]"
     --date 2026-07-13 --limit 5
 .venv/bin/tripps search "Kiruna" "Stockholm Centralstation" --date 2026-07-13
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --date 2026-07-13 --return 2026-07-16
+.venv/bin/tripps search "Stockholm C" "Göteborg C" --modes train,bus   # only these modes
 .venv/bin/tripps fares  "Stockholm C" "Göteborg C" --start 2026-07-13 --days 7
 .venv/bin/tripps serve                            # web UI + JSON API on :8000
 ```
@@ -148,6 +149,12 @@ Everything is configurable through `TRIPPS_*` environment variables; see `config
 way the planner does and asserts a price still comes back, exiting non-zero if any source is
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
+
+**Mode selection.** The web UI's "Travel by" row and the CLI's `--modes train,bus,ferry,
+freerider,flight` (and the `modes=` API param) choose which long-distance modes a search may
+use; walk and local-transit feeders are always allowed. Excluding a mode also skips its work
+— unchecking Flight avoids the slow Google scrape, unchecking Freerider skips the inventory
+fetch.
 
 **Round-trip and fare calendar.** `search --return DATE` prices there and back on their own
 dates and sums the cheapest of each; `tripps fares` (and the "Cheapest day" button, and

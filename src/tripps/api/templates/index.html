@@ -50,6 +50,8 @@
   .checks { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
   .checks label { text-transform: none; letter-spacing: 0; font-size: .95rem;
                   color: var(--fg); margin: 0; display: flex; gap: .45rem; align-items: center; }
+  .checks-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em;
+                  color: var(--muted); align-self: center; margin-right: .25rem; }
   .full { grid-column: 1 / -1; }
   button {
     padding: .7rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent);
@@ -118,14 +120,12 @@
     </div>
 
     <div class="full checks">
-      <label>
-        <input type="checkbox" name="include_freerider" value="true" checked>
-        Hertz Freerider ({{ freerider_count }} cars listed)
-      </label>
-      <label>
-        <input type="checkbox" name="include_flights" value="true">
-        Domestic flights
-      </label>
+      <span class="checks-label">Travel by</span>
+      <label><input type="checkbox" name="mode_train" checked> Train</label>
+      <label><input type="checkbox" name="mode_bus" checked> Bus</label>
+      <label><input type="checkbox" name="mode_ferry" checked> Ferry</label>
+      <label><input type="checkbox" name="mode_freerider" checked> Freerider <span class="opt">({{ freerider_count }} cars)</span></label>
+      <label><input type="checkbox" name="mode_flight"> Flight <span class="opt">(slow)</span></label>
     </div>
 
     <div class="full">
@@ -215,14 +215,18 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   function modeParams() {
-    // Match the server default: flights only when the box is ticked.
-    const modes = ["train", "bus", "ferry", "local_transit"];
-    if (form.include_freerider.checked) modes.push("freerider");
-    if (form.include_flights.checked) modes.push("flight");
+    // local_transit is always allowed (feeder legs); the checkboxes pick the travel modes.
+    const modes = ["local_transit"];
+    if (form.mode_train.checked) modes.push("train");
+    if (form.mode_bus.checked) modes.push("bus");
+    if (form.mode_ferry.checked) modes.push("ferry");
+    if (form.mode_freerider.checked) modes.push("freerider");
+    if (form.mode_flight.checked) modes.push("flight");
     const p = new URLSearchParams();
     p.set("origin", form.origin.value);
     p.set("destination", form.destination.value);
     modes.forEach(m => p.append("modes", m));
+    p.set("include_freerider", form.mode_freerider.checked);
     if (form.max_hours.value) p.set("max_hours", form.max_hours.value);
     if (form.max_transfers.value) p.set("max_transfers", form.max_transfers.value);
     return p;
