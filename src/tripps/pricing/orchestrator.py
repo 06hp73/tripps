@@ -339,15 +339,74 @@ class PricingOrchestrator:
                     "check those fares on the operator's own site."
                 )
 
+        # Every selected travel mode should be represented, not just whichever is cheapest.
+        # Take the top-N by price, then pull in the cheapest itinerary using each allowed mode
+        # that the top-N missed, so ticking train+bus+car shows a train, a bus and a car option
+        # rather than a list of whichever mode happened to win on price.
+        shown = _ensure_mode_coverage(ranked, _cover_modes(constraints), max_results)
+
         status = {a.name: (await a.health()).state.value for a in self.adapters}
 
         return PricingResult(
-            itineraries=ranked[:max_results],
-            warnings=warnings + _collect_warnings(ranked[:max_results]),
+            itineraries=shown,
+            warnings=warnings + _collect_warnings(shown),
             source_status=status,
             calls_made=ctx.call_budget.spent(),
             floor_violations=len(ctx.violations),
         )
+
+
+#: The user-facing travel modes a "Travel by" tick can select. Walk and local transit are
+#: connective, not a choice, so they never need their own representative.
+_TRAVEL_MODES = (
+    TransportMode.TRAIN,
+    TransportMode.BUS,
+    TransportMode.FERRY,
+    TransportMode.FREERIDER,
+    TransportMode.FLIGHT,
+)
+
+
+def _cover_modes(constraints: SearchConstraints) -> list[TransportMode]:
+    """The selected travel modes to guarantee a representative for, cheapest-mode-first ish."""
+    return [m for m in _TRAVEL_MODES if m in constraints.allowed_modes]
+
+
+def _itinerary_modes(itin: Itinerary) -> set[TransportMode]:
+    return {leg.mode for leg in itin.legs if leg.mode is not TransportMode.WALK}
+
+
+def _ensure_mode_coverage(
+    ranked: list[Itinerary], cover_modes: list[TransportMode], max_results: int
+) -> list[Itinerary]:
+    """Top-N by price, plus the cheapest priced itinerary for each mode the top-N missed.
+
+    `ranked` is already price-sorted (unpriced sink to the bottom). The top-N stands; then for
+    each selected mode not yet represented, the first (cheapest) priced itinerary using it is
+    appended. A mode with no priced option adds nothing. The result is re-sorted by price, so
+    a guaranteed train representative still lands in its correct price position.
+    """
+    shown = list(ranked[:max_results])
+    covered: set[TransportMode] = set()
+    for itin in shown:
+        covered |= _itinerary_modes(itin)
+
+    chosen_ids = {id(i) for i in shown}
+    for mode in cover_modes:
+        if mode in covered:
+            continue
+        for itin in ranked:
+            if itin.total_price_ore is None:
+                break  # ranked is price-sorted; once we hit unpriced, none are priced
+            if id(itin) in chosen_ids:
+                continue
+            if mode in _itinerary_modes(itin):
+                shown.append(itin)
+                chosen_ids.add(id(itin))
+                covered |= _itinerary_modes(itin)
+                break
+
+    return sorted(shown, key=_price_sort_key)
 
 
 def _floor_sort_key(itin: Itinerary) -> tuple:

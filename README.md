@@ -152,9 +152,12 @@ results also feed `/health` (the `canaries` block) and the live `/api/canary` en
 
 **Mode selection.** The web UI's "Travel by" row and the CLI's `--modes train,bus,ferry,
 freerider,flight` (and the `modes=` API param) choose which long-distance modes a search may
-use; walk and local-transit feeders are always allowed. Excluding a mode also skips its work
-— unchecking Flight avoids the slow Google scrape, unchecking Freerider skips the inventory
-fetch.
+use; walk and local-transit feeders are always allowed. Journeys are combinations of the
+ticked modes — tick train+car and you get train→free-car→train trips. Every ticked mode is
+also guaranteed a representative in the results: if buses are cheapest, the list no longer
+collapses to all buses; the cheapest train (and car, and flight) are pulled in at their
+correct price position. Excluding a mode also skips its work — unchecking Flight avoids the
+slow Google scrape, unchecking Freerider skips the inventory fetch.
 
 **Round-trip and fare calendar.** `search --return DATE` prices there and back on their own
 dates and sums the cheapest of each; `tripps fares` (and the "Cheapest day" button, and
