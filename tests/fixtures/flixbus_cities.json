@@ -1,0 +1,53 @@
+[
+ {
+  "score": 58.940334,
+  "country": "se",
+  "has_train_station": false,
+  "district": "Stockholm County",
+  "name": "Stockholm",
+  "legacy_id": 3798,
+  "subdivision_code": null,
+  "location": {
+   "lon": 18.0685808,
+   "lat": 59.3293235
+  },
+  "timezone_offset_seconds": 7200,
+  "id": "40dfdbe7-8646-11e6-9066-549f350fcb0c",
+  "stations": null,
+  "is_flixbus_city": true
+ },
+ {
+  "score": 19.063393,
+  "country": "se",
+  "has_train_station": false,
+  "district": null,
+  "name": "Stockholm Arlanda Airport",
+  "legacy_id": 123113,
+  "subdivision_code": null,
+  "location": {
+   "lon": 17.9342942,
+   "lat": 59.6493928
+  },
+  "timezone_offset_seconds": 7200,
+  "id": "a7b1fa68-4337-40e7-b5b9-0cc8ba0deb05",
+  "stations": null,
+  "is_flixbus_city": true
+ },
+ {
+  "score": 18.747723,
+  "country": "se",
+  "has_train_station": false,
+  "district": "Stockholm County",
+  "name": "Stockholm (Liljeholmen)",
+  "legacy_id": 125413,
+  "subdivision_code": null,
+  "location": {
+   "lon": 18.0256259,
+   "lat": 59.310088
+  },
+  "timezone_offset_seconds": 7200,
+  "id": "ad5e3ed4-9a00-440e-aabe-ca95d756e5be",
+  "stations": null,
+  "is_flixbus_city": true
+ }
+]

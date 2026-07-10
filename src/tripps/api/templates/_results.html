@@ -1,0 +1,119 @@
+{# Results partial, injected into #results. Price confidence is always visible: a Freerider
+   estimate and a live FlixBus fare must never look like the same kind of number. #}
+<style>
+  .warnbox { background: var(--warn-bg); border: 1px solid var(--warn); color: var(--warn);
+             border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1.25rem; font-size: .9rem; }
+  .warnbox ul { margin: .35rem 0 0; padding-left: 1.1rem; }
+  .itin { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+          padding: 1rem 1.15rem; margin-bottom: 1rem; }
+  .itin.best { border-color: var(--accent); border-width: 2px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+          flex-wrap: wrap; margin-bottom: .75rem; }
+  .price { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
+  .price.none { font-size: 1rem; font-weight: 600; color: var(--warn); }
+  .meta { color: var(--muted); font-size: .9rem; }
+  .badge { display: inline-block; font-size: .7rem; text-transform: uppercase;
+           letter-spacing: .05em; padding: .15rem .45rem; border-radius: 4px;
+           border: 1px solid var(--line); color: var(--muted); vertical-align: middle; }
+  .badge.exact { color: var(--accent); border-color: var(--accent); }
+  .badge.estimated, .badge.stale { color: var(--warn); border-color: var(--warn); }
+  .badge.unavailable { color: var(--warn); border-color: var(--warn); }
+  .badge.free { color: var(--free); border-color: var(--free); background: var(--free-bg); }
+  .legs { list-style: none; margin: 0; padding: 0; }
+  .leg { display: grid; grid-template-columns: 5.5rem 1fr auto; gap: .75rem;
+         padding: .5rem 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .leg .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; }
+  .leg .what strong { font-weight: 600; }
+  .leg .cost { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .mode { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .walk { opacity: .65; }
+  a.book { color: var(--accent); text-decoration: none; font-size: .85rem; }
+  a.book:hover { text-decoration: underline; }
+  .statline { color: var(--muted); font-size: .8rem; margin-top: 1.5rem; }
+  .empty { color: var(--muted); }
+</style>
+
+{% if error %}
+  <div class="warnbox">{{ error }}</div>
+{% elif not itineraries %}
+  <p class="empty">No journey found. Try widening the constraints or another date.</p>
+  {% if response and response.warnings %}
+    <div class="warnbox">
+      <ul>{% for w in response.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+    </div>
+  {% endif %}
+{% else %}
+
+  {% if response.warnings %}
+    <div class="warnbox">
+      <strong>Before you book</strong>
+      <ul>{% for w in response.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+    </div>
+  {% endif %}
+
+  {% for itin in itineraries %}
+    <article class="itin {% if loop.first %}best{% endif %}">
+      <div class="head">
+        <div>
+          {% if itin.total_price_sek is not none %}
+            <span class="price">{{ "%.0f"|format(itin.total_price_sek) }} SEK</span>
+          {% else %}
+            <span class="price none">Price unavailable</span>
+          {% endif %}
+          <span class="badge {{ itin.price_confidence.value }}">{{ itin.price_confidence.value }}</span>
+          {% if loop.first and itin.total_price_sek is not none %}
+            <span class="badge free">cheapest</span>
+          {% endif %}
+        </div>
+        <div class="meta">
+          {{ itin.departure.strftime("%H:%M") }} → {{ itin.arrival.strftime("%H:%M") }}
+          · {{ (itin.duration_seconds // 3600) }}h{{ "%02d"|format((itin.duration_seconds % 3600) // 60) }}
+          · {{ itin.transfers }} transfer{{ "" if itin.transfers == 1 else "s" }}
+        </div>
+      </div>
+
+      <ul class="legs">
+        {% for leg in itin.legs %}
+          <li class="leg {% if leg.mode.value == 'walk' %}walk{% endif %}">
+            <span class="time">{{ leg.departure.strftime("%H:%M") }}–{{ leg.arrival.strftime("%H:%M") }}</span>
+            <span class="what">
+              <span class="mode">{{ leg.mode.value.replace("_", " ") }}</span><br>
+              <strong>{{ leg.from_stop.name }}</strong> → <strong>{{ leg.to_stop.name }}</strong>
+              {% if leg.operator %}<br><span class="meta">{{ leg.operator }}{% if leg.headsign %} · {{ leg.headsign }}{% endif %}</span>{% endif %}
+              {% if leg.quote and leg.quote.note %}<br><span class="meta">{{ leg.quote.note }}</span>{% endif %}
+            </span>
+            <span class="cost">
+              {% if leg.mode.value == "walk" %}
+                <span class="meta">walk</span>
+              {% elif leg.quote and leg.quote.amount_ore is not none %}
+                {% if leg.quote.amount_ore == 0 %}
+                  <span class="badge free">free</span>
+                {% else %}
+                  {{ "%.0f"|format(leg.quote.amount_sek) }} SEK
+                {% endif %}
+                <br><span class="badge {{ leg.quote.confidence.value }}">{{ leg.quote.confidence.value }}</span>
+              {% else %}
+                <span class="badge unavailable">no price</span>
+              {% endif %}
+              {% if leg.quote and leg.quote.deeplink %}
+                <br><a class="book" href="{{ leg.quote.deeplink }}" target="_blank" rel="noopener noreferrer">book →</a>
+              {% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    </article>
+  {% endfor %}
+
+  {% if stats %}
+    <p class="statline">
+      {{ stats.candidates }} candidate itineraries from {{ stats.rounds }} rounds ·
+      {{ stats.priced }} priced with {{ stats.upstream_calls }} upstream call{{ "" if stats.upstream_calls == 1 else "s" }} ·
+      {{ stats.freerider_offers }} Freerider car{{ "" if stats.freerider_offers == 1 else "s" }} ·
+      {{ stats.flight_offers }} flight{{ "" if stats.flight_offers == 1 else "s" }}
+      {% if response.source_status %}
+        · sources: {% for name, state in response.source_status.items() %}{{ name }}={{ state }}{{ ", " if not loop.last }}{% endfor %}
+      {% endif %}
+    </p>
+  {% endif %}
+{% endif %}

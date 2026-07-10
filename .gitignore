@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.playwright-mcp/
+.env
+
+# The downloaded GTFS feed (~67 MB) and the local cache database, at the repo root only.
+# Anchored with a leading slash: an unanchored `data/` would also swallow
+# src/tripps/data/airports.json, which is packaged code, not a build artefact.
+/data/

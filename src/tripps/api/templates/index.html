@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tripps — cheapest way across Sweden</title>
+<style>
+  :root {
+    --bg: #fbfaf8; --fg: #1c1b1a; --muted: #6b6764; --line: #e3e0dc;
+    --card: #ffffff; --accent: #1d6f52; --warn: #8a5a1a; --warn-bg: #fdf6e9;
+    --free: #1d6f52; --free-bg: #eaf5ef;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16150f; --fg: #edeae4; --muted: #9b958d; --line: #33312b;
+      --card: #1f1e18; --accent: #6fbf95; --warn: #d9a441; --warn-bg: #2a2317;
+      --free: #6fbf95; --free-bg: #1b2a22;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 60rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  h1 { font-size: 1.9rem; margin: 0 0 .25rem; letter-spacing: -.02em; }
+  .tagline { color: var(--muted); margin: 0 0 2rem; }
+  form {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.25rem; display: grid; gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+  label { display: block; font-size: .8rem; text-transform: uppercase;
+          letter-spacing: .04em; color: var(--muted); margin-bottom: .35rem; }
+  input[type=text], input[type=date], input[type=time], input[type=number] {
+    width: 100%; padding: .55rem .65rem; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit;
+  }
+  .checks { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .checks label { text-transform: none; letter-spacing: 0; font-size: .95rem;
+                  color: var(--fg); margin: 0; display: flex; gap: .45rem; align-items: center; }
+  .full { grid-column: 1 / -1; }
+  button {
+    padding: .7rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent);
+    color: #fff; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .55; cursor: progress; }
+  .note { color: var(--muted); font-size: .85rem; }
+  .banner { background: var(--warn-bg); border: 1px solid var(--warn);
+            color: var(--warn); border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1.5rem; }
+  #results { margin-top: 2rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>tripps</h1>
+  <p class="tagline">The cheapest way from A to B in Sweden — train, bus, flight, and free Hertz Freerider cars, combined.</p>
+
+  {% if errors %}
+    <div class="banner">
+      {% for e in errors %}<div>{{ e }}</div>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form id="search" method="post" action="/search">
+    <div>
+      <label for="origin">From</label>
+      <input type="text" id="origin" name="origin" required placeholder="Stockholm C" autocomplete="off">
+    </div>
+    <div>
+      <label for="destination">To</label>
+      <input type="text" id="destination" name="destination" required placeholder="Göteborg C" autocomplete="off">
+    </div>
+    <div>
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" value="{{ today }}" required>
+    </div>
+    <div>
+      <label for="earliest">Leave after</label>
+      <input type="time" id="earliest" name="earliest" value="06:00">
+    </div>
+    <div>
+      <label for="max_hours">Max hours</label>
+      <input type="number" id="max_hours" name="max_hours" min="1" max="48" step="0.5" placeholder="any">
+    </div>
+    <div>
+      <label for="max_transfers">Max transfers</label>
+      <input type="number" id="max_transfers" name="max_transfers" min="0" max="5" placeholder="any">
+    </div>
+
+    <div class="full checks">
+      <label>
+        <input type="checkbox" name="include_freerider" value="true" checked>
+        Hertz Freerider ({{ freerider_count }} cars listed)
+      </label>
+      <label>
+        <input type="checkbox" name="include_flights" value="true">
+        Domestic flights
+      </label>
+    </div>
+
+    <div class="full">
+      <button type="submit" id="go">Find the cheapest</button>
+      <span class="note" id="status"></span>
+    </div>
+  </form>
+
+  <div id="results"></div>
+</main>
+
+<script>
+  const form = document.getElementById("search");
+  const results = document.getElementById("results");
+  const button = document.getElementById("go");
+  const status = document.getElementById("status");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    button.disabled = true;
+    status.textContent = "Routing, then pricing the survivors…";
+    results.innerHTML = "";
+    try {
+      const response = await fetch("/search", { method: "POST", body: new FormData(form) });
+      results.innerHTML = await response.text();
+    } catch (err) {
+      results.innerHTML = '<p class="banner">Search failed: ' + err + "</p>";
+    } finally {
+      button.disabled = false;
+      status.textContent = "";
+    }
+  });
+</script>
+</body>
+</html>

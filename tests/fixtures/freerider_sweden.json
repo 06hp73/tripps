@@ -1,0 +1,978 @@
+[
+ {
+  "pickupLocationName": "Uppsala DT/Self Service Kiosk",
+  "returnLocationName": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+  "routes": [
+   {
+    "id": 59379,
+    "transportOfferId": 40295,
+    "pickupLocation": {
+     "name": "Uppsala DT/Self Service Kiosk",
+     "tracCode": "SWUPP63",
+     "country": "se",
+     "emailAddress": "hertz.uppsala@bilbolaget.nu",
+     "address": "Kungsgatan 97",
+     "city": "Uppsala",
+     "phoneNumber": "+46 (0)18 160200",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "6": {
+       "openingTime": null,
+       "closingTime": null
+      },
+      "7": {
+       "openingTime": null,
+       "closingTime": null
+      }
+     },
+     "geoLat": 59.848316,
+     "geoLon": 17.660113,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "Weekdays / office hours: A staffed office is available during opening hours, 7:00 AM–4:00 PM, inside Bilbolaget (VOLVO), Kungsgatan 97, 753 18 Uppsala. Evenings and weekends: The self-service kiosk is located at the entrance to Bilbolaget, level with parking row “A1”. Phone number for the local station (weekdays from 9:00 AM until the office closes): +46 (0)18 160200. In case of emergency Breakdown car, please call: +46(0)87678410. For urgent matters outside staffed opening hours, please contact Hertz Self ",
+     "infoTextLocationNative": "Vardagar / kontorstider: Bemannat kontor under öppettider 7-16 finns inne på Bilbolaget  (VOLVO) Kungsgatan 97, 753 18 Uppsala. Helger och kvällar: Självbetjäningskiosken finns vid entrén till Bilbolaget, i höjd av parkeringsrad \"A1\". Phone number to local station weekdays 9.00 am until office is closed +46(0)18-160200. In case of emergency Breakdown car, please call: +46(0)87678410. For urgent matters outside staffed opening hours, please contact Hertz Self Service Kiosk Support +46(0)771–320 310.",
+     "infoTextParkingEnglish": "Preferred parking for cars is available in rows C2–D3. If you have a minivan or truck, please try to park in row after D3. If those areas are full, you may also use rows B2–C1.",
+     "infoTextParkingNative": "Prioriterad parkering finns på parkeringsraderna C2 - D3 för bilar. Om du har en Minivan eller Lastbil, försök att parkera på D4. Om det är helt fullt, får du även använda parkeringsraderna B2 - C1.",
+     "infoTextMiscEnglish": "The office is staffed for pick-up on weekdays from 7:00 AM to 4:00 PM. At other times, please use the self-service kiosk located by parking row A1 at the entrance to Bilbolaget. Bring the physical credit card used for the booking, your plastic driver’s licence, and a passport or national ID card if your driver’s licence was issued outside Sweden.",
+     "infoTextMiscNative": "Kontoret är bemannat för upphämtning vardagar 07:00–16:00. Övriga tider använder du självbetjäningskiosken i höjd med parkeringsrad A1 vid ingången till Bilbolaget. Ta med det fysiska kreditkortet som användes vid bokningen, ditt körkort i plastformat och pass eller nationellt ID-kort om körkortet är utfärdat utanför Sverige.",
+     "infoTextReturnEnglish": "After parking, please take a few photos of the car as documentation of its condition. If returning the vehicle outside staffed hours, leave the keys in the self-service kiosk (follow the instructions in the kiosk). If the kiosk is full, use the manual silver-colored key drop slot in the building façade, located approximately 10 meters away in the inner corner near the kiosk (“silver-colored mailbox flap in the façade”), and send an email to hertz.uppsala@bilbolaget.nu stating that the keys, together with th",
+     "infoTextReturnNative": "Efter parkering, ta några bilder på bilen när du parkerar den som dokumentation av skicket. Vid återlämning utanför bemannade tider lämnas nycklarna i självtjänstkiosken (följ instruktion i kiosk). Om kiosken är full, använd det manuella silverfärgade nyckelinkastet i fasaden cirka ca 10 meter i inre hörnet vid kiosken \"silverfärgad postlådelucka i fasaden\" samt mejla till hertz.uppsala@bilbolaget.nu att nycklar med registreringsnummer är återlämnad."
+    },
+    "returnLocation": {
+     "name": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+     "tracCode": "SWSTO50",
+     "country": "se",
+     "emailAddress": "arlanda@hertz.se",
+     "address": "Vingvägen 4",
+     "city": "Stockholm (Arlanda)",
+     "phoneNumber": "+46 (0)8 590 905 00",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T20:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 59.638257,
+     "geoLon": 17.940247,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please take the bus from the Car Rental Center to get to Terminal 2/3 or Terminal 4. The buses run at least four times an hour.",
+     "infoTextDropOffNative": "Vänligen ta bussen från Hyrbilscenter för att komma till Terminal 2/3 eller Terminal 4. Bussarna går minst fyra gånger i timmen.",
+     "infoTextLocationEnglish": "Pick up your car at the Hertz office at the Rental Car Center during staffed hours; all other hours, please use our self-service kiosk. You will find the self-service kiosk opposite the bus stop, at the Hertz parking area.",
+     "infoTextLocationNative": "Hämta din bil inne på Hertz kontoret på Hyrbilscenter under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken mittemot busshållplatsen, vid Hertz parkering.",
+     "infoTextParkingEnglish": "The car is parked in a designated Hertz parking space. The exact parking space is stated in your rental agreement.",
+     "infoTextParkingNative": "Bilen är parkerad på en uppmärkt Hertz plats. Exakt parkeringsplats står på ditt hyresavtal.",
+     "infoTextMiscEnglish": "Please take the 'P2 Car Rental' bus from Terminal 2/3 or Terminal 4 to reach the Car Rental Center. The buses run at least four times an hour. Our staffed hours are Monday to Friday from 07:00 to 23:00, Saturday from 07:00 to 22:00, and Sunday from 07:00 to 23:00.",
+     "infoTextMiscNative": "Vänligen ta buss 'P2 Car Rental' från Terminal 2/3 eller Terminal 4 för att komma till Hyrbilscenter. Bussarna går minst fyra gånger i timmen. Våra bemannade tider är mån-fre 07-23, lör 07-22 och sön 07-23.",
+     "infoTextReturnEnglish": "Park the car at the Hertz parking lot by Instant Return. Leave the key with the Hertz staff or in the key drop box located to the right of the door, if there is no Hertz staff present.                                                                                                                                                                                                                                                                          ",
+     "infoTextReturnNative": "Parkera bilen vid Hertz parkering vid Instant Return. L{mna nyckeln till Hertz personal eller i nyckelinkastet som sitter till h|ger om d|rren om det inte finns Hertz personal p} plats.                                                                                                                                                                                                                                                                         "
+    },
+    "priorityOrder": 1,
+    "distance": 40.0,
+    "originalDistance": 33.16,
+    "travelTime": 27,
+    "originalTravelTime": 23,
+    "availableAt": "2026-07-10T06:00:00",
+    "latestReturn": "2026-07-10T17:45:00",
+    "expireTime": "2026-07-10T17:18:00",
+    "carModel": "VOLVO XC40 B3 FWD AUT PLUS DAR",
+    "publicDescription": "",
+    "publicInformation": ""
+   }
+  ]
+ },
+ {
+  "pickupLocationName": "Luleå Flygplats / Self Service Kiosk",
+  "returnLocationName": "Gällivare DT",
+  "routes": [
+   {
+    "id": 59370,
+    "transportOfferId": 40287,
+    "pickupLocation": {
+     "name": "Luleå Flygplats / Self Service Kiosk",
+     "tracCode": "SWLLA50",
+     "country": "se",
+     "emailAddress": "lulea@hertz.se",
+     "address": "FLYGSTATIONSVÄGEN 4",
+     "city": "Luleå",
+     "phoneNumber": "+46 (0)920 87344",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T18:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T18:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T18:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T18:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T18:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T10:30:00",
+       "closingTime": "1970-01-01T19:30:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T13:00:00",
+       "closingTime": "1970-01-01T22:00:00"
+      }
+     },
+     "geoLat": 65.549004,
+     "geoLon": 22.12325,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "Pick up the key at the office during staffed hours; at other times, please use our self-service kiosk. The self-service kiosk is located in the passage near the entrance closest to the car rental desk.",
+     "infoTextLocationNative": "Nyckel hämtas på kontoret under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Självservicekiosken är placerad i slussen vid entrén närmast hyrbilsdisken.",
+     "infoTextParkingEnglish": "Walk out of the terminal, cross the road. Follow the car rental signs along the footpath to get to the car rental parking lot.",
+     "infoTextParkingNative": "Gå ut ur terminalen, gå över vägen. Följ skyltarna \"Hyrbilar\" längs med gångvägen så kommer du till hyrbilsparkeringen. ",
+     "infoTextMiscEnglish": "This office is staffed on weekdays from 07:00 to 20:30, on Saturdays from 11:30 to 20:30, and on Sundays from 14:00 to 23:00. Contact Swedavia if the entrance door to the airlock is locked; see the information at the entrance.",
+     "infoTextMiscNative": "Detta kontor är bemannat helgfria vardagar 07.00-20.30, lördagar 11.30-20.30 och söndagar 14.00-23.00. Kontakta Swedavia om entrédörren in till luftslussen är låst, se information vid entrén.",
+     "infoTextReturnEnglish": "Drive into the airport area towards the terminal building and follow the signs for 'Car Rentals'. The parking is on the left side. Park the car at the designated Hertz parking space and leave the key in the self-service kiosk or in the key drop box to the left of the car rental desk.",
+     "infoTextReturnNative": "Kör in på flygplatsområdet mot terminalbyggnaden och följ skyltning mot \"Hyrbilar\". Parkeringen ligger på vänster sida. Parkera på en märkt Hertz plats och lämna nyckeln i självservicekiosken eller i nyckelinkastet till vänster om hyrbilsdisken."
+    },
+    "returnLocation": {
+     "name": "Gällivare DT",
+     "tracCode": "SWGEV61",
+     "country": "se",
+     "emailAddress": "hertz.gallivare@bilbolaget.com",
+     "address": "Sommarvägen 2",
+     "city": "Gällivare",
+     "phoneNumber": "+46 (0)970-12550",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "6": {
+       "openingTime": null,
+       "closingTime": null
+      },
+      "7": {
+       "openingTime": null,
+       "closingTime": null
+      }
+     },
+     "geoLat": 67.14987,
+     "geoLon": 20.660999,
+     "kiosk": false,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "",
+     "infoTextLocationNative": "",
+     "infoTextParkingEnglish": "",
+     "infoTextParkingNative": "",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "",
+     "infoTextReturnNative": ""
+    },
+    "priorityOrder": 1,
+    "distance": 297.0,
+    "originalDistance": 247.19,
+    "travelTime": 201,
+    "originalTravelTime": 168,
+    "availableAt": "2026-07-09T13:15:00",
+    "latestReturn": "2026-07-10T21:15:00",
+    "expireTime": "2026-07-10T17:54:00",
+    "carModel": "FORD FOCUS HGV 1,0T 125 ACT MA",
+    "publicDescription": "",
+    "publicInformation": ""
+   }
+  ]
+ },
+ {
+  "pickupLocationName": "KIRKENES LUFTHAVN",
+  "returnLocationName": "Stockholm Centralstation / Self Service Kiosk",
+  "routes": [
+   {
+    "id": 58148,
+    "transportOfferId": 39515,
+    "pickupLocation": {
+     "name": "KIRKENES LUFTHAVN",
+     "tracCode": "NOKKN51",
+     "country": "no",
+     "emailAddress": "kirkenes@hertz.no",
+     "address": "KIRKENES LUFTHAVN",
+     "city": "HESSENG",
+     "phoneNumber": "90 05 31 71",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "6": {
+       "openingTime": null,
+       "closingTime": null
+      },
+      "7": {
+       "openingTime": null,
+       "closingTime": null
+      }
+     },
+     "geoLat": 69.726,
+     "geoLon": 29.895,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "The kiosk is located at the counter in the arrivals terminal.",
+     "infoTextLocationNative": "Kiosken er plassert ved skranken i ankomstterminalen",
+     "infoTextParkingEnglish": "The rental cars are parked to the right when you exit the terminal.",
+     "infoTextParkingNative": "Leiebilene er parkert til høyre når du kommer ut av terminalen ",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "Park the car in the designated Hertz parking area and leave the key at the kiosk in the arrivals terminal.",
+     "infoTextReturnNative": "Parker bilen på merket Hertz-parkering og lever nøkkel i kiosk i ankomstterminalen."
+    },
+    "returnLocation": {
+     "name": "Stockholm Centralstation / Self Service Kiosk",
+     "tracCode": "SWSTO60",
+     "country": "se",
+     "emailAddress": "vasagatan@hertz.se",
+     "address": "MÄSTER SAMUELSGATAN 71",
+     "city": "STOCKHOLM",
+     "phoneNumber": "+46 (0)8 4546250",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T16:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T16:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T16:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T16:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T16:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T12:00:00"
+      },
+      "7": {
+       "openingTime": null,
+       "closingTime": null
+      }
+     },
+     "geoLat": 59.331785,
+     "geoLon": 18.059201,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please note that the garage is closed 24:00 - 05:00 every day of the week. ",
+     "infoTextDropOffNative": "Observera att garaget är stängt 24.00 - 05.00 alla dagar.",
+     "infoTextLocationEnglish": "Pick-up your rentalcar at the Hertz office in the street level when the office is staffed. All other hours please use The Self Service Kiosk that´s located in the Continental garage, floor K3, follow the Hertz signs. To enter the garage please enter the pincode 41 61 73 OK.",
+     "infoTextLocationNative": "Hämta din bil på Hertz kontoret i gatuplan under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken i Continentalgaraget, våning K3. Följ Hertzskyltarna. Använd kod 41 61 73 OK för att komma in i garaget.",
+     "infoTextParkingEnglish": "The cars are parked in Hertz-marked parking spaces on the same floor as the self-service kiosk.",
+     "infoTextParkingNative": "Bilarna står på Hertzmärkta parkeringsplatser på samma våningsplan som självservicekiosken.",
+     "infoTextMiscEnglish": "To enter the garage please enter the pincode 41 61 73 OK. The garage is closed 24:00 - 05:00 every day of the week. The Hertz office is staffed weekdays 08-17, Saturday 09-13.",
+     "infoTextMiscNative": "Använd kod 41 61 73 OK för att komma in i garaget. Garaget är stängt 24.00 - 05.00 alla dagar. Våra bemannade tider är helgfria vardagar 08-17, lördag 09-13.",
+     "infoTextReturnEnglish": "Park the car on a designated Hertz parking space, floor K3 in the Continental garage. Return the key in the Self Service Kiosk.",
+     "infoTextReturnNative": "Parkera på Hertzmärka platser på våning K3 i Continentalgaraget. Lämna nyckeln i självservicekiosken."
+    },
+    "priorityOrder": 2,
+    "distance": 1896.0,
+    "originalDistance": 1579.57,
+    "travelTime": 1408,
+    "originalTravelTime": 1174,
+    "availableAt": "2026-06-29T13:30:00",
+    "latestReturn": "2026-07-14T21:00:00",
+    "expireTime": "2026-07-13T21:32:00",
+    "carModel": "VOLVO XC60 T6 AUT AWD NE PL DA",
+    "publicDescription": "",
+    "publicInformation": ""
+   }
+  ]
+ },
+ {
+  "pickupLocationName": "Göteborg Landvetter Flygplats / Self Service Kiosk",
+  "returnLocationName": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+  "routes": [
+   {
+    "id": 59339,
+    "transportOfferId": 40259,
+    "pickupLocation": {
+     "name": "Göteborg Landvetter Flygplats / Self Service Kiosk",
+     "tracCode": "SWGOT50",
+     "country": "se",
+     "emailAddress": "landvetter@hertz.se",
+     "address": "P.O Box 2006",
+     "city": "Landvetter",
+     "phoneNumber": "+46 (0)31 946020",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 57.66829,
+     "geoLon": 12.297067,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "The Self Service Kiosk is located in the rental car garage on the first floor, next to the Hertz parking area.",
+     "infoTextLocationNative": "Du hittar självservicekiosken i hyrbilsgaraget på plan 1 vid Hertz parkeringsplatser.",
+     "infoTextParkingEnglish": "Hertz rental cars are parked on designated Hertz parking spaces in the rental car garage, rows A and B.",
+     "infoTextParkingNative": "Bilarna står på Hertzmärkta platser, rad A eller B, i hyrbilsgaraget.",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "Park the car on a designated Hertz parking space in the rental car garage. Return the key in the keybox at the entrance to the Hertz office.",
+     "infoTextReturnNative": "Parkera bilen på Hertzmärkt parkeringsplats i hyrbilsgaraget. Lämna nyckeln i nyckelinkastet vid ingången till Hertzkontoret."
+    },
+    "returnLocation": {
+     "name": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+     "tracCode": "SWSTO50",
+     "country": "se",
+     "emailAddress": "arlanda@hertz.se",
+     "address": "Vingvägen 4",
+     "city": "Stockholm (Arlanda)",
+     "phoneNumber": "+46 (0)8 590 905 00",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T20:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 59.638257,
+     "geoLon": 17.940247,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please take the bus from the Car Rental Center to get to Terminal 2/3 or Terminal 4. The buses run at least four times an hour.",
+     "infoTextDropOffNative": "Vänligen ta bussen från Hyrbilscenter för att komma till Terminal 2/3 eller Terminal 4. Bussarna går minst fyra gånger i timmen.",
+     "infoTextLocationEnglish": "Pick up your car at the Hertz office at the Rental Car Center during staffed hours; all other hours, please use our self-service kiosk. You will find the self-service kiosk opposite the bus stop, at the Hertz parking area.",
+     "infoTextLocationNative": "Hämta din bil inne på Hertz kontoret på Hyrbilscenter under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken mittemot busshållplatsen, vid Hertz parkering.",
+     "infoTextParkingEnglish": "The car is parked in a designated Hertz parking space. The exact parking space is stated in your rental agreement.",
+     "infoTextParkingNative": "Bilen är parkerad på en uppmärkt Hertz plats. Exakt parkeringsplats står på ditt hyresavtal.",
+     "infoTextMiscEnglish": "Please take the 'P2 Car Rental' bus from Terminal 2/3 or Terminal 4 to reach the Car Rental Center. The buses run at least four times an hour. Our staffed hours are Monday to Friday from 07:00 to 23:00, Saturday from 07:00 to 22:00, and Sunday from 07:00 to 23:00.",
+     "infoTextMiscNative": "Vänligen ta buss 'P2 Car Rental' från Terminal 2/3 eller Terminal 4 för att komma till Hyrbilscenter. Bussarna går minst fyra gånger i timmen. Våra bemannade tider är mån-fre 07-23, lör 07-22 och sön 07-23.",
+     "infoTextReturnEnglish": "Park the car at the Hertz parking lot by Instant Return. Leave the key with the Hertz staff or in the key drop box located to the right of the door, if there is no Hertz staff present.                                                                                                                                                                                                                                                                          ",
+     "infoTextReturnNative": "Parkera bilen vid Hertz parkering vid Instant Return. L{mna nyckeln till Hertz personal eller i nyckelinkastet som sitter till h|ger om d|rren om det inte finns Hertz personal p} plats.                                                                                                                                                                                                                                                                         "
+    },
+    "priorityOrder": 1,
+    "distance": 581.0,
+    "originalDistance": 483.45,
+    "travelTime": 372,
+    "originalTravelTime": 310,
+    "availableAt": "2026-07-13T06:00:00",
+    "latestReturn": "2026-07-14T21:45:00",
+    "expireTime": "2026-07-14T15:33:00",
+    "carModel": "Lynk & Co 01",
+    "publicDescription": "",
+    "publicInformation": ""
+   },
+   {
+    "id": 59346,
+    "transportOfferId": 40266,
+    "pickupLocation": {
+     "name": "Göteborg Landvetter Flygplats / Self Service Kiosk",
+     "tracCode": "SWGOT50",
+     "country": "se",
+     "emailAddress": "landvetter@hertz.se",
+     "address": "P.O Box 2006",
+     "city": "Landvetter",
+     "phoneNumber": "+46 (0)31 946020",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 57.66829,
+     "geoLon": 12.297067,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "The Self Service Kiosk is located in the rental car garage on the first floor, next to the Hertz parking area.",
+     "infoTextLocationNative": "Du hittar självservicekiosken i hyrbilsgaraget på plan 1 vid Hertz parkeringsplatser.",
+     "infoTextParkingEnglish": "Hertz rental cars are parked on designated Hertz parking spaces in the rental car garage, rows A and B.",
+     "infoTextParkingNative": "Bilarna står på Hertzmärkta platser, rad A eller B, i hyrbilsgaraget.",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "Park the car on a designated Hertz parking space in the rental car garage. Return the key in the keybox at the entrance to the Hertz office.",
+     "infoTextReturnNative": "Parkera bilen på Hertzmärkt parkeringsplats i hyrbilsgaraget. Lämna nyckeln i nyckelinkastet vid ingången till Hertzkontoret."
+    },
+    "returnLocation": {
+     "name": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+     "tracCode": "SWSTO50",
+     "country": "se",
+     "emailAddress": "arlanda@hertz.se",
+     "address": "Vingvägen 4",
+     "city": "Stockholm (Arlanda)",
+     "phoneNumber": "+46 (0)8 590 905 00",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T20:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 59.638257,
+     "geoLon": 17.940247,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please take the bus from the Car Rental Center to get to Terminal 2/3 or Terminal 4. The buses run at least four times an hour.",
+     "infoTextDropOffNative": "Vänligen ta bussen från Hyrbilscenter för att komma till Terminal 2/3 eller Terminal 4. Bussarna går minst fyra gånger i timmen.",
+     "infoTextLocationEnglish": "Pick up your car at the Hertz office at the Rental Car Center during staffed hours; all other hours, please use our self-service kiosk. You will find the self-service kiosk opposite the bus stop, at the Hertz parking area.",
+     "infoTextLocationNative": "Hämta din bil inne på Hertz kontoret på Hyrbilscenter under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken mittemot busshållplatsen, vid Hertz parkering.",
+     "infoTextParkingEnglish": "The car is parked in a designated Hertz parking space. The exact parking space is stated in your rental agreement.",
+     "infoTextParkingNative": "Bilen är parkerad på en uppmärkt Hertz plats. Exakt parkeringsplats står på ditt hyresavtal.",
+     "infoTextMiscEnglish": "Please take the 'P2 Car Rental' bus from Terminal 2/3 or Terminal 4 to reach the Car Rental Center. The buses run at least four times an hour. Our staffed hours are Monday to Friday from 07:00 to 23:00, Saturday from 07:00 to 22:00, and Sunday from 07:00 to 23:00.",
+     "infoTextMiscNative": "Vänligen ta buss 'P2 Car Rental' från Terminal 2/3 eller Terminal 4 för att komma till Hyrbilscenter. Bussarna går minst fyra gånger i timmen. Våra bemannade tider är mån-fre 07-23, lör 07-22 och sön 07-23.",
+     "infoTextReturnEnglish": "Park the car at the Hertz parking lot by Instant Return. Leave the key with the Hertz staff or in the key drop box located to the right of the door, if there is no Hertz staff present.                                                                                                                                                                                                                                                                          ",
+     "infoTextReturnNative": "Parkera bilen vid Hertz parkering vid Instant Return. L{mna nyckeln till Hertz personal eller i nyckelinkastet som sitter till h|ger om d|rren om det inte finns Hertz personal p} plats.                                                                                                                                                                                                                                                                         "
+    },
+    "priorityOrder": 1,
+    "distance": 581.0,
+    "originalDistance": 483.45,
+    "travelTime": 372,
+    "originalTravelTime": 310,
+    "availableAt": "2026-07-13T06:00:00",
+    "latestReturn": "2026-07-14T21:45:00",
+    "expireTime": "2026-07-14T15:33:00",
+    "carModel": "Lynk & Co 01",
+    "publicDescription": "",
+    "publicInformation": ""
+   },
+   {
+    "id": 59351,
+    "transportOfferId": 40271,
+    "pickupLocation": {
+     "name": "Göteborg Landvetter Flygplats / Self Service Kiosk",
+     "tracCode": "SWGOT50",
+     "country": "se",
+     "emailAddress": "landvetter@hertz.se",
+     "address": "P.O Box 2006",
+     "city": "Landvetter",
+     "phoneNumber": "+46 (0)31 946020",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 57.66829,
+     "geoLon": 12.297067,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "The Self Service Kiosk is located in the rental car garage on the first floor, next to the Hertz parking area.",
+     "infoTextLocationNative": "Du hittar självservicekiosken i hyrbilsgaraget på plan 1 vid Hertz parkeringsplatser.",
+     "infoTextParkingEnglish": "Hertz rental cars are parked on designated Hertz parking spaces in the rental car garage, rows A and B.",
+     "infoTextParkingNative": "Bilarna står på Hertzmärkta platser, rad A eller B, i hyrbilsgaraget.",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "Park the car on a designated Hertz parking space in the rental car garage. Return the key in the keybox at the entrance to the Hertz office.",
+     "infoTextReturnNative": "Parkera bilen på Hertzmärkt parkeringsplats i hyrbilsgaraget. Lämna nyckeln i nyckelinkastet vid ingången till Hertzkontoret."
+    },
+    "returnLocation": {
+     "name": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+     "tracCode": "SWSTO50",
+     "country": "se",
+     "emailAddress": "arlanda@hertz.se",
+     "address": "Vingvägen 4",
+     "city": "Stockholm (Arlanda)",
+     "phoneNumber": "+46 (0)8 590 905 00",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T20:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 59.638257,
+     "geoLon": 17.940247,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please take the bus from the Car Rental Center to get to Terminal 2/3 or Terminal 4. The buses run at least four times an hour.",
+     "infoTextDropOffNative": "Vänligen ta bussen från Hyrbilscenter för att komma till Terminal 2/3 eller Terminal 4. Bussarna går minst fyra gånger i timmen.",
+     "infoTextLocationEnglish": "Pick up your car at the Hertz office at the Rental Car Center during staffed hours; all other hours, please use our self-service kiosk. You will find the self-service kiosk opposite the bus stop, at the Hertz parking area.",
+     "infoTextLocationNative": "Hämta din bil inne på Hertz kontoret på Hyrbilscenter under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken mittemot busshållplatsen, vid Hertz parkering.",
+     "infoTextParkingEnglish": "The car is parked in a designated Hertz parking space. The exact parking space is stated in your rental agreement.",
+     "infoTextParkingNative": "Bilen är parkerad på en uppmärkt Hertz plats. Exakt parkeringsplats står på ditt hyresavtal.",
+     "infoTextMiscEnglish": "Please take the 'P2 Car Rental' bus from Terminal 2/3 or Terminal 4 to reach the Car Rental Center. The buses run at least four times an hour. Our staffed hours are Monday to Friday from 07:00 to 23:00, Saturday from 07:00 to 22:00, and Sunday from 07:00 to 23:00.",
+     "infoTextMiscNative": "Vänligen ta buss 'P2 Car Rental' från Terminal 2/3 eller Terminal 4 för att komma till Hyrbilscenter. Bussarna går minst fyra gånger i timmen. Våra bemannade tider är mån-fre 07-23, lör 07-22 och sön 07-23.",
+     "infoTextReturnEnglish": "Park the car at the Hertz parking lot by Instant Return. Leave the key with the Hertz staff or in the key drop box located to the right of the door, if there is no Hertz staff present.                                                                                                                                                                                                                                                                          ",
+     "infoTextReturnNative": "Parkera bilen vid Hertz parkering vid Instant Return. L{mna nyckeln till Hertz personal eller i nyckelinkastet som sitter till h|ger om d|rren om det inte finns Hertz personal p} plats.                                                                                                                                                                                                                                                                         "
+    },
+    "priorityOrder": 1,
+    "distance": 581.0,
+    "originalDistance": 483.45,
+    "travelTime": 372,
+    "originalTravelTime": 310,
+    "availableAt": "2026-07-13T06:00:00",
+    "latestReturn": "2026-07-14T21:45:00",
+    "expireTime": "2026-07-14T15:33:00",
+    "carModel": "Lynk & Co 01",
+    "publicDescription": "",
+    "publicInformation": ""
+   },
+   {
+    "id": 59352,
+    "transportOfferId": 40272,
+    "pickupLocation": {
+     "name": "Göteborg Landvetter Flygplats / Self Service Kiosk",
+     "tracCode": "SWGOT50",
+     "country": "se",
+     "emailAddress": "landvetter@hertz.se",
+     "address": "P.O Box 2006",
+     "city": "Landvetter",
+     "phoneNumber": "+46 (0)31 946020",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 57.66829,
+     "geoLon": 12.297067,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "The Self Service Kiosk is located in the rental car garage on the first floor, next to the Hertz parking area.",
+     "infoTextLocationNative": "Du hittar självservicekiosken i hyrbilsgaraget på plan 1 vid Hertz parkeringsplatser.",
+     "infoTextParkingEnglish": "Hertz rental cars are parked on designated Hertz parking spaces in the rental car garage, rows A and B.",
+     "infoTextParkingNative": "Bilarna står på Hertzmärkta platser, rad A eller B, i hyrbilsgaraget.",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "Park the car on a designated Hertz parking space in the rental car garage. Return the key in the keybox at the entrance to the Hertz office.",
+     "infoTextReturnNative": "Parkera bilen på Hertzmärkt parkeringsplats i hyrbilsgaraget. Lämna nyckeln i nyckelinkastet vid ingången till Hertzkontoret."
+    },
+    "returnLocation": {
+     "name": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+     "tracCode": "SWSTO50",
+     "country": "se",
+     "emailAddress": "arlanda@hertz.se",
+     "address": "Vingvägen 4",
+     "city": "Stockholm (Arlanda)",
+     "phoneNumber": "+46 (0)8 590 905 00",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T20:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 59.638257,
+     "geoLon": 17.940247,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please take the bus from the Car Rental Center to get to Terminal 2/3 or Terminal 4. The buses run at least four times an hour.",
+     "infoTextDropOffNative": "Vänligen ta bussen från Hyrbilscenter för att komma till Terminal 2/3 eller Terminal 4. Bussarna går minst fyra gånger i timmen.",
+     "infoTextLocationEnglish": "Pick up your car at the Hertz office at the Rental Car Center during staffed hours; all other hours, please use our self-service kiosk. You will find the self-service kiosk opposite the bus stop, at the Hertz parking area.",
+     "infoTextLocationNative": "Hämta din bil inne på Hertz kontoret på Hyrbilscenter under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken mittemot busshållplatsen, vid Hertz parkering.",
+     "infoTextParkingEnglish": "The car is parked in a designated Hertz parking space. The exact parking space is stated in your rental agreement.",
+     "infoTextParkingNative": "Bilen är parkerad på en uppmärkt Hertz plats. Exakt parkeringsplats står på ditt hyresavtal.",
+     "infoTextMiscEnglish": "Please take the 'P2 Car Rental' bus from Terminal 2/3 or Terminal 4 to reach the Car Rental Center. The buses run at least four times an hour. Our staffed hours are Monday to Friday from 07:00 to 23:00, Saturday from 07:00 to 22:00, and Sunday from 07:00 to 23:00.",
+     "infoTextMiscNative": "Vänligen ta buss 'P2 Car Rental' från Terminal 2/3 eller Terminal 4 för att komma till Hyrbilscenter. Bussarna går minst fyra gånger i timmen. Våra bemannade tider är mån-fre 07-23, lör 07-22 och sön 07-23.",
+     "infoTextReturnEnglish": "Park the car at the Hertz parking lot by Instant Return. Leave the key with the Hertz staff or in the key drop box located to the right of the door, if there is no Hertz staff present.                                                                                                                                                                                                                                                                          ",
+     "infoTextReturnNative": "Parkera bilen vid Hertz parkering vid Instant Return. L{mna nyckeln till Hertz personal eller i nyckelinkastet som sitter till h|ger om d|rren om det inte finns Hertz personal p} plats.                                                                                                                                                                                                                                                                         "
+    },
+    "priorityOrder": 1,
+    "distance": 581.0,
+    "originalDistance": 483.45,
+    "travelTime": 372,
+    "originalTravelTime": 310,
+    "availableAt": "2026-07-13T06:00:00",
+    "latestReturn": "2026-07-14T21:45:00",
+    "expireTime": "2026-07-14T15:33:00",
+    "carModel": "Lynk & Co 01",
+    "publicDescription": "",
+    "publicInformation": ""
+   },
+   {
+    "id": 59353,
+    "transportOfferId": 40273,
+    "pickupLocation": {
+     "name": "Göteborg Landvetter Flygplats / Self Service Kiosk",
+     "tracCode": "SWGOT50",
+     "country": "se",
+     "emailAddress": "landvetter@hertz.se",
+     "address": "P.O Box 2006",
+     "city": "Landvetter",
+     "phoneNumber": "+46 (0)31 946020",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T06:30:00",
+       "closingTime": "1970-01-01T22:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T15:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T08:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 57.66829,
+     "geoLon": 12.297067,
+     "kiosk": true,
+     "infoTextDropOffEnglish": null,
+     "infoTextDropOffNative": null,
+     "infoTextLocationEnglish": "The Self Service Kiosk is located in the rental car garage on the first floor, next to the Hertz parking area.",
+     "infoTextLocationNative": "Du hittar självservicekiosken i hyrbilsgaraget på plan 1 vid Hertz parkeringsplatser.",
+     "infoTextParkingEnglish": "Hertz rental cars are parked on designated Hertz parking spaces in the rental car garage, rows A and B.",
+     "infoTextParkingNative": "Bilarna står på Hertzmärkta platser, rad A eller B, i hyrbilsgaraget.",
+     "infoTextMiscEnglish": "",
+     "infoTextMiscNative": "",
+     "infoTextReturnEnglish": "Park the car on a designated Hertz parking space in the rental car garage. Return the key in the keybox at the entrance to the Hertz office.",
+     "infoTextReturnNative": "Parkera bilen på Hertzmärkt parkeringsplats i hyrbilsgaraget. Lämna nyckeln i nyckelinkastet vid ingången till Hertzkontoret."
+    },
+    "returnLocation": {
+     "name": "Stockholm Arlanda Flygplats / Self Service Kiosk",
+     "tracCode": "SWSTO50",
+     "country": "se",
+     "emailAddress": "arlanda@hertz.se",
+     "address": "Vingvägen 4",
+     "city": "Stockholm (Arlanda)",
+     "phoneNumber": "+46 (0)8 590 905 00",
+     "regularOpeningHours": {
+      "1": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "2": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "3": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "4": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "5": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      },
+      "6": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T20:00:00"
+      },
+      "7": {
+       "openingTime": "1970-01-01T07:00:00",
+       "closingTime": "1970-01-01T21:00:00"
+      }
+     },
+     "geoLat": 59.638257,
+     "geoLon": 17.940247,
+     "kiosk": true,
+     "infoTextDropOffEnglish": "Please take the bus from the Car Rental Center to get to Terminal 2/3 or Terminal 4. The buses run at least four times an hour.",
+     "infoTextDropOffNative": "Vänligen ta bussen från Hyrbilscenter för att komma till Terminal 2/3 eller Terminal 4. Bussarna går minst fyra gånger i timmen.",
+     "infoTextLocationEnglish": "Pick up your car at the Hertz office at the Rental Car Center during staffed hours; all other hours, please use our self-service kiosk. You will find the self-service kiosk opposite the bus stop, at the Hertz parking area.",
+     "infoTextLocationNative": "Hämta din bil inne på Hertz kontoret på Hyrbilscenter under bemannade tider, övriga tider hänvisar vi till vår självservicekiosk. Du hittar självservicekiosken mittemot busshållplatsen, vid Hertz parkering.",
+     "infoTextParkingEnglish": "The car is parked in a designated Hertz parking space. The exact parking space is stated in your rental agreement.",
+     "infoTextParkingNative": "Bilen är parkerad på en uppmärkt Hertz plats. Exakt parkeringsplats står på ditt hyresavtal.",
+     "infoTextMiscEnglish": "Please take the 'P2 Car Rental' bus from Terminal 2/3 or Terminal 4 to reach the Car Rental Center. The buses run at least four times an hour. Our staffed hours are Monday to Friday from 07:00 to 23:00, Saturday from 07:00 to 22:00, and Sunday from 07:00 to 23:00.",
+     "infoTextMiscNative": "Vänligen ta buss 'P2 Car Rental' från Terminal 2/3 eller Terminal 4 för att komma till Hyrbilscenter. Bussarna går minst fyra gånger i timmen. Våra bemannade tider är mån-fre 07-23, lör 07-22 och sön 07-23.",
+     "infoTextReturnEnglish": "Park the car at the Hertz parking lot by Instant Return. Leave the key with the Hertz staff or in the key drop box located to the right of the door, if there is no Hertz staff present.                                                                                                                                                                                                                                                                          ",
+     "infoTextReturnNative": "Parkera bilen vid Hertz parkering vid Instant Return. L{mna nyckeln till Hertz personal eller i nyckelinkastet som sitter till h|ger om d|rren om det inte finns Hertz personal p} plats.                                                                                                                                                                                                                                                                         "
+    },
+    "priorityOrder": 1,
+    "distance": 581.0,
+    "originalDistance": 483.45,
+    "travelTime": 372,
+    "originalTravelTime": 310,
+    "availableAt": "2026-07-13T06:00:00",
+    "latestReturn": "2026-07-14T21:45:00",
+    "expireTime": "2026-07-14T15:33:00",
+    "carModel": "Lynk & Co 01",
+    "publicDescription": "",
+    "publicInformation": ""
+   }
+  ]
+ }
+]

@@ -1,0 +1,436 @@
+"""Build the routing timetable from a static GTFS feed (GTFS Sweden 3 / GTFS Sverige 2).
+
+Why self-host the feed instead of calling ResRobot's journey planner per query: Trafiklab
+rate-limits ResRobot at 45 req/min on the free tier and explicitly declines quota upgrades
+for crawler-shaped workloads, pushing bulk consumers to GTFS. A national static feed is
+CC0, refreshes daily, and answers an unlimited number of queries offline. ResRobot is kept
+only for resolving a typed place name to a stop id.
+
+Two GTFS details drive the code below.
+
+**Extended route types.** Trafiklab feeds use the extended (three- and four-digit) route
+type vocabulary, not the basic 0-7 codes. `102` is a long-distance train, `700` a local
+bus. Filtering on the basic vocabulary would silently drop every intercity service. Both
+are accepted here, because the historical GTFS Sverige 2 feed uses basic codes.
+
+**Regional trains are not optional.** Oresundstag (Goteborg-Malmo) and Malartag
+(Stockholm-Orebro) are classified regional/suburban, yet they are frequently the cheapest
+way to travel those corridors. A "long-distance only" filter would silently miss the
+cheapest answer, so `INTERCITY_ROUTE_TYPES` includes regional rail.
+"""
+
+from __future__ import annotations
+
+import csv
+import io
+import logging
+import zipfile
+from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import date, datetime
+from pathlib import Path
+
+from ..models import Stop, TransportMode
+from ..routing.timetable import RouteInfo, Timetable, TimetableBuilder, Trip, close_transfers
+from ..timeutil import parse_gtfs_time
+
+log = logging.getLogger(__name__)
+
+# --- route type vocabulary -------------------------------------------------
+# Extended GTFS route types, per the Google/Trafiklab extension. Ranges rather than
+# exhaustive lists, because feeds use codes we have not seen.
+
+
+def _in(value: int, low: int, high: int) -> bool:
+    return low <= value <= high
+
+
+def mode_for_route_type(route_type: int) -> TransportMode:
+    """Map a GTFS route_type onto a planner mode.
+
+    Suburban rail (109), metro (400-404) and local bus (700, 704, 715) are LOCAL_TRANSIT:
+    schedules exist for them but no price source does, so they must be distinguishable in
+    order to be flagged rather than silently summed into a "cheapest" total.
+    """
+    # Basic vocabulary (GTFS Sverige 2 and many regional feeds).
+    basic = {
+        0: TransportMode.LOCAL_TRANSIT,  # tram
+        1: TransportMode.LOCAL_TRANSIT,  # subway
+        2: TransportMode.TRAIN,
+        3: TransportMode.BUS,
+        4: TransportMode.FERRY,
+        5: TransportMode.LOCAL_TRANSIT,  # cable tram
+        6: TransportMode.LOCAL_TRANSIT,  # aerial lift
+        7: TransportMode.LOCAL_TRANSIT,  # funicular
+    }
+    if route_type in basic:
+        return basic[route_type]
+
+    if route_type == 109 or _in(route_type, 400, 405):
+        return TransportMode.LOCAL_TRANSIT  # suburban rail, metro
+    if _in(route_type, 100, 117):
+        return TransportMode.TRAIN
+    if _in(route_type, 200, 209):
+        return TransportMode.BUS  # coach services
+    if route_type in (702, 703, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714):
+        return TransportMode.BUS  # express / regional coach variants
+    if _in(route_type, 700, 716):
+        return TransportMode.LOCAL_TRANSIT  # 700 generic, 704 local, 715 demand-responsive
+    if _in(route_type, 900, 906):
+        return TransportMode.LOCAL_TRANSIT  # tram
+    if _in(route_type, 1000, 1021):
+        return TransportMode.FERRY
+    if route_type == 1100:
+        return TransportMode.FLIGHT
+    if _in(route_type, 1200, 1299):
+        return TransportMode.FERRY
+    if _in(route_type, 1500, 1507):
+        return TransportMode.LOCAL_TRANSIT  # taxi
+    return TransportMode.LOCAL_TRANSIT
+
+
+#: Route types worth putting in the intercity network. Includes regional and suburban rail
+#: because those services carry the cheapest fares on several trunk corridors, and ferries
+#: because Destination Gotland is the dominant cheap option to Visby.
+INTERCITY_MODES = frozenset(
+    {TransportMode.TRAIN, TransportMode.BUS, TransportMode.FERRY, TransportMode.FLIGHT}
+)
+
+
+@dataclass(slots=True)
+class GtfsConfig:
+    """What to keep from a national feed.
+
+    `include_local_transit` pulls in metro/tram/local bus. They are needed for the first
+    and last mile, and they blow the timetable up by an order of magnitude, so they are off
+    by default for intercity search.
+    """
+
+    include_local_transit: bool = False
+    #: Only these agencies, by name. Empty means every agency.
+    agencies: frozenset[str] = frozenset()
+    #: Cap on GTFS `transfers.txt` walk times; also the closure cap.
+    max_transfer_seconds: int = 1800
+    #: Fallback change time when the feed does not specify one.
+    default_transfer_seconds: int = 300
+    #: Collapse platforms onto their parent station. Intercity routing does not care which
+    #: platform a train leaves from, and collapsing removes a large class of pointless
+    #: intra-station transfers.
+    collapse_parent_stations: bool = True
+
+    def wants(self, mode: TransportMode) -> bool:
+        if mode in INTERCITY_MODES:
+            return True
+        return self.include_local_transit
+
+
+@dataclass(slots=True)
+class GtfsStats:
+    stops: int = 0
+    routes: int = 0
+    trips: int = 0
+    dropped_trips: int = 0
+    agencies: set[str] = field(default_factory=set)
+    route_types: dict[int, int] = field(default_factory=dict)
+    problems: list[str] = field(default_factory=list)
+
+
+def _read_csv(zf: zipfile.ZipFile, name: str) -> list[dict[str, str]]:
+    if name not in zf.namelist():
+        return []
+    with zf.open(name) as raw:
+        text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
+        return list(csv.DictReader(text))
+
+
+def _iter_csv(zf: zipfile.ZipFile, name: str):
+    """Stream a member. `stop_times.txt` in a national feed has millions of rows."""
+    if name not in zf.namelist():
+        return
+    with zf.open(name) as raw:
+        text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
+        yield from csv.DictReader(text)
+
+
+def _parse_date(value: str) -> date:
+    return datetime.strptime(value.strip(), "%Y%m%d").date()
+
+
+def active_service_ids(zf: zipfile.ZipFile, service_date: date) -> set[str]:
+    """Service ids running on `service_date`, honouring calendar_dates exceptions.
+
+    A feed may express its calendar entirely through `calendar_dates.txt` (no
+    `calendar.txt` at all), which is legal GTFS and common for operators with irregular
+    service, so neither file may be assumed present.
+    """
+    weekday = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+    ][service_date.weekday()]
+
+    active: set[str] = set()
+    for row in _read_csv(zf, "calendar.txt"):
+        try:
+            start, end = _parse_date(row["start_date"]), _parse_date(row["end_date"])
+        except (KeyError, ValueError):
+            continue
+        if start <= service_date <= end and row.get(weekday, "0") == "1":
+            active.add(row["service_id"])
+
+    for row in _read_csv(zf, "calendar_dates.txt"):
+        try:
+            if _parse_date(row["date"]) != service_date:
+                continue
+        except (KeyError, ValueError):
+            continue
+        exception = row.get("exception_type", "").strip()
+        if exception == "1":
+            active.add(row["service_id"])
+        elif exception == "2":
+            active.discard(row["service_id"])
+
+    return active
+
+
+def load_timetable(
+    zip_path: Path | str,
+    service_date: date,
+    config: GtfsConfig | None = None,
+) -> tuple[Timetable, GtfsStats]:
+    """Parse a GTFS zip into a `Timetable` for one service date."""
+    config = config or GtfsConfig()
+    stats = GtfsStats()
+    builder = TimetableBuilder()
+
+    with zipfile.ZipFile(zip_path) as zf:
+        agencies = {
+            row["agency_id"]: row.get("agency_name", row["agency_id"])
+            for row in _read_csv(zf, "agency.txt")
+            if row.get("agency_id")
+        }
+        # A single-agency feed may omit agency_id entirely.
+        default_agency = next(iter(agencies.values()), None) if len(agencies) == 1 else None
+
+        kept_routes: dict[str, tuple[RouteInfo, TransportMode]] = {}
+        for row in _read_csv(zf, "routes.txt"):
+            try:
+                route_type = int(row["route_type"])
+            except (KeyError, ValueError):
+                continue
+            mode = mode_for_route_type(route_type)
+            if not config.wants(mode):
+                continue
+            operator = agencies.get(row.get("agency_id", ""), default_agency)
+            if config.agencies and (operator or "") not in config.agencies:
+                continue
+            kept_routes[row["route_id"]] = (
+                RouteInfo(id=row["route_id"], mode=mode, operator=operator, route_type=route_type),
+                mode,
+            )
+            stats.route_types[route_type] = stats.route_types.get(route_type, 0) + 1
+            if operator:
+                stats.agencies.add(operator)
+
+        services = active_service_ids(zf, service_date)
+
+        kept_trips: dict[str, tuple[str, str | None]] = {}
+        for row in _iter_csv(zf, "trips.txt"):
+            if row.get("route_id") not in kept_routes:
+                continue
+            if row.get("service_id") not in services:
+                continue
+            kept_trips[row["trip_id"]] = (row["route_id"], row.get("trip_headsign") or None)
+
+        stops_by_id, alias = _load_stops(zf, config)
+
+        # Stream stop_times once, gathering only the trips we kept.
+        trip_times: dict[str, list[tuple[int, str, int, int]]] = defaultdict(list)
+        for row in _iter_csv(zf, "stop_times.txt"):
+            trip_id = row.get("trip_id")
+            if trip_id not in kept_trips:
+                continue
+            stop_id = alias.get(row["stop_id"], row["stop_id"])
+            if stop_id not in stops_by_id:
+                continue
+            try:
+                arrival = parse_gtfs_time(row["arrival_time"])
+                departure = parse_gtfs_time(row["departure_time"])
+                sequence = int(row["stop_sequence"])
+            except (KeyError, ValueError):
+                continue  # a stop_time without times is a non-timepoint; skip it
+            trip_times[trip_id].append((sequence, stop_id, arrival, departure))
+
+        used_stops: set[str] = set()
+        for entries in trip_times.values():
+            if len(entries) < 2:
+                stats.dropped_trips += 1
+                continue
+            entries.sort(key=lambda e: e[0])
+            # Collapsing platforms can make consecutive stop_times share a station.
+            deduped = _dedupe_consecutive(entries)
+            if len(deduped) < 2:
+                stats.dropped_trips += 1
+                continue
+            used_stops.update(e[1] for e in deduped)
+
+        for stop_id in used_stops:
+            builder.add_stop(stops_by_id[stop_id])
+
+        for trip_id, entries in trip_times.items():
+            if len(entries) < 2:
+                continue
+            entries.sort(key=lambda e: e[0])
+            deduped = _dedupe_consecutive(entries)
+            if len(deduped) < 2:
+                continue
+            route_id, headsign = kept_trips[trip_id]
+            info, _mode = kept_routes[route_id]
+            stop_ids = [e[1] for e in deduped]
+            trip = Trip(
+                id=trip_id,
+                arrivals=[e[2] for e in deduped],
+                departures=[e[3] for e in deduped],
+                headsign=headsign,
+            )
+            if not _monotonic(trip):
+                stats.dropped_trips += 1
+                stats.problems.append(f"trip {trip_id}: non-monotonic stop times")
+                continue
+            builder.add_trip(info, stop_ids, trip)
+            stats.trips += 1
+
+        _load_transfers(zf, builder, alias, used_stops, config)
+
+    timetable = builder.build()
+    stats.stops = timetable.num_stops
+    stats.routes = len(timetable.routes)
+    stats.problems.extend(timetable.validate())
+    return timetable, stats
+
+
+def _dedupe_consecutive(
+    entries: list[tuple[int, str, int, int]],
+) -> list[tuple[int, str, int, int]]:
+    """Collapse repeated stations caused by parent-station aliasing.
+
+    Keeps the first arrival and the last departure of the run, which is the correct
+    behaviour for a train that calls at two platforms of the same station.
+    """
+    out: list[tuple[int, str, int, int]] = []
+    for entry in entries:
+        if out and out[-1][1] == entry[1]:
+            seq, stop_id, arrival, _dep = out[-1]
+            out[-1] = (seq, stop_id, arrival, entry[3])
+        else:
+            out.append(entry)
+    return out
+
+
+def _monotonic(trip: Trip) -> bool:
+    for i in range(len(trip.arrivals)):
+        if trip.departures[i] < trip.arrivals[i]:
+            return False
+        if i + 1 < len(trip.arrivals) and trip.arrivals[i + 1] < trip.departures[i]:
+            return False
+    return True
+
+
+def _load_stops(
+    zf: zipfile.ZipFile, config: GtfsConfig
+) -> tuple[dict[str, Stop], dict[str, str]]:
+    """Return (stops by effective id, alias from raw stop_id to effective id)."""
+    raw_rows = _read_csv(zf, "stops.txt")
+    alias: dict[str, str] = {}
+    stops: dict[str, Stop] = {}
+
+    parents = {
+        row["stop_id"]
+        for row in raw_rows
+        if row.get("location_type", "0") == "1"
+    }
+
+    for row in raw_rows:
+        stop_id = row["stop_id"]
+        location_type = row.get("location_type", "0") or "0"
+        if location_type not in ("0", "1"):
+            continue  # entrances, generic nodes, boarding areas are not routable
+        parent = (row.get("parent_station") or "").strip()
+        if config.collapse_parent_stations and parent and parent in parents:
+            alias[stop_id] = parent
+            continue
+        try:
+            lat, lon = float(row["stop_lat"]), float(row["stop_lon"])
+        except (KeyError, ValueError):
+            continue
+        stops[stop_id] = Stop(
+            id=stop_id,
+            name=row.get("stop_name") or stop_id,
+            lat=lat,
+            lon=lon,
+            external_ids={"gtfs": stop_id},
+        )
+    return stops, alias
+
+
+def _load_transfers(
+    zf: zipfile.ZipFile,
+    builder: TimetableBuilder,
+    alias: dict[str, str],
+    used_stops: set[str],
+    config: GtfsConfig,
+) -> None:
+    """Load `transfers.txt`, symmetrize it, then transitively close the footpath graph.
+
+    RAPTOR relaxes footpaths exactly once per round, so a two-hop walk that is never
+    materialized is a journey the router simply cannot find. Closure is capped so the
+    walk graph does not turn into an all-pairs matrix.
+
+    `transfers.txt` rows are directional, and feeds routinely list only one direction of a
+    pair. A footpath is physically symmetric: if you can walk from the train station to the
+    coach terminal in ten minutes, you can walk back. Loading it directionally strands the
+    return journey, so pairs are mirrored here. Rows that forbid a transfer
+    (`transfer_type=3`) are dropped before mirroring, which keeps that veto effective.
+    """
+    raw: dict[int, dict[int, int]] = defaultdict(dict)
+    index: dict[str, int] = {}
+
+    def idx(stop_id: str) -> int | None:
+        if stop_id not in used_stops:
+            return None
+        if stop_id not in index:
+            index[stop_id] = builder.index_of(stop_id)
+        return index[stop_id]
+
+    for row in _iter_csv(zf, "transfers.txt"):
+        from_id = alias.get(row.get("from_stop_id", ""), row.get("from_stop_id", ""))
+        to_id = alias.get(row.get("to_stop_id", ""), row.get("to_stop_id", ""))
+        if from_id == to_id:
+            continue
+        a, b = idx(from_id), idx(to_id)
+        if a is None or b is None:
+            continue
+        transfer_type = (row.get("transfer_type") or "0").strip()
+        if transfer_type == "3":
+            continue  # transfer explicitly forbidden here
+        try:
+            seconds = int(row.get("min_transfer_time") or config.default_transfer_seconds)
+        except ValueError:
+            seconds = config.default_transfer_seconds
+        if seconds > config.max_transfer_seconds:
+            continue
+        for x, y in ((a, b), (b, a)):
+            current = raw[x].get(y)
+            if current is None or seconds < current:
+                raw[x][y] = seconds
+
+    closed = close_transfers(raw, config.max_transfer_seconds)
+    for a, targets in closed.items():
+        for b, seconds in targets.items():
+            builder.add_transfer(
+                builder.stop_at(a).id, builder.stop_at(b).id, seconds, bidirectional=False
+            )

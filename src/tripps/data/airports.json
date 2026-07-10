@@ -1,0 +1,274 @@
+[
+ {
+  "iata": "AGH",
+  "name": "Ängelholm-Helsingborg Airport",
+  "lat": 56.2961,
+  "lon": 12.8471,
+  "municipality": "Ängelholm",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "AJR",
+  "name": "Arvidsjaur Airport",
+  "lat": 65.5903,
+  "lon": 19.2819,
+  "municipality": "Arvidsjaur",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "ARN",
+  "name": "Stockholm-Arlanda Airport",
+  "lat": 59.64849,
+  "lon": 17.92883,
+  "municipality": "Stockholm",
+  "type": "large_airport"
+ },
+ {
+  "iata": "BLE",
+  "name": "Dala Airport",
+  "lat": 60.422,
+  "lon": 15.5152,
+  "municipality": "Borlange",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "BMA",
+  "name": "Stockholm-Bromma Airport",
+  "lat": 59.3544,
+  "lon": 17.9417,
+  "municipality": "Stockholm",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "GEV",
+  "name": "Gällivare Airport",
+  "lat": 67.1324,
+  "lon": 20.8146,
+  "municipality": "Gällivare",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "GOT",
+  "name": "Göteborg Landvetter Airport",
+  "lat": 57.6628,
+  "lon": 12.2798,
+  "municipality": "Göteborg",
+  "type": "large_airport"
+ },
+ {
+  "iata": "HAD",
+  "name": "Halmstad Airport",
+  "lat": 56.6911,
+  "lon": 12.8202,
+  "municipality": "Halmstad",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "JKG",
+  "name": "Jönköping Airport",
+  "lat": 57.7576,
+  "lon": 14.0687,
+  "municipality": "Jönköping",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "KLR",
+  "name": "Kalmar Airport",
+  "lat": 56.6855,
+  "lon": 16.2876,
+  "municipality": "Kalmar",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "KRF",
+  "name": "Kramfors-Sollefteå Höga Kusten Airport",
+  "lat": 63.0486,
+  "lon": 17.7689,
+  "municipality": "Nyland",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "KRN",
+  "name": "Kiruna Airport",
+  "lat": 67.822,
+  "lon": 20.3368,
+  "municipality": "Kiruna",
+  "type": "large_airport"
+ },
+ {
+  "iata": "KSD",
+  "name": "Karlstad Airport",
+  "lat": 59.4447,
+  "lon": 13.3374,
+  "municipality": "Karlstad",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "LLA",
+  "name": "Luleå Airport",
+  "lat": 65.5438,
+  "lon": 22.122,
+  "municipality": "Luleå",
+  "type": "large_airport"
+ },
+ {
+  "iata": "LPI",
+  "name": "Linköping City Airport",
+  "lat": 58.40491,
+  "lon": 15.6845,
+  "municipality": "Linköping",
+  "type": "large_airport"
+ },
+ {
+  "iata": "LYC",
+  "name": "Lycksele Airport",
+  "lat": 64.5483,
+  "lon": 18.7162,
+  "municipality": "Lycksele",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "MMX",
+  "name": "Malmö Sturup Airport",
+  "lat": 55.53556,
+  "lon": 13.37633,
+  "municipality": "Malmö",
+  "type": "large_airport"
+ },
+ {
+  "iata": "MXX",
+  "name": "Mora Airport",
+  "lat": 60.9579,
+  "lon": 14.5114,
+  "municipality": "Mora",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "NRK",
+  "name": "Norrköping Airport",
+  "lat": 58.5863,
+  "lon": 16.2506,
+  "municipality": "Norrköping",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "NYO",
+  "name": "Stockholm Skavsta Airport",
+  "lat": 58.78966,
+  "lon": 16.91148,
+  "municipality": "Nyköping",
+  "type": "large_airport"
+ },
+ {
+  "iata": "OER",
+  "name": "Örnsköldsvik Airport",
+  "lat": 63.4083,
+  "lon": 18.99,
+  "municipality": "Örnsköldsvik",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "ORB",
+  "name": "Örebro Airport",
+  "lat": 59.2237,
+  "lon": 15.038,
+  "municipality": "Örebro",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "OSD",
+  "name": "Åre Östersund Airport",
+  "lat": 63.19355,
+  "lon": 14.50417,
+  "municipality": "Östersund",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "RNB",
+  "name": "Ronneby Airport",
+  "lat": 56.2667,
+  "lon": 15.265,
+  "municipality": "Ronneby",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "SCR",
+  "name": "Scandinavian Mountains Airport",
+  "lat": 61.16508,
+  "lon": 12.83352,
+  "municipality": "Malung-Sälen",
+  "type": "large_airport"
+ },
+ {
+  "iata": "SDL",
+  "name": "Sundsvall-Härnösand Airport",
+  "lat": 62.5281,
+  "lon": 17.4439,
+  "municipality": "Sundsvall/ Härnösand",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "SFT",
+  "name": "Skellefteå Airport",
+  "lat": 64.6248,
+  "lon": 21.0769,
+  "municipality": "Skellefteå",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "THN",
+  "name": "Trollhättan-Vänersborg Airport",
+  "lat": 58.3181,
+  "lon": 12.345,
+  "municipality": "Trollhättan",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "TYF",
+  "name": "Torsby Airport",
+  "lat": 60.1576,
+  "lon": 12.9913,
+  "municipality": "Torsby",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "UME",
+  "name": "Umeå Airport",
+  "lat": 63.7918,
+  "lon": 20.2828,
+  "municipality": "Umeå",
+  "type": "large_airport"
+ },
+ {
+  "iata": "VBY",
+  "name": "Visby Airport",
+  "lat": 57.6628,
+  "lon": 18.3462,
+  "municipality": "Visby",
+  "type": "large_airport"
+ },
+ {
+  "iata": "VHM",
+  "name": "Vilhelmina South Lapland Airport",
+  "lat": 64.5791,
+  "lon": 16.8336,
+  "municipality": "Vilhelmina",
+  "type": "medium_airport"
+ },
+ {
+  "iata": "VST",
+  "name": "Stockholm Västerås Airport",
+  "lat": 59.5894,
+  "lon": 16.6336,
+  "municipality": "Stockholm / Västerås",
+  "type": "large_airport"
+ },
+ {
+  "iata": "VXO",
+  "name": "Växjö Kronoberg Airport",
+  "lat": 56.9291,
+  "lon": 14.728,
+  "municipality": "Växjö",
+  "type": "medium_airport"
+ }
+]
