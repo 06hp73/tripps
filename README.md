@@ -145,6 +145,14 @@ way the planner does and asserts a price still comes back, exiting non-zero if a
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
 
+`tripps calibrate` closes the price-floor feedback loop. The router optimizes a price *lower
+bound* (`floors.py`), shipped with deliberately loose defaults; every phase-2 price is logged
+to `reprice_delta`, and this command fits a tighter per-operator floor from that history —
+`per_km = min(actual/distance)`, `base = min(actual - per_km·distance)`, both provably at or
+below every observed fare, then discounted 10% for headroom. Tighter floors mean a smaller
+Pareto frontier and fewer upstream price calls. Run it periodically once real searches have
+accumulated; the floor-violation detector catches and self-corrects any overshoot.
+
 Endpoints: `GET /` (UI), `POST /search`, `GET /api/search`, `GET /api/stops`,
 `GET /api/freerider`, `GET /health`.
 

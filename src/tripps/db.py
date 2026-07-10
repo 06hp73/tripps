@@ -82,6 +82,18 @@ CREATE TABLE IF NOT EXISTS reprice_delta (
     floor_ore   INTEGER NOT NULL,
     actual_ore  INTEGER NOT NULL
 );
+
+-- Per-operator price floors calibrated from reprice_delta, replacing the hand-set defaults.
+-- These feed back into the router's price lower bound: tighter (but still safe) floors mean
+-- a smaller Pareto frontier and fewer upstream price calls per search.
+CREATE TABLE IF NOT EXISTS operator_floor (
+    operator     TEXT PRIMARY KEY,
+    mode         TEXT NOT NULL,
+    base_ore     INTEGER NOT NULL,
+    per_km_ore   INTEGER NOT NULL,
+    samples      INTEGER NOT NULL,
+    updated_at   TEXT NOT NULL
+);
 """
 
 
@@ -360,4 +372,35 @@ class Database:
         with self._lock:
             return self._conn.execute(
                 "SELECT * FROM reprice_delta WHERE floor_ore > actual_ore ORDER BY recorded_at DESC"
+            ).fetchall()
+
+    def reprice_observations(self) -> list[sqlite3.Row]:
+        """Every (operator, mode, distance, actual) point, for floor calibration."""
+        with self._lock:
+            return self._conn.execute(
+                "SELECT operator, mode, distance_km, actual_ore FROM reprice_delta "
+                "WHERE operator IS NOT NULL AND distance_km > 0 AND actual_ore > 0"
+            ).fetchall()
+
+    # --- calibrated floors ------------------------------------------------
+
+    def put_operator_floors(self, floors: list[dict]) -> None:
+        """Replace the calibrated-floor table with a fresh batch."""
+        with self._write() as conn:
+            conn.executemany(
+                """
+                INSERT INTO operator_floor (operator, mode, base_ore, per_km_ore, samples, updated_at)
+                VALUES (:operator, :mode, :base_ore, :per_km_ore, :samples, :updated_at)
+                ON CONFLICT(operator) DO UPDATE SET
+                    mode=excluded.mode, base_ore=excluded.base_ore,
+                    per_km_ore=excluded.per_km_ore, samples=excluded.samples,
+                    updated_at=excluded.updated_at
+                """,
+                floors,
+            )
+
+    def get_operator_floors(self) -> list[sqlite3.Row]:
+        with self._lock:
+            return self._conn.execute(
+                "SELECT operator, mode, base_ore, per_km_ore, samples FROM operator_floor"
             ).fetchall()

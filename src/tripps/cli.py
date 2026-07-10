@@ -10,6 +10,7 @@ from datetime import date
 
 import httpx
 
+from .calibration import load_calibrated_floors
 from .config import get_settings
 from .db import Database
 from .ingest.flights import GoogleFlightsProvider, NullFlightProvider
@@ -30,7 +31,6 @@ from .pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from .pricing.orchestrator import PricingOrchestrator
 from .pricing.sj import SJAdapter
 from .pricing.tora import ToraAdapter
-from .routing.floors import PriceFloorModel
 from .search import Planner, SearchOptions, summarize
 from .timeutil import now_local
 
@@ -158,8 +158,9 @@ async def _search(args: argparse.Namespace) -> int:
         else StaticFareAdapter(),
         DeeplinkAdapter(),
     ]
+    floors = load_calibrated_floors(db)
     orchestrator = PricingOrchestrator(
-        adapters, db, budget=settings.budget, ttl=settings.ttl, floors=PriceFloorModel()
+        adapters, db, budget=settings.budget, ttl=settings.ttl, floors=floors
     )
 
     allowed = {TransportMode.TRAIN, TransportMode.BUS, TransportMode.FERRY, TransportMode.WALK}
@@ -171,6 +172,7 @@ async def _search(args: argparse.Namespace) -> int:
     planner = Planner(
         timetable,
         orchestrator,
+        floors=floors,
         db=db,
         options=SearchOptions(max_results=args.limit, include_flights=args.flights),
         flight_provider=GoogleFlightsProvider() if args.flights else NullFlightProvider(),
@@ -236,6 +238,36 @@ def _serve(args: argparse.Namespace) -> int:
     import uvicorn
 
     uvicorn.run("tripps.api.app:app", host=args.host, port=args.port, reload=args.reload)
+    return 0
+
+
+def _calibrate(min_samples: int) -> int:
+    """Recompute per-operator price floors from logged fares and persist them."""
+    from .calibration import DEFAULT_FLOORS, run_calibration
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    db = Database(settings.db_path)
+    observations = len(db.reprice_observations())
+    calibrated = run_calibration(db, min_samples=min_samples)
+    db.close()
+
+    if not calibrated:
+        print(
+            f"no floors calibrated ({observations} priced observations; need >= {min_samples} "
+            "per operator). Run some searches first.",
+            file=sys.stderr,
+        )
+        return 0
+
+    print(f"calibrated {len(calibrated)} operator floors from {observations} observations:\n")
+    for c in sorted(calibrated, key=lambda x: -x.samples):
+        default = DEFAULT_FLOORS.get(next((m for m in DEFAULT_FLOORS if m.value == c.mode), None))
+        base_def = f" (default {default.base_ore / 100:.0f}+{default.per_km_ore}öre/km)" if default else ""
+        print(
+            f"  {c.operator[:22]:24} {c.mode:6} base {c.base_ore / 100:5.0f} SEK  "
+            f"{c.per_km_ore:3d} öre/km  n={c.samples}{base_def}"
+        )
     return 0
 
 
@@ -306,6 +338,11 @@ def main(argv: list[str] | None = None) -> int:
     cn = sub.add_parser("canary", help="probe every live price source and report drift")
     cn.add_argument("--json", action="store_true", dest="as_json")
 
+    cal = sub.add_parser(
+        "calibrate", help="tighten the routing price floors from logged fares"
+    )
+    cal.add_argument("--min-samples", type=int, default=8)
+
     args = parser.parse_args(argv)
     _configure_logging(args.verbose)
 
@@ -319,6 +356,8 @@ def main(argv: list[str] | None = None) -> int:
         return _serve(args)
     if args.command == "canary":
         return asyncio.run(_canary(args.as_json))
+    if args.command == "calibrate":
+        return _calibrate(args.min_samples)
     return 1
 
 

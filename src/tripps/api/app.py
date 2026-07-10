@@ -22,6 +22,7 @@ from fastapi import FastAPI, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+from ..calibration import load_calibrated_floors
 from ..config import Settings, get_settings
 from ..db import Database
 from ..ingest.flights import GoogleFlightsProvider, NullFlightProvider
@@ -42,7 +43,6 @@ from ..pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from ..pricing.orchestrator import PricingOrchestrator
 from ..pricing.sj import SJAdapter
 from ..pricing.tora import ToraAdapter
-from ..routing.floors import PriceFloorModel
 from ..routing.timetable import Timetable
 from ..search import Planner, SearchOptions, summarize
 from ..timeutil import now_local
@@ -116,7 +116,8 @@ class AppState:
             self.db,
             budget=self.settings.budget,
             ttl=self.settings.ttl,
-            floors=PriceFloorModel(),
+            # Floors calibrated from logged fares if any exist, else the safe defaults.
+            floors=load_calibrated_floors(self.db),
         )
         return self.orchestrator
 
@@ -165,9 +166,11 @@ class AppState:
         """
         timetable = self._timetable_for(service_date)
         self.timetable_date = service_date
+        orchestrator = self._ensure_orchestrator()
         return Planner(
             timetable,
-            self._ensure_orchestrator(),
+            orchestrator,
+            floors=orchestrator.floors,  # the router prunes with the same calibrated floors
             db=self.db,
             options=SearchOptions(),
             flight_provider=self.flight_provider,
