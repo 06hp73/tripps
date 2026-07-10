@@ -163,7 +163,9 @@ slow Google scrape, unchecking Freerider skips the inventory fetch.
 dates and sums the cheapest of each; `tripps fares` (and the "Cheapest day" button, and
 `/api/fares`) prices every day over a window and shows which is cheapest, because these fares
 are yield-managed — one Stockholm→Göteborg week ranged 335–585 SEK, so *when* to travel often
-beats *how*. Each day is a full search; the built timetable is cached to disk (~2 MB, loads
+beats *how*. In the web UI each day is tappable, expanding to that day's full journey — every
+leg with its operator, price, and a booking deeplink; `/api/fares` carries the full itinerary
+per day so the expansion needs no second request. Each day is a full search; the built timetable is cached to disk (~2 MB, loads
 in under a second versus ~15 s to parse), so the first window run is slow and the rest fast.
 
 `tripps watch` turns the perishable Freerider inventory into a standing interest. Free cars

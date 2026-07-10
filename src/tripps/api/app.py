@@ -509,6 +509,9 @@ async def api_fares(
                         m.value for m in f.cheapest.modes if m.value != "walk"
                     ] if f.cheapest else [],
                     "departure": f.cheapest.departure.isoformat() if f.cheapest else None,
+                    # The full cheapest itinerary, so pressing a day can expand its legs and
+                    # booking links without a second request.
+                    "itinerary": f.cheapest.model_dump(mode="json") if f.cheapest else None,
                 }
                 for f in fares
             ],

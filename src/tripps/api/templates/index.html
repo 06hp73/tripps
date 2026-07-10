@@ -62,10 +62,24 @@
   .opt { text-transform: none; color: var(--muted); font-weight: 400; letter-spacing: 0; }
   .fare-cal { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
   .fare-day { border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; background: var(--card); }
+  .fare-day[role=button] { cursor: pointer; transition: border-color .1s, transform .05s; }
+  .fare-day[role=button]:hover { border-color: var(--accent); }
+  .fare-day.open { border-color: var(--accent); border-width: 2px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
   .fare-day.best { border-color: var(--accent); border-width: 2px; }
+  .fare-day.disabled { opacity: .5; }
   .fare-day .d { font-size: .8rem; color: var(--muted); }
   .fare-day .p { font-size: 1.25rem; font-weight: 700; }
   .fare-day .m { font-size: .8rem; color: var(--muted); }
+  .fare-day .hint { font-size: .68rem; color: var(--accent); margin-top: .35rem; }
+  /* Itineraries rendered client-side (round-trip, fare detail) share the server partial's look. */
+  .itin { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; margin-bottom: 1rem; }
+  .itin .head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: .5rem; }
+  .itin .price { font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em; }
+  .itin .meta { color: var(--muted); font-size: .9rem; }
+  .itin .legs { list-style: none; margin: 0; padding: 0; }
+  .itin .legs li { padding: .4rem 0; border-top: 1px solid var(--line); font-size: .92rem; }
+  a.book { color: var(--accent); text-decoration: none; font-weight: 600; }
+  a.book:hover { text-decoration: underline; }
   .rt-head { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.25rem 0 .5rem; }
   .rt-total { font-size: 1.3rem; font-weight: 700; margin: 1rem 0; }
   .note { color: var(--muted); font-size: .85rem; }
@@ -232,18 +246,24 @@
     return p;
   }
 
+  function legRows(itin) {
+    return itin.legs.filter(l => l.mode !== "walk").map(l => {
+      const cost = l.quote && l.quote.amount_ore != null
+        ? (l.quote.amount_ore === 0 ? "free" : Math.round(l.quote.amount_ore / 100) + " SEK") : "no price";
+      const book = l.quote && l.quote.deeplink
+        ? ` · <a class="book" href="${esc(l.quote.deeplink)}" target="_blank" rel="noopener noreferrer">book →</a>` : "";
+      const op = l.operator ? ` <span class="meta">(${esc(l.operator)})</span>` : "";
+      return `<li>${l.departure.slice(11,16)}–${l.arrival.slice(11,16)} <b>${esc(l.mode)}</b>${op} `
+        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}${book}</li>`;
+    }).join("");
+  }
+
   function renderItinerary(itin) {
     const price = itin.total_price_sek != null
       ? Math.round(itin.total_price_sek) + " SEK" : "price unavailable";
-    const legs = itin.legs.filter(l => l.mode !== "walk").map(l => {
-      const cost = l.quote && l.quote.amount_ore != null
-        ? (l.quote.amount_ore === 0 ? "free" : Math.round(l.quote.amount_ore / 100) + " SEK") : "no price";
-      return `<li>${l.departure.slice(11,16)}–${l.arrival.slice(11,16)} <b>${esc(l.mode)}</b> `
-        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}</li>`;
-    }).join("");
     return `<div class="itin"><div class="head"><span class="price">${price}</span> `
       + `<span class="meta">${itin.departure.slice(11,16)}→${itin.arrival.slice(11,16)}</span></div>`
-      + `<ul class="legs">${legs}</ul></div>`;
+      + `<ul class="legs">${legRows(itin)}</ul></div>`;
   }
 
   function renderResponse(resp) {
@@ -310,16 +330,33 @@
     const data = await runJson("/api/fares?" + p.toString());
     if (!data) return;
     const best = data.cheapest ? data.cheapest.date : null;
-    const cells = data.days.map(d => {
+    const cells = data.days.map((d, i) => {
       const price = d.price_sek != null ? Math.round(d.price_sek) + " SEK" : "—";
       const dt = new Date(d.date + "T00:00");
       const label = dt.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
       const modes = (d.modes || []).join("+");
-      return `<div class="fare-day${d.date === best ? " best" : ""}"><div class="d">${label}</div>`
-        + `<div class="p">${price}</div><div class="m">${esc(modes)}</div></div>`;
+      const cls = d.itinerary ? `fare-day${d.date === best ? " best" : ""}` : "fare-day disabled";
+      return `<div class="${cls}" data-day="${i}"${d.itinerary ? ' role="button" tabindex="0"' : ""}>`
+        + `<div class="d">${label}</div><div class="p">${price}</div><div class="m">${esc(modes)}</div>`
+        + `<div class="hint">${d.itinerary ? "tap for legs & booking" : ""}</div></div>`;
     }).join("");
-    results.innerHTML = `<div class="rt-head">Cheapest day · ${esc(form.origin.value)} → ${esc(form.destination.value)}</div>`
-      + `<div class="fare-cal">${cells}</div>`;
+    results.innerHTML = `<div class="rt-head">Cheapest day · ${esc(form.origin.value)} → ${esc(form.destination.value)} `
+      + `<span class="opt">(tap a day to see the journey)</span></div>`
+      + `<div class="fare-cal">${cells}</div><div id="fare-detail"></div>`;
+
+    const detail = document.getElementById("fare-detail");
+    const openDay = (i) => {
+      const d = data.days[i];
+      if (!d || !d.itinerary) return;
+      [...results.querySelectorAll(".fare-day")].forEach(c => c.classList.toggle("open", c.dataset.day === String(i)));
+      const dt = new Date(d.date + "T00:00").toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+      detail.innerHTML = `<div class="rt-head">${esc(dt)} · ${Math.round(d.price_sek)} SEK</div>` + renderItinerary(d.itinerary);
+      detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    };
+    results.querySelectorAll(".fare-day[role=button]").forEach(card => {
+      card.addEventListener("click", () => openDay(Number(card.dataset.day)));
+      card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDay(Number(card.dataset.day)); } });
+    });
   });
 </script>
 </body>
