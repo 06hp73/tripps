@@ -1,0 +1,4352 @@
+{
+ "warnings": [],
+ "passengerSpecifications": [
+  {
+   "id": null,
+   "personDetail": null,
+   "type": "ADULT",
+   "externalRef": "ADULT-0",
+   "age": null,
+   "gender": null,
+   "dateOfBirth": null,
+   "prmNeeds": []
+  }
+ ],
+ "journeys": [
+  {
+   "id": "7f3b23fa-03c4-42b1-8278-7102d740b35f",
+   "createdOn": "2026-07-10T16:14:11.908900785Z",
+   "preBookableUntil": "2026-07-10T16:44:11.4759011Z",
+   "summary": "Malmö Centralstation → Göteborg Centralstation | Fri, Jul 24, 2026 08:12 - Fri, Jul 24, 2026 11:05 (2h 53m)",
+   "trip": {
+    "departureTime": "2026-07-24T08:12:00+02:00",
+    "arrivalTime": "2026-07-24T11:05:00+02:00",
+    "duration": "PT2H53M",
+    "changes": 0,
+    "originPlace": {
+     "id": "urn:x_swe:stn:740000003",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Malmö Centralstation",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "destinationPlace": {
+     "id": "urn:x_swe:stn:740000002",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Göteborg Centralstation",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "transportationModes": [
+     "TRAIN"
+    ],
+    "throughTicketTags": [],
+    "legs": [
+     {
+      "id": "f29fea82-7c28-4bf7-b362-2eda2c7ea673",
+      "departureTime": "2026-07-24T08:12:00+02:00",
+      "arrivalTime": "2026-07-24T11:05:00+02:00",
+      "duration": "PT2H53M",
+      "originPlace": {
+       "id": "urn:x_swe:stn:740000003",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Malmö Centralstation",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "destinationPlace": {
+       "id": "urn:x_swe:stn:740000002",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Göteborg Centralstation",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "operators": [
+       {
+        "ref": "urn:x_swe:carrier:300",
+        "name": "Öresundståg"
+       }
+      ],
+      "transportationMode": "TRAIN",
+      "vehicleNumbers": [
+       "1026"
+      ],
+      "productCategory": {
+       "name": "Regional",
+       "shortName": "RE",
+       "productCategoryRef": "RE"
+      },
+      "intermediateStops": [
+       {
+        "id": "urn:x_swe:stn:740000120",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Lund Centralstation",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T08:24:00+02:00",
+        "arrivalTime": "2026-07-24T08:22:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740001554",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Landskrona station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T08:39:00+02:00",
+        "arrivalTime": "2026-07-24T08:39:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000044",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Helsingborg Centralstation",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:01:00+02:00",
+        "arrivalTime": "2026-07-24T08:54:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000064",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Ängelholm station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:15:00+02:00",
+        "arrivalTime": "2026-07-24T09:15:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740001603",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Båstad station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:27:00+02:00",
+        "arrivalTime": "2026-07-24T09:27:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000058",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Laholm station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:33:00+02:00",
+        "arrivalTime": "2026-07-24T09:33:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000080",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Halmstad Centralstation",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:53:00+02:00",
+        "arrivalTime": "2026-07-24T09:46:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740001579",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Falkenberg station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:12:00+02:00",
+        "arrivalTime": "2026-07-24T10:12:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000110",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Varberg station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:26:00+02:00",
+        "arrivalTime": "2026-07-24T10:25:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000161",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Kungsbacka station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:44:00+02:00",
+        "arrivalTime": "2026-07-24T10:44:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000315",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Mölndal station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:57:00+02:00",
+        "arrivalTime": "2026-07-24T10:57:00+02:00"
+       }
+      ],
+      "attributes": [
+       {
+        "text": "No reservation",
+        "code": "BOKEJB"
+       },
+       {
+        "text": "EU regulation 2021/782",
+        "code": "EVFEUJ"
+       },
+       {
+        "text": "Wheelchair space, no reservation, level entry",
+        "code": "KOMREP"
+       }
+      ],
+      "transferDurationUntilNextLeg": null
+     }
+    ],
+    "carriers": [
+     {
+      "ref": "urn:x_swe:carrier:300",
+      "name": "Öresundståg"
+     }
+    ],
+    "attributes": [
+     {
+      "text": "No reservation",
+      "code": "BOKEJB"
+     },
+     {
+      "text": "Wheelchair space, no reservation, level entry",
+      "code": "KOMREP"
+     },
+     {
+      "text": "EU regulation 1371/2007",
+      "code": "EVFEUJ"
+     }
+    ],
+    "nightTrainPresence": "NONE",
+    "seatReservationRequired": false
+   },
+   "bookingOptions": {
+    "status": "BOOKABLE",
+    "lowestSecondClassPrice": {
+     "currency": "SEK",
+     "amount": 43500,
+     "scale": 2,
+     "vats": [
+      {
+       "countryCode": "SE",
+       "amount": 2298,
+       "scale": 2,
+       "percentage": 6.0,
+       "taxId": null,
+       "scope": "UNKNOWN"
+      }
+     ]
+    },
+    "lowestFirstClassPrice": {
+     "currency": "SEK",
+     "amount": 52400,
+     "scale": 2,
+     "vats": [
+      {
+       "countryCode": "SE",
+       "amount": 2768,
+       "scale": 2,
+       "percentage": 6.0,
+       "taxId": null,
+       "scope": "UNKNOWN"
+      }
+     ]
+    },
+    "basicBookingView": {
+     "SECOND": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 43500,
+       "scale": 2,
+       "vats": [
+        {
+         "countryCode": "SE",
+         "amount": 2298,
+         "scale": 2,
+         "percentage": 6.0,
+         "taxId": null,
+         "scope": "UNKNOWN"
+        }
+       ]
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "4a5b2b1f-c69c-4176-9b2a-1a29a04f5e36"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "4a5b2b1f-c69c-4176-9b2a-1a29a04f5e36",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "09becd5a-527b-4810-b192-39fe66310e02"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 3200,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "09becd5a-527b-4810-b192-39fe66310e02",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      }
+     },
+     "FIRST": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 52400,
+       "scale": 2,
+       "vats": [
+        {
+         "countryCode": "SE",
+         "amount": 2768,
+         "scale": 2,
+         "percentage": 6.0,
+         "taxId": null,
+         "scope": "UNKNOWN"
+        }
+       ]
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "00e611f5-1c1b-4374-ac4d-565c953ffda4"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "00e611f5-1c1b-4374-ac4d-565c953ffda4",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "23c16266-b406-40d3-bcc1-c09cb36ae9f4"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 3200,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "23c16266-b406-40d3-bcc1-c09cb36ae9f4",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      }
+     }
+    },
+    "detailedBookingView": {
+     "bookingOptions": [
+      {
+       "legIds": [
+        "f29fea82-7c28-4bf7-b362-2eda2c7ea673"
+       ],
+       "offers": [
+        {
+         "id": "4a5b2b1f-c69c-4176-9b2a-1a29a04f5e36",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 8:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 43500,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2298,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "93ee7504-87bc-4565-923e-5c8671401f2d",
+           "code": "NO",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "2 class, non-refundable",
+           "description": "2 class, non-refundable",
+           "legIds": [
+            "f29fea82-7c28-4bf7-b362-2eda2c7ea673"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "09becd5a-527b-4810-b192-39fe66310e02",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 8:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 46700,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2468,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "77aebe26-069f-43bb-8394-5bb872ea5c4c",
+           "code": "F2",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "2 class, refundable",
+           "description": "2 class, refundable",
+           "legIds": [
+            "f29fea82-7c28-4bf7-b362-2eda2c7ea673"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "00e611f5-1c1b-4374-ac4d-565c953ffda4",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 8:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 52400,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2768,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "a2b0569d-975c-41a5-b259-510348c9c3fd",
+           "code": "AL",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "1st class (refers to Öresundståg), non-refundable",
+           "description": "1st class (refers to Öresundståg), non-refundable",
+           "legIds": [
+            "f29fea82-7c28-4bf7-b362-2eda2c7ea673"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "23c16266-b406-40d3-bcc1-c09cb36ae9f4",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 8:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 55600,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2938,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "b1f40952-1ff5-4e28-abf0-0e1b85acade6",
+           "code": "F1",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "1st class (refers to Öresundståg), refundable",
+           "description": "1st class (refers to Öresundståg), refundable",
+           "legIds": [
+            "f29fea82-7c28-4bf7-b362-2eda2c7ea673"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        }
+       ]
+      }
+     ]
+    },
+    "discountOnLowestSecondClassPrice": null,
+    "discountOnLowestFirstClassPrice": null
+   }
+  },
+  {
+   "id": "6dbb14a4-6504-45d5-894c-27a16f0bd3f5",
+   "createdOn": "2026-07-10T16:14:11.909729286Z",
+   "preBookableUntil": "2026-07-10T16:44:11.4665616Z",
+   "summary": "Malmö Centralstation → Göteborg Centralstation | Fri, Jul 24, 2026 09:12 - Fri, Jul 24, 2026 12:05 (2h 53m)",
+   "trip": {
+    "departureTime": "2026-07-24T09:12:00+02:00",
+    "arrivalTime": "2026-07-24T12:05:00+02:00",
+    "duration": "PT2H53M",
+    "changes": 0,
+    "originPlace": {
+     "id": "urn:x_swe:stn:740000003",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Malmö Centralstation",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "destinationPlace": {
+     "id": "urn:x_swe:stn:740000002",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Göteborg Centralstation",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "transportationModes": [
+     "TRAIN"
+    ],
+    "throughTicketTags": [],
+    "legs": [
+     {
+      "id": "fc017073-dc4a-40e4-852c-35eec8e058f9",
+      "departureTime": "2026-07-24T09:12:00+02:00",
+      "arrivalTime": "2026-07-24T12:05:00+02:00",
+      "duration": "PT2H53M",
+      "originPlace": {
+       "id": "urn:x_swe:stn:740000003",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Malmö Centralstation",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "destinationPlace": {
+       "id": "urn:x_swe:stn:740000002",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Göteborg Centralstation",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "operators": [
+       {
+        "ref": "urn:x_swe:carrier:300",
+        "name": "Öresundståg"
+       }
+      ],
+      "transportationMode": "TRAIN",
+      "vehicleNumbers": [
+       "1034"
+      ],
+      "productCategory": {
+       "name": "Regional",
+       "shortName": "RE",
+       "productCategoryRef": "RE"
+      },
+      "intermediateStops": [
+       {
+        "id": "urn:x_swe:stn:740000120",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Lund Centralstation",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:24:00+02:00",
+        "arrivalTime": "2026-07-24T09:22:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740001554",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Landskrona station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T09:39:00+02:00",
+        "arrivalTime": "2026-07-24T09:39:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000044",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Helsingborg Centralstation",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:01:00+02:00",
+        "arrivalTime": "2026-07-24T09:54:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000064",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Ängelholm station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:15:00+02:00",
+        "arrivalTime": "2026-07-24T10:15:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740001603",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Båstad station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:27:00+02:00",
+        "arrivalTime": "2026-07-24T10:27:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000058",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Laholm station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:33:00+02:00",
+        "arrivalTime": "2026-07-24T10:33:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000080",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Halmstad Centralstation",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T10:53:00+02:00",
+        "arrivalTime": "2026-07-24T10:46:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740001579",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Falkenberg station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T11:12:00+02:00",
+        "arrivalTime": "2026-07-24T11:12:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000110",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Varberg station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T11:26:00+02:00",
+        "arrivalTime": "2026-07-24T11:25:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000161",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Kungsbacka station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T11:44:00+02:00",
+        "arrivalTime": "2026-07-24T11:44:00+02:00"
+       },
+       {
+        "id": "urn:x_swe:stn:740000315",
+        "alternativeIds": null,
+        "geoPosition": null,
+        "name": "Mölndal station",
+        "countryCodeISO": "SE",
+        "countryCodeUIC": 74,
+        "departureTime": "2026-07-24T11:57:00+02:00",
+        "arrivalTime": "2026-07-24T11:57:00+02:00"
+       }
+      ],
+      "attributes": [
+       {
+        "text": "No reservation",
+        "code": "BOKEJB"
+       },
+       {
+        "text": "EU regulation 2021/782",
+        "code": "EVFEUJ"
+       },
+       {
+        "text": "Wheelchair space, no reservation, level entry",
+        "code": "KOMREP"
+       }
+      ],
+      "transferDurationUntilNextLeg": null
+     }
+    ],
+    "carriers": [
+     {
+      "ref": "urn:x_swe:carrier:300",
+      "name": "Öresundståg"
+     }
+    ],
+    "attributes": [
+     {
+      "text": "No reservation",
+      "code": "BOKEJB"
+     },
+     {
+      "text": "Wheelchair space, no reservation, level entry",
+      "code": "KOMREP"
+     },
+     {
+      "text": "EU regulation 1371/2007",
+      "code": "EVFEUJ"
+     }
+    ],
+    "nightTrainPresence": "NONE",
+    "seatReservationRequired": false
+   },
+   "bookingOptions": {
+    "status": "BOOKABLE",
+    "lowestSecondClassPrice": {
+     "currency": "SEK",
+     "amount": 43500,
+     "scale": 2,
+     "vats": [
+      {
+       "countryCode": "SE",
+       "amount": 2298,
+       "scale": 2,
+       "percentage": 6.0,
+       "taxId": null,
+       "scope": "UNKNOWN"
+      }
+     ]
+    },
+    "lowestFirstClassPrice": {
+     "currency": "SEK",
+     "amount": 52400,
+     "scale": 2,
+     "vats": [
+      {
+       "countryCode": "SE",
+       "amount": 2768,
+       "scale": 2,
+       "percentage": 6.0,
+       "taxId": null,
+       "scope": "UNKNOWN"
+      }
+     ]
+    },
+    "basicBookingView": {
+     "SECOND": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 43500,
+       "scale": 2,
+       "vats": [
+        {
+         "countryCode": "SE",
+         "amount": 2298,
+         "scale": 2,
+         "percentage": 6.0,
+         "taxId": null,
+         "scope": "UNKNOWN"
+        }
+       ]
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "d128fc82-ed65-49b5-b68f-2434cec1709f"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "d128fc82-ed65-49b5-b68f-2434cec1709f",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "7d63b878-87b7-463a-ac8c-36380eff017c"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 3200,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "7d63b878-87b7-463a-ac8c-36380eff017c",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      }
+     },
+     "FIRST": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 52400,
+       "scale": 2,
+       "vats": [
+        {
+         "countryCode": "SE",
+         "amount": 2768,
+         "scale": 2,
+         "percentage": 6.0,
+         "taxId": null,
+         "scope": "UNKNOWN"
+        }
+       ]
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "dba1dff6-5c53-4454-9cfa-d05cbb8b93fa"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "dba1dff6-5c53-4454-9cfa-d05cbb8b93fa",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "55352d08-b431-4c89-9785-b83fbf25974d"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 3200,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "55352d08-b431-4c89-9785-b83fbf25974d",
+         "optionsPerLegGroup": []
+        }
+       ],
+       "discount": null
+      }
+     }
+    },
+    "detailedBookingView": {
+     "bookingOptions": [
+      {
+       "legIds": [
+        "fc017073-dc4a-40e4-852c-35eec8e058f9"
+       ],
+       "offers": [
+        {
+         "id": "d128fc82-ed65-49b5-b68f-2434cec1709f",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 9:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 43500,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2298,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "ebbe81de-8947-4806-ae04-b586579fafc5",
+           "code": "NO",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "2 class, non-refundable",
+           "description": "2 class, non-refundable",
+           "legIds": [
+            "fc017073-dc4a-40e4-852c-35eec8e058f9"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "7d63b878-87b7-463a-ac8c-36380eff017c",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 9:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 46700,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2468,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "0390c8bc-c176-4a66-aa1b-5ccef213d911",
+           "code": "F2",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "2 class, refundable",
+           "description": "2 class, refundable",
+           "legIds": [
+            "fc017073-dc4a-40e4-852c-35eec8e058f9"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "dba1dff6-5c53-4454-9cfa-d05cbb8b93fa",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 9:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 52400,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2768,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "1bc5ee6c-41de-49f4-aedd-e1c49fc636c2",
+           "code": "AL",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "1st class (refers to Öresundståg), non-refundable",
+           "description": "1st class (refers to Öresundståg), non-refundable",
+           "legIds": [
+            "fc017073-dc4a-40e4-852c-35eec8e058f9"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "55352d08-b431-4c89-9785-b83fbf25974d",
+         "summary": "Offer for Malmö Centralstation - Göteborg Centralstation 7/24/2026 9:12:00 AM +02:00",
+         "price": {
+          "currency": "SEK",
+          "amount": 55600,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 2938,
+            "scale": 2,
+            "percentage": 6.0,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "abd1e2fb-95f6-4805-95f0-f31cfa2dd2f6",
+           "code": "F1",
+           "owner": "urn:x_swe:carrier:300",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "1st class (refers to Öresundståg), refundable",
+           "description": "1st class (refers to Öresundståg), refundable",
+           "legIds": [
+            "fc017073-dc4a-40e4-852c-35eec8e058f9"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [],
+         "seatReservationRequired": false,
+         "ancillaryRequired": false
+        }
+       ]
+      }
+     ]
+    },
+    "discountOnLowestSecondClassPrice": null,
+    "discountOnLowestFirstClassPrice": null
+   }
+  },
+  {
+   "id": "4812d323-5a5f-4aca-81c1-1b56dcbec667",
+   "createdOn": "2026-07-10T16:14:11.91027367Z",
+   "preBookableUntil": "2026-07-24T07:31:00Z",
+   "summary": "Malmö Centralstation → Göteborg Centralstation | Fri, Jul 24, 2026 09:31 - Fri, Jul 24, 2026 11:50 (2h 19m)",
+   "trip": {
+    "departureTime": "2026-07-24T09:31:00+02:00",
+    "arrivalTime": "2026-07-24T11:50:00+02:00",
+    "duration": "PT2H19M",
+    "changes": 0,
+    "originPlace": {
+     "id": "urn:x_swe:stn:740000003",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Malmö Centralstation",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "destinationPlace": {
+     "id": "urn:x_swe:stn:740000002",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Göteborg Centralstation",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "transportationModes": [
+     "HIGH_SPEED_TRAIN"
+    ],
+    "throughTicketTags": [],
+    "legs": [
+     {
+      "id": "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002",
+      "departureTime": "2026-07-24T09:31:00+02:00",
+      "arrivalTime": "2026-07-24T11:50:00+02:00",
+      "duration": "PT2H19M",
+      "originPlace": {
+       "id": "urn:x_swe:stn:740000003",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Malmö Centralstation",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "destinationPlace": {
+       "id": "urn:x_swe:stn:740000002",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Göteborg Centralstation",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "operators": [
+       {
+        "ref": "urn:x_swe:carrier:74",
+        "name": "SJ"
+       }
+      ],
+      "transportationMode": "HIGH_SPEED_TRAIN",
+      "vehicleNumbers": [
+       "484"
+      ],
+      "productCategory": {
+       "name": "Snabbtåg",
+       "shortName": "Snabbtåg",
+       "productCategoryRef": "ST"
+      },
+      "intermediateStops": [],
+      "attributes": [
+       {
+        "text": "SJ3000",
+        "code": "VRMSJ3"
+       },
+       {
+        "text": "Food 1 class",
+        "code": "KOMPLU"
+       },
+       {
+        "text": "Bistro car",
+        "code": "KOMRES"
+       },
+       {
+        "text": "Mandatory seat reservation",
+        "code": "BOKOBL"
+       },
+       {
+        "text": "WiFi",
+        "code": "KOMINV"
+       },
+       {
+        "text": "2 class calm",
+        "code": "KOMLUG"
+       },
+       {
+        "text": "EU regulation 2021/782",
+        "code": "EVFEUJ"
+       },
+       {
+        "text": "Wheelchair space, no reservation, level entry",
+        "code": "KOMREP"
+       },
+       {
+        "text": "Meal",
+        "code": "KOMMAT"
+       },
+       {
+        "text": "1st class w/extra comfort",
+        "code": "KOMAEK"
+       },
+       {
+        "text": "Coffee buffet 1 class",
+        "code": "KOMKB1"
+       }
+      ],
+      "transferDurationUntilNextLeg": null
+     }
+    ],
+    "carriers": [
+     {
+      "ref": "urn:x_swe:carrier:74",
+      "name": "SJ"
+     }
+    ],
+    "attributes": [
+     {
+      "text": "SJ 3000",
+      "code": "VRMSJ3"
+     },
+     {
+      "text": "Extra legroom",
+      "code": "KOMAEK"
+     },
+     {
+      "text": "Platsbokning ingår",
+      "code": "BOKOBL"
+     },
+     {
+      "text": "Mat kan förbeställas",
+      "code": "KOMPLU"
+     },
+     {
+      "text": "Coffee, tea and fruit in the carriage",
+      "code": "KOMKB1"
+     },
+     {
+      "text": "Wheelchair space, no reservation, level entry",
+      "code": "KOMREP"
+     },
+     {
+      "text": "2 class Calm",
+      "code": "KOMLUG"
+     },
+     {
+      "text": "1 and 2 class",
+      "code": "KOMAB"
+     },
+     {
+      "text": "Bistro",
+      "code": "KOMRES"
+     },
+     {
+      "text": "Mat kan förbeställas",
+      "code": "KOMMAT"
+     },
+     {
+      "text": "Wifi",
+      "code": "KOMINV"
+     },
+     {
+      "text": "Show image: X55",
+      "code": "FORX55"
+     },
+     {
+      "text": "EU regulation 2021/782: rights and obligations of rail passengers",
+      "code": "EVFEUJ"
+     },
+     {
+      "text": "Level boarding on the train",
+      "code": "KOMRRP"
+     }
+    ],
+    "nightTrainPresence": "NONE",
+    "seatReservationRequired": true
+   },
+   "bookingOptions": {
+    "status": "BOOKABLE",
+    "lowestSecondClassPrice": {
+     "currency": "SEK",
+     "amount": 65300,
+     "scale": 2,
+     "vats": []
+    },
+    "lowestFirstClassPrice": {
+     "currency": "SEK",
+     "amount": 69500,
+     "scale": 2,
+     "vats": []
+    },
+    "basicBookingView": {
+     "SECOND": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 65300,
+       "scale": 2,
+       "vats": []
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "e81a2790-e023-467e-b6e1-fd7cba3ff356"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "e81a2790-e023-467e-b6e1-fd7cba3ff356",
+         "optionsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME9Pwr7AmQmtsho2ei2fzMJt_phwsOwTxzQHVvEM3oe181qQWd8rMbt1cfRM71zgHA1x3S3Q235XoC9kt4u3NkaupIYVktuHiwDdaPQFR7YY10CjLjnHK5JB-ECe9iu1N62XZso5xbvBqIfuc-tWHklgNzjYn24n9mb9DZKBzGJTi6VUYZebA1DCo7J-fKNpz85s0hVCOe4QD81xQW04=",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24ZaB3CcixWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdqygYVfxz7ekzF6pg9VTQd",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's pancakes",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHPANCAKES",
+                   "code": "AM_CHPANCAKES",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's pancakes",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_CcjeVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp_DNQB1JVnFYgTCYGvyUztg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with cured meats",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCURED",
+                   "code": "AM_GRAINCURED",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with cured meats",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_Cd2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcAExCjILWc35I0YQfGrwg6",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with soy meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINVEGAN",
+                   "code": "AM_GRAINVEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with soy meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCcmxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJfbijhOyigcRoXgB5kxvkJ4",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14100,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICHB",
+                   "code": "AM_PRAWNSANDWICHB",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9qaSBRe9p_ETnBBte-zObaEtQFFWqfOvUAbTUVEdAODAhp-R_N-eWrofkvHFZbsyxyyhT2kEg16JsL_qBIwv3lGh90Xmc9ZUqCmFiABVyhkAVZCctWg5gKD7IoZLQL7EIjiFUd4upU_75Ok8-crhU1GKjnF2On7g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad  with chicken",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCHICKEN",
+                   "code": "AM_GRAINCHICKEN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad  with chicken",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10AM2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdIR-FHK4B992sGks6FDS61",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs gluten-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLSGF",
+                   "code": "AM_CHMEATBALLSGF",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs gluten-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10ZaexBEoRgcvponU6txd9SfPqGtKPrwi-3CZjPBWraq_QskIkzp6KlKGRuCgMXFKS9uVthHZe9K23nJf1pcrDcHt_v0DpHHWIu76cMTfNuzsA6IAYUpnEJGlwpokR0c4Ah3ReNWS2-cMIfHgN2g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLS",
+                   "code": "AM_CHMEATBALLS",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ]
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "420c49ed-04b1-4142-9bf3-ca16bfb3735c"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 18500,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "420c49ed-04b1-4142-9bf3-ca16bfb3735c",
+         "optionsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME63w78AiQ3t8Bog6BxV5DE1zSI91vudD8Rkmg_nHGPxkie3vo0_tT5WTiwXIlz6Es_0A31i-4Tu-SVzahLw4_0NqBYdo5eL2E0NVDG-XbbCkLdhROfHeWABIE-7efjlyFPDNKqx4ARZ6Ia56YwPZVd0QZHZPwaCtAi_NXITXhiid6arnmJHF3ay_Kp-HFyVVGRUUH1zx3XHVjBld",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24ZaB3CcixWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdqygYVfxz7ekzF6pg9VTQd",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's pancakes",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHPANCAKES",
+                   "code": "AM_CHPANCAKES",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's pancakes",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_CcjeVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp_DNQB1JVnFYgTCYGvyUztg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with cured meats",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCURED",
+                   "code": "AM_GRAINCURED",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with cured meats",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_Cd2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcAExCjILWc35I0YQfGrwg6",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with soy meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINVEGAN",
+                   "code": "AM_GRAINVEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with soy meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCcmxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJfbijhOyigcRoXgB5kxvkJ4",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14100,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICHB",
+                   "code": "AM_PRAWNSANDWICHB",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9qaSBRe9p_ETnBBte-zObaEtQFFWqfOvUAbTUVEdAODAhp-R_N-eWrofkvHFZbsyxyyhT2kEg16JsL_qBIwv3lGh90Xmc9ZUqCmFiABVyhkAVZCctWg5gKD7IoZLQL7EIjiFUd4upU_75Ok8-crhU1GKjnF2On7g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad  with chicken",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCHICKEN",
+                   "code": "AM_GRAINCHICKEN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad  with chicken",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10AM2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdIR-FHK4B992sGks6FDS61",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs gluten-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLSGF",
+                   "code": "AM_CHMEATBALLSGF",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs gluten-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10ZaexBEoRgcvponU6txd9SfPqGtKPrwi-3CZjPBWraq_QskIkzp6KlKGRuCgMXFKS9uVthHZe9K23nJf1pcrDcHt_v0DpHHWIu76cMTfNuzsA6IAYUpnEJGlwpokR0c4Ah3ReNWS2-cMIfHgN2g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLS",
+                   "code": "AM_CHMEATBALLS",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ]
+        }
+       ],
+       "discount": null
+      }
+     },
+     "FIRST": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 69500,
+       "scale": 2,
+       "vats": []
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "ce3e6f72-47c3-4d08-8847-92a3d77d8ed3"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "ce3e6f72-47c3-4d08-8847-92a3d77d8ed3",
+         "optionsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME6Pw78AiQ2tsBog6B015DE1zJmDp6RmRrZDwIbLkBm1uv2QjuLsC-bzieLe7UoFp3-F2S2RKz5XoC9nN0YVhiTNnxxK3oJqfKNMbKOe0ugE30jQrkhkeZZCWnDlhwb5SD0g2ylhGa5BXhIwfzzz3TLCRWyJbCbmfiLcwPB4N-xSb6VXnZf50sql5Kp-fI5dAw7yPXiRau6zE2eB4JA==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6Cs7SIHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPA5RaHzH23nrTjvT38hN8DUg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALMEAT_1",
+                   "code": "AM_MEALMEAT_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZb1zBsexWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJf3JLjeJl_tpxm-bwFLyArl",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 12900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic salad",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHMEAL",
+                   "code": "AM_KHMEAL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic salad",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZadkBtuxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcjvgV1n0K57nTorua2nFER",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 8500,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic wrap",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHWRAP",
+                   "code": "AM_KHWRAP",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic wrap",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCbqxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcDBbi_xKjoFP7ppDnBnd_8",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICH",
+                   "code": "AM_PRAWNSANDWICH",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dszfVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp3hiqs22rTI4vZHzN8wa5oQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's gluten and lactose-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1GL",
+                   "code": "AM_MEAL1GL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's gluten and lactose-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6AcLAPHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPAwyowWmB9a9yJiuAE7tzEKQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's fish/seafood",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALFISH_1",
+                   "code": "AM_MEALFISH_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's fish/seafood",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dt2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdZ4P8dleS9ux2OBLRgHmgS",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's vegan",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1VEGAN",
+                   "code": "AM_MEAL1VEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's vegan",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ]
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "25335044-5b32-44f9-8a5b-8c84cddc2e3f"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 18500,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "25335044-5b32-44f9-8a5b-8c84cddc2e3f",
+         "optionsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME6P0r8AiQ2tsBoheSbMCDk1SQXLR2xEOsTnoHE-5GmWziNeV8V7dH4u_mxDUW18Y2-S5vghYgIWaT3M0Rdz7PbMsagfVPSE4tluVDI-Ye-Wob0UEGcDR0XKhu-3dvkuTq8XpwPGlMOzzk7lWouEU9-R7POb35C0x5409Q8425gKd6arnQj_7Ray_Kp8f3ByqFjcrB6slKKmY0prV",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6Cs7SIHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPA5RaHzH23nrTjvT38hN8DUg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALMEAT_1",
+                   "code": "AM_MEALMEAT_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZb1zBsexWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJf3JLjeJl_tpxm-bwFLyArl",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 12900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic salad",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHMEAL",
+                   "code": "AM_KHMEAL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic salad",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZadkBtuxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcjvgV1n0K57nTorua2nFER",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 8500,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic wrap",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHWRAP",
+                   "code": "AM_KHWRAP",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic wrap",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCbqxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcDBbi_xKjoFP7ppDnBnd_8",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICH",
+                   "code": "AM_PRAWNSANDWICH",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dszfVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp3hiqs22rTI4vZHzN8wa5oQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's gluten and lactose-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1GL",
+                   "code": "AM_MEAL1GL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's gluten and lactose-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6AcLAPHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPAwyowWmB9a9yJiuAE7tzEKQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's fish/seafood",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALFISH_1",
+                   "code": "AM_MEALFISH_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's fish/seafood",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dt2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdZ4P8dleS9ux2OBLRgHmgS",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's vegan",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1VEGAN",
+                   "code": "AM_MEAL1VEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's vegan",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ]
+        }
+       ],
+       "discount": null
+      }
+     }
+    },
+    "detailedBookingView": {
+     "bookingOptions": [
+      {
+       "legIds": [
+        "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+       ],
+       "offers": [
+        {
+         "id": "e81a2790-e023-467e-b6e1-fd7cba3ff356",
+         "summary": null,
+         "price": {
+          "currency": "SEK",
+          "amount": 65300,
+          "scale": 2,
+          "vats": []
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "JNON_2_H",
+           "code": "JNON_2_H",
+           "owner": "urn:x_swe:carrier:74",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "2 class, Non-rebookable",
+           "description": null,
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME9Pwr7AmQmtsho2ei2fzMJt_phwsOwTxzQHVvEM3oe181qQWd8rMbt1cfRM71zgHA1x3S3Q235XoC9kt4u3NkaupIYVktuHiwDdaPQFR7YY10CjLjnHK5JB-ECe9iu1N62XZso5xbvBqIfuc-tWHklgNzjYn24n9mb9DZKBzGJTi6VUYZebA1DCo7J-fKNpz85s0hVCOe4QD81xQW04=",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24ZaB3CcixWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdqygYVfxz7ekzF6pg9VTQd",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's pancakes",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHPANCAKES",
+                   "code": "AM_CHPANCAKES",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's pancakes",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_CcjeVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp_DNQB1JVnFYgTCYGvyUztg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with cured meats",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCURED",
+                   "code": "AM_GRAINCURED",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with cured meats",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_Cd2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcAExCjILWc35I0YQfGrwg6",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with soy meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINVEGAN",
+                   "code": "AM_GRAINVEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with soy meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCcmxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJfbijhOyigcRoXgB5kxvkJ4",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14100,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICHB",
+                   "code": "AM_PRAWNSANDWICHB",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9qaSBRe9p_ETnBBte-zObaEtQFFWqfOvUAbTUVEdAODAhp-R_N-eWrofkvHFZbsyxyyhT2kEg16JsL_qBIwv3lGh90Xmc9ZUqCmFiABVyhkAVZCctWg5gKD7IoZLQL7EIjiFUd4upU_75Ok8-crhU1GKjnF2On7g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad  with chicken",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCHICKEN",
+                   "code": "AM_GRAINCHICKEN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad  with chicken",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10AM2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdIR-FHK4B992sGks6FDS61",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs gluten-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLSGF",
+                   "code": "AM_CHMEATBALLSGF",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs gluten-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10ZaexBEoRgcvponU6txd9SfPqGtKPrwi-3CZjPBWraq_QskIkzp6KlKGRuCgMXFKS9uVthHZe9K23nJf1pcrDcHt_v0DpHHWIu76cMTfNuzsA6IAYUpnEJGlwpokR0c4Ah3ReNWS2-cMIfHgN2g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLS",
+                   "code": "AM_CHMEATBALLS",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "afe95b00-c0a7-485f-8b64-e96752eeaede",
+         "summary": null,
+         "price": {
+          "currency": "SEK",
+          "amount": 65300,
+          "scale": 2,
+          "vats": []
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "JNON_2CALM_H",
+           "code": "JNON_2CALM_H",
+           "owner": "urn:x_swe:carrier:74",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "2 class Calm, Non-rebookable",
+           "description": null,
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME63w78AiQ3t8Bog6BxV5DE1zJmDp6RmRrZDwIbLkBmVu2eNm99EOsI49euZ9k11uMXnneGLzznODa4kvz4lXpT8IMBTvKyfQXEEaJOdK2lLy8mB2lwvt9bgBEhdRwZJF8RN6aEaQdjPITDXeVRApeyoifSfSDWtX0ak-YzEk53id6VXnZSTajDF5Kp-faAlsDvC14RlzOr9F016vTQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24ZaB3CcixWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdqygYVfxz7ekzF6pg9VTQd",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's pancakes",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHPANCAKES",
+                   "code": "AM_CHPANCAKES",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's pancakes",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_CcjeVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp_DNQB1JVnFYgTCYGvyUztg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with cured meats",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCURED",
+                   "code": "AM_GRAINCURED",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with cured meats",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_Cd2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcAExCjILWc35I0YQfGrwg6",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with soy meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINVEGAN",
+                   "code": "AM_GRAINVEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with soy meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCcmxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJfbijhOyigcRoXgB5kxvkJ4",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14100,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICHB",
+                   "code": "AM_PRAWNSANDWICHB",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9qaSBRe9p_ETnBBte-zObaEtQFFWqfOvUAbTUVEdAODAhp-R_N-eWrofkvHFZbsyxyyhT2kEg16JsL_qBIwv3lGh90Xmc9ZUqCmFiABVyhkAVZCctWg5gKD7IoZLQL7EIjiFUd4upU_75Ok8-crhU1GKjnF2On7g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad  with chicken",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCHICKEN",
+                   "code": "AM_GRAINCHICKEN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad  with chicken",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10AM2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdIR-FHK4B992sGks6FDS61",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs gluten-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLSGF",
+                   "code": "AM_CHMEATBALLSGF",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs gluten-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10ZaexBEoRgcvponU6txd9SfPqGtKPrwi-3CZjPBWraq_QskIkzp6KlKGRuCgMXFKS9uVthHZe9K23nJf1pcrDcHt_v0DpHHWIu76cMTfNuzsA6IAYUpnEJGlwpokR0c4Ah3ReNWS2-cMIfHgN2g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLS",
+                   "code": "AM_CHMEATBALLS",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "ce3e6f72-47c3-4d08-8847-92a3d77d8ed3",
+         "summary": null,
+         "price": {
+          "currency": "SEK",
+          "amount": 69500,
+          "scale": 2,
+          "vats": []
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "JNON_1_H",
+           "code": "JNON_1_H",
+           "owner": "urn:x_swe:carrier:74",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "1 class, Non-rebookable",
+           "description": null,
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME6Pw78AiQ2tsBog6B015DE1zJmDp6RmRrZDwIbLkBm1uv2QjuLsC-bzieLe7UoFp3-F2S2RKz5XoC9nN0YVhiTNnxxK3oJqfKNMbKOe0ugE30jQrkhkeZZCWnDlhwb5SD0g2ylhGa5BXhIwfzzz3TLCRWyJbCbmfiLcwPB4N-xSb6VXnZf50sql5Kp-fI5dAw7yPXiRau6zE2eB4JA==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6Cs7SIHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPA5RaHzH23nrTjvT38hN8DUg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALMEAT_1",
+                   "code": "AM_MEALMEAT_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZb1zBsexWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJf3JLjeJl_tpxm-bwFLyArl",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 12900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic salad",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHMEAL",
+                   "code": "AM_KHMEAL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic salad",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZadkBtuxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcjvgV1n0K57nTorua2nFER",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 8500,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic wrap",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHWRAP",
+                   "code": "AM_KHWRAP",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic wrap",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCbqxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcDBbi_xKjoFP7ppDnBnd_8",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICH",
+                   "code": "AM_PRAWNSANDWICH",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dszfVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp3hiqs22rTI4vZHzN8wa5oQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's gluten and lactose-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1GL",
+                   "code": "AM_MEAL1GL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's gluten and lactose-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6AcLAPHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPAwyowWmB9a9yJiuAE7tzEKQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's fish/seafood",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALFISH_1",
+                   "code": "AM_MEALFISH_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's fish/seafood",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dt2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdZ4P8dleS9ux2OBLRgHmgS",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's vegan",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1VEGAN",
+                   "code": "AM_MEAL1VEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's vegan",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "420c49ed-04b1-4142-9bf3-ca16bfb3735c",
+         "summary": null,
+         "price": {
+          "currency": "SEK",
+          "amount": 83800,
+          "scale": 2,
+          "vats": []
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "YES",
+         "products": [
+          {
+           "id": "JREF_2CALM_H",
+           "code": "JREF_2CALM_H",
+           "owner": "urn:x_swe:carrier:74",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "2 class Calm, Refundable",
+           "description": null,
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME63w78AiQ3t8Bog6BxV5DE1zSI91vudD8Rkmg_nHGPxkie3vo0_tT5WTiwXIlz6Es_0A31i-4Tu-SVzahLw4_0NqBYdo5eL2E0NVDG-XbbCkLdhROfHeWABIE-7efjlyFPDNKqx4ARZ6Ia56YwPZVd0QZHZPwaCtAi_NXITXhiid6arnmJHF3ay_Kp-HFyVVGRUUH1zx3XHVjBld",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24ZaB3CcixWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdqygYVfxz7ekzF6pg9VTQd",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's pancakes",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHPANCAKES",
+                   "code": "AM_CHPANCAKES",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's pancakes",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_CcjeVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp_DNQB1JVnFYgTCYGvyUztg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with cured meats",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCURED",
+                   "code": "AM_GRAINCURED",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with cured meats",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_Cd2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcAExCjILWc35I0YQfGrwg6",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with soy meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINVEGAN",
+                   "code": "AM_GRAINVEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with soy meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCcmxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJfbijhOyigcRoXgB5kxvkJ4",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14100,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICHB",
+                   "code": "AM_PRAWNSANDWICHB",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9qaSBRe9p_ETnBBte-zObaEtQFFWqfOvUAbTUVEdAODAhp-R_N-eWrofkvHFZbsyxyyhT2kEg16JsL_qBIwv3lGh90Xmc9ZUqCmFiABVyhkAVZCctWg5gKD7IoZLQL7EIjiFUd4upU_75Ok8-crhU1GKjnF2On7g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad  with chicken",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCHICKEN",
+                   "code": "AM_GRAINCHICKEN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad  with chicken",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10AM2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdIR-FHK4B992sGks6FDS61",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs gluten-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLSGF",
+                   "code": "AM_CHMEATBALLSGF",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs gluten-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10ZaexBEoRgcvponU6txd9SfPqGtKPrwi-3CZjPBWraq_QskIkzp6KlKGRuCgMXFKS9uVthHZe9K23nJf1pcrDcHt_v0DpHHWIu76cMTfNuzsA6IAYUpnEJGlwpokR0c4Ah3ReNWS2-cMIfHgN2g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLS",
+                   "code": "AM_CHMEATBALLS",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "50c261f2-2f8b-41b6-90b9-71402d06f9e9",
+         "summary": null,
+         "price": {
+          "currency": "SEK",
+          "amount": 83800,
+          "scale": 2,
+          "vats": []
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "YES",
+         "products": [
+          {
+           "id": "JREF_2_H",
+           "code": "JREF_2_H",
+           "owner": "urn:x_swe:carrier:74",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "2 class, Refundable",
+           "description": null,
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME6P0r7A6QmtshnW8H337Ek1SQXLRm0PFmKq7sDQRFa3aInZ_KDUgf1qFDz_KcQRZBzRyRuSzSTslC8AiJA3bnkcJEdIyCZcXQXb6pJdztJY35LGTedFdmhjCSifGQFuwDvDNKqzARu5e6KXsQ_VgNDLZU8ZnayE01-0LQ84mplSd6VXnZXZPgzJ5Kp-fE75F9JpTqSQIAGCEfsQPEA==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24ZaB3CcixWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdqygYVfxz7ekzF6pg9VTQd",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's pancakes",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHPANCAKES",
+                   "code": "AM_CHPANCAKES",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's pancakes",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_CcjeVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp_DNQB1JVnFYgTCYGvyUztg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with cured meats",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCURED",
+                   "code": "AM_GRAINCURED",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with cured meats",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM28f7F_Cd2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcAExCjILWc35I0YQfGrwg6",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad with soy meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINVEGAN",
+                   "code": "AM_GRAINVEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad with soy meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCcmxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJfbijhOyigcRoXgB5kxvkJ4",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14100,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICHB",
+                   "code": "AM_PRAWNSANDWICHB",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9qaSBRe9p_ETnBBte-zObaEtQFFWqfOvUAbTUVEdAODAhp-R_N-eWrofkvHFZbsyxyyhT2kEg16JsL_qBIwv3lGh90Xmc9ZUqCmFiABVyhkAVZCctWg5gKD7IoZLQL7EIjiFUd4upU_75Ok8-crhU1GKjnF2On7g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 10300,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Grain salad  with chicken",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_GRAINCHICKEN",
+                   "code": "AM_GRAINCHICKEN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Grain salad  with chicken",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10AM2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdIR-FHK4B992sGks6FDS61",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs gluten-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLSGF",
+                   "code": "AM_CHMEATBALLSGF",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs gluten-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM24Zb10ZaexBEoRgcvponU6txd9SfPqGtKPrwi-3CZjPBWraq_QskIkzp6KlKGRuCgMXFKS9uVthHZe9K23nJf1pcrDcHt_v0DpHHWIu76cMTfNuzsA6IAYUpnEJGlwpokR0c4Ah3ReNWS2-cMIfHgN2g==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 6200,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Children's meatballs",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_CHMEATBALLS",
+                   "code": "AM_CHMEATBALLS",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Children's meatballs",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "25335044-5b32-44f9-8a5b-8c84cddc2e3f",
+         "summary": null,
+         "price": {
+          "currency": "SEK",
+          "amount": 88000,
+          "scale": 2,
+          "vats": []
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "FULL_FLEXIBLE",
+         "isRefundable": "YES",
+         "isExchangeable": "YES",
+         "products": [
+          {
+           "id": "JREF_1_H",
+           "code": "JREF_1_H",
+           "owner": "urn:x_swe:carrier:74",
+           "flexibility": "FULL_FLEXIBLE",
+           "summary": "1 class, Refundable",
+           "description": null,
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "484|SJHIGH|2026-07-24T09:31:00+02:00|2026-07-24T11:50:00+02:00|740000003|740000002"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": null,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAqucDqo9MXxokOLw9ME6P0r8AiQ2tsBoheSbMCDk1SQXLR2xEOsTnoHE-5GmWziNeV8V7dH4u_mxDUW18Y2-S5vghYgIWaT3M0Rdz7PbMsagfVPSE4tluVDI-Ye-Wob0UEGcDR0XKhu-3dvkuTq8XpwPGlMOzzk7lWouEU9-R7POb35C0x5409Q8425gKd6arnQj_7Ray_Kp8f3ByqFjcrB6slKKmY0prV",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": true
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 0,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6Cs7SIHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPA5RaHzH23nrTjvT38hN8DUg==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's meat",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALMEAT_1",
+                   "code": "AM_MEALMEAT_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's meat",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZb1zBsexWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJf3JLjeJl_tpxm-bwFLyArl",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 12900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic salad",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHMEAL",
+                   "code": "AM_KHMEAL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic salad",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2wZadkBtuxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcjvgV1n0K57nTorua2nFER",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 8500,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Kalf & Hansen organic wrap",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_KHWRAP",
+                   "code": "AM_KHWRAP",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Kalf & Hansen organic wrap",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM2rf7FhCbqxWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJcDBbi_xKjoFP7ppDnBnd_8",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 14900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Prawn sandwich",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_PRAWNSANDWICH",
+                   "code": "AM_PRAWNSANDWICH",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Prawn sandwich",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dszfVg8Ry4CK3AI3p28BP_L4S5CP5kSo3jB1KAP6Mu6B_ANVvvSQmaH600JKUkrU4-t_g3Je9K21jovl6MTbPW5xrUftHHWIuKyAIHGRu2VS-IoIVoTGJWlypYZe1sgp3hiqs22rTI4vZHzN8wa5oQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's gluten and lactose-free",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1GL",
+                   "code": "AM_MEAL1GL",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's gluten and lactose-free",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6AcLAPHwCmcWKlklU2RgML4qEPZGdtwaol3xjKhXsJvjQpEIE8LXh6cvg3kIhOSCS7fM5lnxM86m1jovn-tjLcGBp4FLjDnKMuKyAI2ONqiMO-NRaRo7WIXRwpIZc1cdmEGPAwyowWmB9a9yJiuAE7tzEKQ==",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's fish/seafood",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEALFISH_1",
+                   "code": "AM_MEALFISH_1",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's fish/seafood",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                },
+                {
+                 "id": "AAAAAAAAAAAAAAAquJ5bkag1suosFdJZkM22aLF6dt2xWAFD0suSxGEytnYZRu_qRZ7e-wiwxiZ5JBX0PL-G60JNpoWJm6D03ChEXAyS-_NqgHZe9K21jon15sqWcHZpuETpHHWIuKyDMX-f_XEA4JIYVIbCPnR1v5lYwJdZ4P8dleS9ux2OBLRgHmgS",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 16900,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "summary": "Today's vegan",
+                 "description": "",
+                 "type": "FOOD & BEVERAGES",
+                 "products": [
+                  {
+                   "id": "AM_MEAL1VEGAN",
+                   "code": "AM_MEAL1VEGAN",
+                   "owner": "urn:x_swe:carrier:74",
+                   "flexibility": "FULL_FLEXIBLE",
+                   "summary": "Today's vegan",
+                   "description": null,
+                   "legIds": null,
+                   "travelClass": "SECOND",
+                   "carrierConstraintText": null
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        }
+       ]
+      }
+     ]
+    },
+    "discountOnLowestSecondClassPrice": null,
+    "discountOnLowestFirstClassPrice": null
+   }
+  },
+  {
+   "id": "182c7b02-b638-4281-aeeb-ff5b21fca7e0",
+   "createdOn": "2026-07-10T16:14:11.912999258Z",
+   "preBookableUntil": "2026-07-10T17:14:11.7305491Z",
+   "summary": "Malmö C Norra Vallgatan → Göteborg Nils Ericsonterminal | Fri, Jul 24, 2026 09:50 - Fri, Jul 24, 2026 13:15 (3h 25m)",
+   "trip": {
+    "departureTime": "2026-07-24T09:50:00+02:00",
+    "arrivalTime": "2026-07-24T13:15:00+02:00",
+    "duration": "PT3H25M",
+    "changes": 0,
+    "originPlace": {
+     "id": "urn:x_swe:stn:740072050",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Malmö C Norra Vallgatan",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "destinationPlace": {
+     "id": "urn:x_swe:stn:740020483",
+     "alternativeIds": null,
+     "geoPosition": null,
+     "name": "Göteborg Nils Ericsonterminal",
+     "countryCodeISO": "SE",
+     "countryCodeUIC": 74
+    },
+    "transportationModes": [
+     "BUS"
+    ],
+    "throughTicketTags": [],
+    "legs": [
+     {
+      "id": "4513402-600-1172-1164",
+      "departureTime": "2026-07-24T09:50:00+02:00",
+      "arrivalTime": "2026-07-24T13:15:00+02:00",
+      "duration": "PT3H25M",
+      "originPlace": {
+       "id": "urn:x_swe:stn:740072050",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Malmö C Norra Vallgatan",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "destinationPlace": {
+       "id": "urn:x_swe:stn:740020483",
+       "alternativeIds": null,
+       "geoPosition": null,
+       "name": "Göteborg Nils Ericsonterminal",
+       "countryCodeISO": "SE",
+       "countryCodeUIC": 74
+      },
+      "operators": [
+       {
+        "ref": "urn:x_swe:carrier:327",
+        "name": "Vy bus4you"
+       }
+      ],
+      "transportationMode": "BUS",
+      "vehicleNumbers": [
+       "653"
+      ],
+      "productCategory": {
+       "name": "UNKNOWN",
+       "shortName": "UNKNOWN",
+       "productCategoryRef": null
+      },
+      "intermediateStops": [],
+      "attributes": [
+       {
+        "text": "Mandatory seat reservation",
+        "code": "BOKOBL"
+       },
+       {
+        "text": "EU regulation 181/2011",
+        "code": "EVFEUB"
+       }
+      ],
+      "transferDurationUntilNextLeg": null
+     }
+    ],
+    "carriers": [
+     {
+      "ref": "urn:x_swe:carrier:327",
+      "name": "Vy bus4you"
+     }
+    ],
+    "attributes": [
+     {
+      "text": "EU regulation 181/2011",
+      "code": "EVFEUB"
+     },
+     {
+      "text": "Mandatory seat reservation",
+      "code": "BOKOBL"
+     }
+    ],
+    "nightTrainPresence": "NONE",
+    "seatReservationRequired": true
+   },
+   "bookingOptions": {
+    "status": "BOOKABLE",
+    "lowestSecondClassPrice": {
+     "currency": "SEK",
+     "amount": 22400,
+     "scale": 2,
+     "vats": [
+      {
+       "countryCode": "SE",
+       "amount": 1183,
+       "scale": 2,
+       "percentage": 0.06,
+       "taxId": null,
+       "scope": "UNKNOWN"
+      }
+     ]
+    },
+    "lowestFirstClassPrice": {
+     "currency": "SEK",
+     "amount": 25600,
+     "scale": 2,
+     "vats": [
+      {
+       "countryCode": "SE",
+       "amount": 1353,
+       "scale": 2,
+       "percentage": 0.06,
+       "taxId": null,
+       "scope": "UNKNOWN"
+      }
+     ]
+    },
+    "basicBookingView": {
+     "SECOND": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 22400,
+       "scale": 2,
+       "vats": [
+        {
+         "countryCode": "SE",
+         "amount": 1183,
+         "scale": 2,
+         "percentage": 0.06,
+         "taxId": null,
+         "scope": "UNKNOWN"
+        }
+       ]
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "ddd414e7-cf06-484a-9c82-10f68f111d76"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "ddd414e7-cf06-484a-9c82-10f68f111d76",
+         "optionsPerLegGroup": [
+          {
+           "legIds": [
+            "4513402-600-1172-1164"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "383eae1a-256d-41e5-8c2f-c1ac516704ea",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": false
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": []
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ]
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "UNAVAILABLE",
+       "offerIds": [],
+       "ticketTags": [],
+       "additionalPrice": null,
+       "warnings": [],
+       "offerPartOptionsPerOffer": [],
+       "discount": null
+      }
+     },
+     "FIRST": {
+      "status": "BOOKABLE",
+      "basePrice": {
+       "currency": "SEK",
+       "amount": 25600,
+       "scale": 2,
+       "vats": [
+        {
+         "countryCode": "SE",
+         "amount": 1353,
+         "scale": 2,
+         "percentage": 0.06,
+         "taxId": null,
+         "scope": "UNKNOWN"
+        }
+       ]
+      },
+      "discount": null,
+      "NON_REFUNDABLE": {
+       "status": "BOOKABLE",
+       "offerIds": [
+        "b853847c-22ac-467c-b958-e6910c367d52"
+       ],
+       "ticketTags": [],
+       "additionalPrice": {
+        "currency": "SEK",
+        "amount": 0,
+        "scale": 2,
+        "vats": []
+       },
+       "warnings": [],
+       "offerPartOptionsPerOffer": [
+        {
+         "offerId": "b853847c-22ac-467c-b958-e6910c367d52",
+         "optionsPerLegGroup": [
+          {
+           "legIds": [
+            "4513402-600-1172-1164"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "50c2b7f5-37d6-4d05-b26b-ceb8ce62872d",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": false
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": []
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ]
+        }
+       ],
+       "discount": null
+      },
+      "REFUNDABLE": {
+       "status": "UNAVAILABLE",
+       "offerIds": [],
+       "ticketTags": [],
+       "additionalPrice": null,
+       "warnings": [],
+       "offerPartOptionsPerOffer": [],
+       "discount": null
+      }
+     }
+    },
+    "detailedBookingView": {
+     "bookingOptions": [
+      {
+       "legIds": [
+        "4513402-600-1172-1164"
+       ],
+       "offers": [
+        {
+         "id": "ddd414e7-cf06-484a-9c82-10f68f111d76",
+         "summary": "Regular class offer",
+         "price": {
+          "currency": "SEK",
+          "amount": 22400,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 1183,
+            "scale": 2,
+            "percentage": 0.06,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "SECOND",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "8b645022-5530-419d-a9a0-bef54888210a",
+           "code": "8b645022-5530-419d-a9a0-bef54888210a",
+           "owner": "urn:x_swe:carrier:327",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "2nd class",
+           "description": "2nd class",
+           "legIds": [
+            "4513402-600-1172-1164"
+           ],
+           "travelClass": "SECOND",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "4513402-600-1172-1164"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "383eae1a-256d-41e5-8c2f-c1ac516704ea",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": false
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": []
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        },
+        {
+         "id": "b853847c-22ac-467c-b958-e6910c367d52",
+         "summary": "Business class offer",
+         "price": {
+          "currency": "SEK",
+          "amount": 25600,
+          "scale": 2,
+          "vats": [
+           {
+            "countryCode": "SE",
+            "amount": 1353,
+            "scale": 2,
+            "percentage": 0.06,
+            "taxId": null,
+            "scope": "UNKNOWN"
+           }
+          ]
+         },
+         "discount": null,
+         "accommodationType": "SEAT",
+         "accommodationSubType": "ANY_SEAT",
+         "accommodationTypeWL": "SEAT",
+         "travelClass": "FIRST",
+         "flexibility": "NON_REFUNDABLE",
+         "isRefundable": "NO",
+         "isExchangeable": "NO",
+         "products": [
+          {
+           "id": "92bdd617-05a9-4bf5-b0c0-61259d1d230a",
+           "code": "92bdd617-05a9-4bf5-b0c0-61259d1d230a",
+           "owner": "urn:x_swe:carrier:327",
+           "flexibility": "NON_REFUNDABLE",
+           "summary": "1st class",
+           "description": "1st class",
+           "legIds": [
+            "4513402-600-1172-1164"
+           ],
+           "travelClass": "FIRST",
+           "carrierConstraintText": null
+          }
+         ],
+         "ticketTags": [],
+         "optionGroupsPerLegGroup": [
+          {
+           "legIds": [
+            "4513402-600-1172-1164"
+           ],
+           "optionGroupsPerPassengerGroup": [
+            {
+             "passengerRefs": [
+              "ADULT-0"
+             ],
+             "reservationOptionGroups": [
+              {
+               "minGroupItemsToBeBooked": 1,
+               "maxGroupItemsToBeBooked": 1,
+               "options": [
+                {
+                 "id": "50c2b7f5-37d6-4d05-b26b-ceb8ce62872d",
+                 "price": {
+                  "currency": "SEK",
+                  "amount": 0,
+                  "scale": 2,
+                  "vats": []
+                 },
+                 "seatMapAvailable": false
+                }
+               ]
+              }
+             ],
+             "ancillaryOptionGroups": []
+            }
+           ],
+           "seatReservationRequired": true,
+           "ancillaryRequired": false
+          }
+         ],
+         "seatReservationRequired": true,
+         "ancillaryRequired": false
+        }
+       ]
+      }
+     ]
+    },
+    "discountOnLowestSecondClassPrice": null,
+    "discountOnLowestFirstClassPrice": null
+   }
+  }
+ ],
+ "travelPassOffers": [],
+ "halLinks": [
+  {
+   "rel": "next",
+   "href": "/offers?page=next_78a61d84c1344be4b46b369d04b0a928_dee36bcf21004cce939bd11b6a3e3d79"
+  },
+  {
+   "rel": "previous",
+   "href": "/offers?page=previous_78a61d84c1344be4b46b369d04b0a928_d28e9fb9a6344ca583e9a767d6a91f12"
+  }
+ ]
+}

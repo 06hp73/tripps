@@ -41,6 +41,7 @@ from ..pricing.freerider import FreeriderAdapter
 from ..pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from ..pricing.orchestrator import PricingOrchestrator
 from ..pricing.sj import SJAdapter
+from ..pricing.tora import ToraAdapter
 from ..routing.floors import PriceFloorModel
 from ..routing.timetable import Timetable
 from ..search import Planner, SearchOptions, summarize
@@ -99,6 +100,10 @@ class AppState:
             SJAdapter(
                 user_agent=self.settings.user_agent,
                 timeout=self.settings.http_timeout_seconds,
+            ),
+            ToraAdapter(
+                user_agent=self.settings.user_agent,
+                min_interval=self.settings.budget.min_interval_seconds,
             ),
             FreeriderAdapter(cost_model=FreeriderCostModel()),
             FlightAdapter(),

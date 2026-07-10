@@ -63,9 +63,10 @@ maximized. See `tests/test_profile_query.py`, which locks this shut.
 | GTFS Sweden (`api.resrobot.se/gtfs/sweden.zip`) | all national schedules, 49 operators | free, CC0, no key needed today | authoritative |
 | FlixBus (`global.api.flixbus.com`) | real coach fares | unofficial, unauthenticated | `exact` |
 | SJ (`prod-api.adp.sj.se`) | real train fares (yield-managed) | unofficial, key from site bundle | `exact` |
+| Tora / Trainplanet (`wl.tora.trainplanet.com/v1/offers`) | Öresundståg, Mälartåg, Skånetrafiken, Tåg i Bergslagen, Vy Bus4You fares | unofficial, TLS-fingerprint WAF (needs `primp`) | `exact` |
 | Hertz Freerider (`hertzfreerider.se/api/transport-routes/`) | free-car inventory | unofficial, unauthenticated | `estimated` |
 | Google Flights via `fast-flights` | domestic flight fares | scrape, needs EU consent cookie | `exact` |
-| Vy, Snälltåget, Mälartåg, Öresundståg, … | — | no obtainable price API | `unavailable` + booking link |
+| remaining operators (Y-buss, Härjedalingen, local transit …) | — | no obtainable price API | `unavailable` + booking link |
 
 Notes that cost real debugging time, preserved here so nobody repeats them:
 
@@ -79,6 +80,16 @@ Notes that cost real debugging time, preserved here so nobody repeats them:
   three-call chain: search, then departures, then per-departure offers; `priceFrom.price`
   is the cheapest fare. Only direct (zero-change) departures are matched, since a routed
   leg is a single train.
+- Öresundståg, Mälartåg, Skånetrafiken (Pågatåg), Tåg i Bergslagen and the Turnit coach
+  Vy Bus4You all sell through one backend: Trainplanet's Tora white-label. A single
+  `POST /v1/offers` returns journeys from *every* operator Trainplanet resells for a pair
+  (one live Malmö→Göteborg response carried Öresundståg, SJ and Vy Bus4You), so the adapter
+  queries once per O/D and picks the journey whose carrier matches the routed leg. Place
+  ids are `urn:x_swe:stn:{UIC}` — the GTFS stop id again. There is no auth, but a
+  TLS-fingerprint WAF returns 403 to any non-browser client: a plain httpx POST fails while
+  the same bytes from Chrome succeed. So this one adapter speaks through `primp` with
+  browser impersonation. SJ and FlixBus are deliberately not routed here — their own
+  adapters reach the operator without a reseller in between.
 - Freerider's `distance` is the **included mileage allowance** (measured at exactly 1.20 ×
   `originalDistance` across every live route), not the distance you drive. `originalDistance`
   is the drive. A contract test fails if that ratio ever drifts.
@@ -141,7 +152,7 @@ src/tripps/
     synthetic.py       Freerider offers -> scheduled trips. No algorithm changes needed.
     journey.py         labels -> itineraries; candidate spread and collapse.
   ingest/              gtfs, freerider, flights, airports (OurAirports-derived)
-  pricing/             flixbus, sj, freerider, flights, operators (link-out), orchestrator
+  pricing/             flixbus, sj, tora, freerider, flights, operators (link-out), orchestrator
   search.py            Planner: resolve, overlay, route, price, rank.
   api/                 FastAPI + a dependency-free web UI.
 ```
@@ -158,14 +169,12 @@ schema change upstream fails a contract test instead of quietly mispricing a leg
 
 ## Known gaps
 
-- **Regional rail prices.** SJ and SJ Nord legs are priced live (see the data-source table).
-  Vy tåg, Snälltåget, Mälartåg and Öresundståg are still unpriced: they sell only through
-  their own channels, and the sanctioned cross-operator channel (Samtrafiken ACCESS / OSDM,
-  or SilverRail) needs a reseller contract with no self-serve path. Those legs are routed and
-  shown with a booking link. `StaticFareAdapter` exists to hold published fixed fares (the
-  regional operators charge non-dynamic O/D fares) and ships empty on purpose.
-- **Turnit-platform coaches** (Vy Bus4You, Y-buss, Härjedalingen, Masexpressen, Flygbussarna)
-  are unpriced for the same reason.
+- **Remaining unpriced operators.** Most rail and coach is now priced (SJ directly;
+  Öresundståg, Mälartåg, Skånetrafiken, Tåg i Bergslagen and Vy Bus4You via Tora). What is
+  left — Y-buss, Härjedalingen, Masexpressen, Flygbussarna, and pure local transit — either
+  sells through a different backend or has no obtainable price source, so those legs are
+  routed and shown with a booking link. `StaticFareAdapter` exists to hold published fixed
+  fares and ships empty on purpose.
 - Local-transit legs are scheduled but never priced, and say so.
 - The road matrix falls back to a great-circle estimate unless `TRIPPS_OSRM_BASE` is set.
 - Legal: unofficial endpoints and scraping are used here for personal, non-commercial use.
