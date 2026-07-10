@@ -34,7 +34,7 @@ from ..ingest.freerider import (
     parse_offers,
     schema_drift,
 )
-from ..ingest.gtfs import GtfsConfig, load_timetable
+from ..ingest.gtfs import GtfsConfig, load_timetable_cached
 from ..models import SearchConstraints, TransportMode
 from ..pricing.flights import FlightAdapter
 from ..pricing.flixbus import FlixBusAdapter
@@ -44,7 +44,13 @@ from ..pricing.orchestrator import PricingOrchestrator
 from ..pricing.sj import SJAdapter
 from ..pricing.tora import ToraAdapter
 from ..routing.timetable import Timetable
-from ..search import Planner, SearchOptions, summarize
+from ..search import (
+    Planner,
+    SearchOptions,
+    cheapest_over_window,
+    round_trip,
+    summarize,
+)
 from ..timeutil import now_local
 from ..watcher import (
     DEFAULT_WATCH_RADIUS_KM,
@@ -137,16 +143,17 @@ class AppState:
         zip_path = self.settings.gtfs_zip_path
         if not zip_path.exists():
             raise FileNotFoundError(f"no GTFS feed at {zip_path}. Run `tripps fetch-gtfs` first.")
-        timetable, stats = load_timetable(zip_path, service_date, GtfsConfig())
-        log.info(
-            "timetable for %s: %d stops, %d routes, %d trips",
-            service_date,
-            stats.stops,
-            stats.routes,
-            stats.trips,
+        # Disk-cached: a date is parsed once (~15 s) and thereafter unpickled (<1 s), which is
+        # what makes date-range ("cheapest day") searches and cold-date searches usable.
+        timetable = load_timetable_cached(
+            zip_path, service_date, GtfsConfig(), cache_dir=self.settings.data_dir / "tt-cache"
         )
-        if stats.problems:
-            log.warning("gtfs problems: %s", stats.problems[:5])
+        log.info(
+            "timetable for %s: %d stops, %d trips",
+            service_date,
+            timetable.num_stops,
+            timetable.num_trips,
+        )
 
         self._timetables[service_date] = timetable
         self._timetables.move_to_end(service_date)
@@ -421,6 +428,101 @@ async def api_search(
         "rounds": stats.rounds,
     }
     return JSONResponse(payload)
+
+
+def _make_planner(state: AppState):
+    def factory(service_date: date):
+        return state.planner_for(service_date)
+
+    return factory
+
+
+@app.get("/api/round-trip")
+async def api_round_trip(
+    request: Request,
+    origin: str = Query(..., min_length=2),
+    destination: str = Query(..., min_length=2),
+    outbound: str = Query(..., alias="date"),
+    return_date: str = Query(..., alias="return"),
+    max_hours: float | None = None,
+    max_transfers: int | None = None,
+    include_freerider: bool = True,
+    modes: list[str] | None = Query(None),
+) -> JSONResponse:
+    state = _state(request)
+    out_date, back_date = _parse_date(outbound), _parse_date(return_date)
+    constraints = _constraints(
+        max_hours, max_transfers, include_freerider, modes, None, out_date
+    )
+    try:
+        result = await round_trip(
+            _make_planner(state), origin, destination, out_date, back_date,
+            constraints=constraints, offers=state.freerider_offers,
+        )
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+    return JSONResponse(
+        {
+            "outbound": result.outbound.model_dump(mode="json"),
+            "inbound": result.inbound.model_dump(mode="json"),
+            "total_price_sek": (result.total_price_ore / 100) if result.total_price_ore else None,
+        }
+    )
+
+
+@app.get("/api/fares")
+async def api_fares(
+    request: Request,
+    origin: str = Query(..., min_length=2),
+    destination: str = Query(..., min_length=2),
+    start: str | None = Query(None),
+    days: int = Query(7, ge=1, le=14),
+    max_hours: float | None = None,
+    max_transfers: int | None = None,
+    include_freerider: bool = True,
+    modes: list[str] | None = Query(None),
+) -> JSONResponse:
+    """Cheapest priced itinerary per day over a window - a fare calendar."""
+    state = _state(request)
+    start_date = _parse_date(start)
+    constraints = _constraints(
+        max_hours, max_transfers, include_freerider, modes, None, start_date
+    )
+    try:
+        fares = await cheapest_over_window(
+            _make_planner(state), origin, destination, start_date, days,
+            constraints=constraints, offers=state.freerider_offers,
+        )
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+    return JSONResponse(
+        {
+            "origin": origin,
+            "destination": destination,
+            "days": [
+                {
+                    "date": f.date.isoformat(),
+                    "price_sek": f.price_sek,
+                    "modes": [
+                        m.value for m in f.cheapest.modes if m.value != "walk"
+                    ] if f.cheapest else [],
+                    "departure": f.cheapest.departure.isoformat() if f.cheapest else None,
+                }
+                for f in fares
+            ],
+            "cheapest": min(
+                (
+                    {"date": f.date.isoformat(), "price_sek": f.price_sek}
+                    for f in fares
+                    if f.price_ore is not None
+                ),
+                key=lambda d: d["price_sek"],
+                default=None,
+            ),
+        }
+    )
 
 
 @app.get("/api/stops")

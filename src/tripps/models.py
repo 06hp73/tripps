@@ -16,7 +16,7 @@ from __future__ import annotations
 import enum
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, computed_field, field_validator
 
 SEK = 100  # öre per krona
 STOCKHOLM_TZ = "Europe/Stockholm"
@@ -197,18 +197,25 @@ class Itinerary(BaseModel):
             raise ValueError("itinerary must have at least one leg")
         return v
 
+    # `computed_field` so these appear in `model_dump()` / the JSON API, not just on the
+    # Python object - the web UI and any API consumer need the total and the times, which are
+    # derived, not stored.
+    @computed_field
     @property
     def departure(self) -> datetime:
         return self.legs[0].departure
 
+    @computed_field
     @property
     def arrival(self) -> datetime:
         return self.legs[-1].arrival
 
+    @computed_field
     @property
     def duration_seconds(self) -> int:
         return int((self.arrival - self.departure).total_seconds())
 
+    @computed_field
     @property
     def transfers(self) -> int:
         """Number of vehicle boardings after the first. Walks are not boardings."""
@@ -232,6 +239,7 @@ class Itinerary(BaseModel):
             if leg.mode is not TransportMode.WALK
         )
 
+    @computed_field
     @property
     def total_price_ore(self) -> int | None:
         """Sum of leg prices, or None if any vehicle leg is unpriced.
@@ -248,11 +256,13 @@ class Itinerary(BaseModel):
             if leg.mode is not TransportMode.WALK and leg.quote is not None
         )
 
+    @computed_field
     @property
     def total_price_sek(self) -> float | None:
         total = self.total_price_ore
         return None if total is None else total / SEK
 
+    @computed_field
     @property
     def price_confidence(self) -> PriceConfidence:
         """Weakest confidence across vehicle legs: a chain is as strong as its worst link."""

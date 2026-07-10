@@ -130,6 +130,8 @@ uv pip install -e ".[dev,flights]"
 .venv/bin/tripps search "Stockholm Centralstation" "Göteborg Centralstation" \
     --date 2026-07-13 --limit 5
 .venv/bin/tripps search "Kiruna" "Stockholm Centralstation" --date 2026-07-13
+.venv/bin/tripps search "Stockholm C" "Göteborg C" --date 2026-07-13 --return 2026-07-16
+.venv/bin/tripps fares  "Stockholm C" "Göteborg C" --start 2026-07-13 --days 7
 .venv/bin/tripps serve                            # web UI + JSON API on :8000
 ```
 
@@ -146,6 +148,13 @@ Everything is configurable through `TRIPPS_*` environment variables; see `config
 way the planner does and asserts a price still comes back, exiting non-zero if any source is
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
+
+**Round-trip and fare calendar.** `search --return DATE` prices there and back on their own
+dates and sums the cheapest of each; `tripps fares` (and the "Cheapest day" button, and
+`/api/fares`) prices every day over a window and shows which is cheapest, because these fares
+are yield-managed — one Stockholm→Göteborg week ranged 335–585 SEK, so *when* to travel often
+beats *how*. Each day is a full search; the built timetable is cached to disk (~2 MB, loads
+in under a second versus ~15 s to parse), so the first window run is slow and the rest fast.
 
 `tripps watch` turns the perishable Freerider inventory into a standing interest. Free cars
 are first-come and vanish in minutes, so a date-specific search only finds one by luck.

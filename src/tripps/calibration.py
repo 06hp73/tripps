@@ -43,8 +43,11 @@ _NEVER_CALIBRATE = frozenset({"flight", "freerider", "walk"})
 #: Below this many observations, one operator's data is too thin to trust; keep the default.
 MIN_SAMPLES = 8
 
-#: Discount applied to the fitted floor for headroom against future cheaper fares.
-SAFETY_MARGIN = 0.9
+#: Discount applied to the fitted floor for headroom against future cheaper fares. A fare
+#: unobserved during calibration can undercut the fitted minimum, so this leaves a wide
+#: margin; the floor-violation detector catches any residual overshoot and the next
+#: calibration self-corrects from the newly logged fare.
+SAFETY_MARGIN = 0.75
 
 
 @dataclass(frozen=True, slots=True)

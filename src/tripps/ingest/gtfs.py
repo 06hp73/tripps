@@ -24,6 +24,7 @@ from __future__ import annotations
 import csv
 import io
 import logging
+import pickle
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -35,6 +36,9 @@ from ..routing.timetable import RouteInfo, Timetable, TimetableBuilder, Trip, cl
 from ..timeutil import parse_gtfs_time
 
 log = logging.getLogger(__name__)
+
+#: Bump when the parse output changes shape, so stale pickles are ignored after an upgrade.
+_TIMETABLE_CACHE_VERSION = 1
 
 # --- route type vocabulary -------------------------------------------------
 # Extended GTFS route types, per the Google/Trafiklab extension. Ranges rather than
@@ -359,6 +363,47 @@ def load_timetable(
     stats.routes = len(timetable.routes)
     stats.problems.extend(timetable.validate())
     return timetable, stats
+
+
+def load_timetable_cached(
+    zip_path: Path | str,
+    service_date: date,
+    config: GtfsConfig | None = None,
+    *,
+    cache_dir: Path | None = None,
+) -> Timetable:
+    """`load_timetable`, but memoized to disk as a pickle keyed by (feed mtime, date).
+
+    Parsing the 564 MB feed takes ~15 s; the built timetable is ~2 MB and unpickles in well
+    under a second. So a date is parsed once and thereafter loaded, which is what makes a
+    "cheapest day over the next week" search (one timetable per day) and cold-date searches
+    across restarts fast. The feed's mtime is in the key, so a fresh download invalidates the
+    cache automatically.
+    """
+    zip_path = Path(zip_path)
+    if cache_dir is None:
+        return load_timetable(zip_path, service_date, config)[0]
+
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    mtime = int(zip_path.stat().st_mtime)
+    key = f"tt-v{_TIMETABLE_CACHE_VERSION}-{mtime}-{service_date.isoformat()}.pkl"
+    path = cache_dir / key
+    if path.exists():
+        try:
+            with path.open("rb") as fh:
+                return pickle.load(fh)
+        except Exception as exc:  # noqa: BLE001 - a corrupt cache must not be fatal
+            log.warning("timetable cache %s unreadable, reparsing: %s", path, exc)
+
+    timetable, _stats = load_timetable(zip_path, service_date, config)
+    tmp = path.with_suffix(".tmp")
+    try:
+        with tmp.open("wb") as fh:
+            pickle.dump(timetable, fh, protocol=pickle.HIGHEST_PROTOCOL)
+        tmp.replace(path)  # atomic, so a crashed write never leaves a half file
+    except Exception as exc:  # noqa: BLE001 - failing to cache is not failing to load
+        log.warning("could not write timetable cache %s: %s", path, exc)
+    return timetable
 
 
 def _dedupe_consecutive(

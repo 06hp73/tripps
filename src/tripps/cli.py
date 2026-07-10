@@ -22,7 +22,7 @@ from .ingest.freerider import (
     parse_offers,
     schema_drift,
 )
-from .ingest.gtfs import GtfsConfig, load_timetable
+from .ingest.gtfs import GtfsConfig, load_timetable, load_timetable_cached
 from .models import SearchConstraints, TransportMode
 from .pricing.flights import FlightAdapter
 from .pricing.flixbus import FlixBusAdapter
@@ -31,7 +31,13 @@ from .pricing.operators import DeeplinkAdapter, StaticFareAdapter
 from .pricing.orchestrator import PricingOrchestrator
 from .pricing.sj import SJAdapter
 from .pricing.tora import ToraAdapter
-from .search import Planner, SearchOptions, summarize
+from .search import (
+    Planner,
+    SearchOptions,
+    cheapest_over_window,
+    round_trip,
+    summarize,
+)
 from .timeutil import now_local
 
 
@@ -108,45 +114,15 @@ async def _freerider(as_json: bool) -> int:
     return 0
 
 
-async def _search(args: argparse.Namespace) -> int:
-    settings = get_settings()
-    settings.ensure_dirs()
-    service_date = date.fromisoformat(args.date) if args.date else now_local().date()
-
-    if not settings.gtfs_zip_path.exists():
-        print(f"error: no GTFS feed at {settings.gtfs_zip_path}; run `tripps fetch-gtfs`", file=sys.stderr)
-        return 2
-
-    print(f"loading timetable for {service_date}...", file=sys.stderr)
-    timetable, stats = load_timetable(settings.gtfs_zip_path, service_date, GtfsConfig())
-    print(
-        f"  {stats.stops} stops, {stats.routes} routes, {stats.trips} trips, "
-        f"{len(stats.agencies)} operators",
-        file=sys.stderr,
-    )
-
-    offers = []
-    if not args.no_freerider:
-        client = FreeriderClient(base_url=settings.freerider_base, user_agent=settings.user_agent)
-        try:
-            offers = only_within(parse_offers(await client.fetch_raw("SWEDEN")), "se")
-            print(f"  {len(offers)} Freerider cars", file=sys.stderr)
-        except Exception as exc:  # noqa: BLE001
-            print(f"  freerider unavailable: {exc}", file=sys.stderr)
-        finally:
-            await client.aclose()
-
-    db = Database(settings.db_path)
-    adapters = [
+def _build_adapters(settings, db):
+    return [
         FlixBusAdapter(
             base_url=settings.flixbus_base,
             user_agent=settings.user_agent,
             min_interval=settings.budget.min_interval_seconds,
             db=db,
         ),
-        SJAdapter(
-            user_agent=settings.user_agent,
-        ),
+        SJAdapter(user_agent=settings.user_agent),
         ToraAdapter(
             user_agent=settings.user_agent,
             min_interval=settings.budget.min_interval_seconds,
@@ -158,38 +134,166 @@ async def _search(args: argparse.Namespace) -> int:
         else StaticFareAdapter(),
         DeeplinkAdapter(),
     ]
+
+
+async def _fetch_freerider(settings, enabled: bool):
+    if not enabled:
+        return []
+    client = FreeriderClient(base_url=settings.freerider_base, user_agent=settings.user_agent)
+    try:
+        offers = only_within(parse_offers(await client.fetch_raw("SWEDEN")), "se")
+        print(f"  {len(offers)} Freerider cars", file=sys.stderr)
+        return offers
+    except Exception as exc:  # noqa: BLE001
+        print(f"  freerider unavailable: {exc}", file=sys.stderr)
+        return []
+    finally:
+        await client.aclose()
+
+
+def _cli_planner_factory(settings, db, *, flights: bool, max_results: int):
+    """A factory(date)->Planner sharing one orchestrator, timetables disk-cached per date."""
+    adapters = _build_adapters(settings, db)
     floors = load_calibrated_floors(db)
     orchestrator = PricingOrchestrator(
         adapters, db, budget=settings.budget, ttl=settings.ttl, floors=floors
     )
+    flight_provider = GoogleFlightsProvider() if flights else NullFlightProvider()
+    cache_dir = settings.data_dir / "tt-cache"
+    seen: set = set()
 
+    def factory(service_date):
+        if service_date not in seen:
+            print(f"loading timetable for {service_date}...", file=sys.stderr)
+            seen.add(service_date)
+        timetable = load_timetable_cached(
+            settings.gtfs_zip_path, service_date, GtfsConfig(), cache_dir=cache_dir
+        )
+        return Planner(
+            timetable,
+            orchestrator,
+            floors=floors,
+            db=db,
+            options=SearchOptions(max_results=max_results, include_flights=flights),
+            flight_provider=flight_provider,
+        )
+
+    return factory, adapters
+
+
+def _cli_constraints(args) -> SearchConstraints:
     allowed = {TransportMode.TRAIN, TransportMode.BUS, TransportMode.FERRY, TransportMode.WALK}
-    if not args.no_freerider:
+    if not getattr(args, "no_freerider", False):
         allowed.add(TransportMode.FREERIDER)
-    if args.flights:
+    if getattr(args, "flights", False):
         allowed.add(TransportMode.FLIGHT)
-
-    planner = Planner(
-        timetable,
-        orchestrator,
-        floors=floors,
-        db=db,
-        options=SearchOptions(max_results=args.limit, include_flights=args.flights),
-        flight_provider=GoogleFlightsProvider() if args.flights else NullFlightProvider(),
+    return SearchConstraints(
+        allowed_modes=frozenset(allowed),
+        max_transfers=getattr(args, "max_transfers", None),
+        max_duration_seconds=int(args.max_hours * 3600) if getattr(args, "max_hours", None) else None,
+        include_freerider=not getattr(args, "no_freerider", False),
     )
 
+
+def _print_itinerary(itin, index: int) -> None:
+    marker = "*" if index == 1 else " "
+    print(f" {marker} {index}. {summarize(itin)}")
+    for leg in itin.legs:
+        if leg.mode is TransportMode.WALK:
+            continue
+        quote = leg.quote
+        if quote is None or quote.amount_ore is None:
+            cost = "no price"
+        elif quote.amount_ore == 0:
+            cost = "free"
+        else:
+            cost = f"{quote.amount_sek:.0f} SEK"
+        print(
+            f"       {leg.departure:%H:%M}-{leg.arrival:%H:%M} {leg.mode.value:12} "
+            f"{leg.from_stop.name[:24]:26} -> {leg.to_stop.name[:24]:26} {cost}"
+        )
+
+
+def _print_response(response) -> None:
+    if not response.itineraries:
+        print("  no itinerary found")
+    for index, itin in enumerate(response.itineraries, 1):
+        _print_itinerary(itin, index)
+        print()
+    if response.warnings:
+        print("warnings:")
+        for warning in dict.fromkeys(response.warnings):
+            print(f"  - {warning}")
+
+
+async def _search(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    settings.ensure_dirs()
+    if not settings.gtfs_zip_path.exists():
+        print(f"error: no GTFS feed at {settings.gtfs_zip_path}; run `tripps fetch-gtfs`", file=sys.stderr)
+        return 2
+
+    service_date = date.fromisoformat(args.date) if args.date else now_local().date()
+    offers = await _fetch_freerider(settings, not args.no_freerider)
+    db = Database(settings.db_path)
+    factory, adapters = _cli_planner_factory(settings, db, flights=args.flights, max_results=args.limit)
+    constraints = _cli_constraints(args)
+
     try:
-        response, run_stats = await planner.search(
-            args.origin,
-            args.destination,
-            service_date,
-            constraints=SearchConstraints(
-                allowed_modes=frozenset(allowed),
-                max_transfers=args.max_transfers,
-                max_duration_seconds=int(args.max_hours * 3600) if args.max_hours else None,
-                include_freerider=not args.no_freerider,
-            ),
-            offers=offers,
+        if args.return_date:
+            return_date = date.fromisoformat(args.return_date)
+            result = await round_trip(
+                factory, args.origin, args.destination, service_date, return_date,
+                constraints=constraints, offers=offers,
+            )
+            print(f"\nOutbound  {args.origin} -> {args.destination}  {service_date}\n")
+            _print_response(result.outbound)
+            print(f"\nReturn    {args.destination} -> {args.origin}  {return_date}\n")
+            _print_response(result.inbound)
+            total = result.total_price_ore
+            print(
+                "\nround-trip total: "
+                + (f"{total / 100:.0f} SEK" if total is not None else "unavailable")
+            )
+        else:
+            response, run_stats = await factory(service_date).search(
+                args.origin, args.destination, service_date, constraints=constraints, offers=offers,
+            )
+            print(f"\n{response.origin.name} -> {response.destination.name} on {response.date}\n")
+            _print_response(response)
+            print(
+                f"\n{run_stats.candidates} candidates, {run_stats.upstream_calls} upstream calls, "
+                f"{run_stats.freerider_offers} cars, {run_stats.flight_offers} flights",
+                file=sys.stderr,
+            )
+    except LookupError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    finally:
+        for adapter in adapters:
+            await adapter.aclose()
+        db.close()
+    return 0
+
+
+async def _fares(args: argparse.Namespace) -> int:
+    """Cheapest priced itinerary per day over a window - a fare calendar."""
+    settings = get_settings()
+    settings.ensure_dirs()
+    if not settings.gtfs_zip_path.exists():
+        print(f"error: no GTFS feed at {settings.gtfs_zip_path}; run `tripps fetch-gtfs`", file=sys.stderr)
+        return 2
+
+    start = date.fromisoformat(args.start) if args.start else now_local().date()
+    offers = await _fetch_freerider(settings, not args.no_freerider)
+    db = Database(settings.db_path)
+    factory, adapters = _cli_planner_factory(settings, db, flights=args.flights, max_results=3)
+    constraints = _cli_constraints(args)
+
+    try:
+        fares = await cheapest_over_window(
+            factory, args.origin, args.destination, start, args.days,
+            constraints=constraints, offers=offers,
         )
     except LookupError as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -198,38 +302,16 @@ async def _search(args: argparse.Namespace) -> int:
         for adapter in adapters:
             await adapter.aclose()
 
-    print(f"\n{response.origin.name} -> {response.destination.name} on {response.date}\n")
-    if not response.itineraries:
-        print("  no itinerary found")
-    for index, itin in enumerate(response.itineraries, 1):
-        marker = "*" if index == 1 else " "
-        print(f" {marker} {index}. {summarize(itin)}")
-        for leg in itin.legs:
-            if leg.mode is TransportMode.WALK:
-                continue
-            quote = leg.quote
-            if quote is None or quote.amount_ore is None:
-                cost = "no price"
-            elif quote.amount_ore == 0:
-                cost = "free"
-            else:
-                cost = f"{quote.amount_sek:.0f} SEK"
-            print(
-                f"       {leg.departure:%H:%M}-{leg.arrival:%H:%M} {leg.mode.value:12} "
-                f"{leg.from_stop.name[:24]:26} -> {leg.to_stop.name[:24]:26} {cost}"
-            )
-        print()
-
-    if response.warnings:
-        print("warnings:")
-        for warning in dict.fromkeys(response.warnings):
-            print(f"  - {warning}")
-
-    print(
-        f"\n{run_stats.candidates} candidates, {run_stats.upstream_calls} upstream calls, "
-        f"{run_stats.freerider_offers} cars, {run_stats.flight_offers} flights",
-        file=sys.stderr,
-    )
+    print(f"\ncheapest {args.origin} -> {args.destination}, {args.days} days from {start}:\n")
+    priced = [f for f in fares if f.price_ore is not None]
+    best = min((f.price_ore for f in priced), default=None)
+    for f in fares:
+        if f.price_ore is None:
+            print(f"  {f.date:%a %b %d}   —")
+            continue
+        modes = "+".join(dict.fromkeys(m.value for m in f.cheapest.modes if m.value != "walk"))
+        mark = " <- cheapest" if f.price_ore == best else ""
+        print(f"  {f.date:%a %b %d}   {f.price_sek:5.0f} SEK  {f.cheapest.departure:%H:%M}  {modes}{mark}")
     db.close()
     return 0
 
@@ -418,11 +500,22 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("origin")
     se.add_argument("destination")
     se.add_argument("--date", help="YYYY-MM-DD, defaults to today")
+    se.add_argument("--return", dest="return_date", help="YYYY-MM-DD return date (round trip)")
     se.add_argument("--limit", type=int, default=5)
     se.add_argument("--max-transfers", type=int, default=None)
     se.add_argument("--max-hours", type=float, default=None)
     se.add_argument("--no-freerider", action="store_true")
     se.add_argument("--flights", action="store_true", help="also scrape domestic flight prices")
+
+    fa = sub.add_parser("fares", help="cheapest day to travel over the next N days")
+    fa.add_argument("origin")
+    fa.add_argument("destination")
+    fa.add_argument("--start", help="YYYY-MM-DD, defaults to today")
+    fa.add_argument("--days", type=int, default=7)
+    fa.add_argument("--max-transfers", type=int, default=None)
+    fa.add_argument("--max-hours", type=float, default=None)
+    fa.add_argument("--no-freerider", action="store_true")
+    fa.add_argument("--flights", action="store_true")
 
     sv = sub.add_parser("serve", help="run the web UI and JSON API")
     sv.add_argument("--host", default="127.0.0.1")
@@ -457,6 +550,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_freerider(args.as_json))
     if args.command == "search":
         return asyncio.run(_search(args))
+    if args.command == "fares":
+        return asyncio.run(_fares(args))
     if args.command == "serve":
         return _serve(args)
     if args.command == "canary":

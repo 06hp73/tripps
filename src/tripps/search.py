@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from .db import Database
 from .ingest.airports import nearest_airports, resolve_airport_stop
@@ -428,6 +429,107 @@ class Planner:
                 f"available {offer.available_at:%b %d}. Book on hertzfreerider.se."
             )
         return notes
+
+
+#: A factory that hands back a Planner bound to a given service date. The app's is backed by
+#: its per-date timetable cache; the CLI builds one per call. Kept abstract so round-trip and
+#: window search can drive many dates without knowing how timetables are loaded.
+PlannerFactory = Callable[[date], "Planner"]
+
+
+def _cheapest_priced(response: SearchResponse) -> Itinerary | None:
+    priced = [i for i in response.itineraries if i.total_price_ore is not None]
+    return min(priced, key=lambda i: i.total_price_ore) if priced else None
+
+
+@dataclass(slots=True)
+class RoundTrip:
+    outbound: SearchResponse
+    inbound: SearchResponse
+
+    @property
+    def cheapest_outbound(self) -> Itinerary | None:
+        return _cheapest_priced(self.outbound)
+
+    @property
+    def cheapest_inbound(self) -> Itinerary | None:
+        return _cheapest_priced(self.inbound)
+
+    @property
+    def total_price_ore(self) -> int | None:
+        out, back = self.cheapest_outbound, self.cheapest_inbound
+        if out is None or back is None or out.total_price_ore is None or back.total_price_ore is None:
+            return None
+        return out.total_price_ore + back.total_price_ore
+
+
+async def round_trip(
+    make_planner: PlannerFactory,
+    origin: str,
+    destination: str,
+    outbound_date: date,
+    return_date: date,
+    *,
+    constraints: SearchConstraints | None = None,
+    offers: list[FreeriderOffer] | None = None,
+) -> RoundTrip:
+    """Search there and back, each on its own date's timetable, and combine the totals.
+
+    The two legs are genuinely separate searches - a return journey runs a different calendar
+    and prices independently - so this drives the planner twice and pairs the cheapest of each.
+    """
+    out_planner = make_planner(outbound_date)
+    out_resp, _ = await out_planner.search(
+        origin, destination, outbound_date, constraints=constraints, offers=offers
+    )
+    in_planner = make_planner(return_date)
+    in_resp, _ = await in_planner.search(
+        destination, origin, return_date, constraints=constraints, offers=offers
+    )
+    return RoundTrip(outbound=out_resp, inbound=in_resp)
+
+
+@dataclass(slots=True)
+class DayFare:
+    date: date
+    cheapest: Itinerary | None
+
+    @property
+    def price_ore(self) -> int | None:
+        return self.cheapest.total_price_ore if self.cheapest is not None else None
+
+    @property
+    def price_sek(self) -> float | None:
+        p = self.price_ore
+        return None if p is None else p / 100
+
+
+async def cheapest_over_window(
+    make_planner: PlannerFactory,
+    origin: str,
+    destination: str,
+    start_date: date,
+    days: int,
+    *,
+    constraints: SearchConstraints | None = None,
+    offers: list[FreeriderOffer] | None = None,
+) -> list[DayFare]:
+    """The cheapest priced itinerary for each day in a window - a fare calendar.
+
+    Swedish long-distance fares are yield-managed (one Stockholm->Goteborg day ranged 445-805
+    SEK on SJ alone), so *when* to travel often saves more than *how*. Each day is a full
+    search; the per-date timetable cache makes the second and later days cheap. Returned in
+    date order; the caller sorts by price to find the bargain day.
+    """
+    results: list[DayFare] = []
+    for offset in range(days):
+        day = start_date + timedelta(days=offset)
+        planner = make_planner(day)
+        response, _ = await planner.search(
+            origin, destination, day, constraints=constraints, offers=offers
+        )
+        results.append(DayFare(date=day, cheapest=_cheapest_priced(response)))
+    return results
 
 
 def resolve_stops(timetable: Timetable, query: str, limit: int = 8) -> list[Stop]:

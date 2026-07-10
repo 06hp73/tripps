@@ -56,6 +56,16 @@
     color: #fff; font: inherit; font-weight: 600; cursor: pointer;
   }
   button:disabled { opacity: .55; cursor: progress; }
+  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-left: .5rem; }
+  .opt { text-transform: none; color: var(--muted); font-weight: 400; letter-spacing: 0; }
+  .fare-cal { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
+  .fare-day { border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; background: var(--card); }
+  .fare-day.best { border-color: var(--accent); border-width: 2px; }
+  .fare-day .d { font-size: .8rem; color: var(--muted); }
+  .fare-day .p { font-size: 1.25rem; font-weight: 700; }
+  .fare-day .m { font-size: .8rem; color: var(--muted); }
+  .rt-head { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.25rem 0 .5rem; }
+  .rt-total { font-size: 1.3rem; font-weight: 700; margin: 1rem 0; }
   .note { color: var(--muted); font-size: .85rem; }
   .banner { background: var(--warn-bg); border: 1px solid var(--warn);
             color: var(--warn); border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1.5rem; }
@@ -91,6 +101,10 @@
       <input type="date" id="date" name="date" value="{{ today }}" required>
     </div>
     <div>
+      <label for="return_date">Return <span class="opt">(optional)</span></label>
+      <input type="date" id="return_date" name="return_date">
+    </div>
+    <div>
       <label for="earliest">Leave after</label>
       <input type="time" id="earliest" name="earliest" value="06:00">
     </div>
@@ -116,6 +130,7 @@
 
     <div class="full">
       <button type="submit" id="go">Find the cheapest</button>
+      <button type="button" id="fares" class="secondary">Cheapest day (next 7)</button>
       <span class="note" id="status"></span>
     </div>
   </form>
@@ -197,8 +212,78 @@
   attachAutocomplete("origin", "origin-suggest");
   attachAutocomplete("destination", "destination-suggest");
 
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function modeParams() {
+    // Match the server default: flights only when the box is ticked.
+    const modes = ["train", "bus", "ferry", "local_transit"];
+    if (form.include_freerider.checked) modes.push("freerider");
+    if (form.include_flights.checked) modes.push("flight");
+    const p = new URLSearchParams();
+    p.set("origin", form.origin.value);
+    p.set("destination", form.destination.value);
+    modes.forEach(m => p.append("modes", m));
+    if (form.max_hours.value) p.set("max_hours", form.max_hours.value);
+    if (form.max_transfers.value) p.set("max_transfers", form.max_transfers.value);
+    return p;
+  }
+
+  function renderItinerary(itin) {
+    const price = itin.total_price_sek != null
+      ? Math.round(itin.total_price_sek) + " SEK" : "price unavailable";
+    const legs = itin.legs.filter(l => l.mode !== "walk").map(l => {
+      const cost = l.quote && l.quote.amount_ore != null
+        ? (l.quote.amount_ore === 0 ? "free" : Math.round(l.quote.amount_ore / 100) + " SEK") : "no price";
+      return `<li>${l.departure.slice(11,16)}–${l.arrival.slice(11,16)} <b>${esc(l.mode)}</b> `
+        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}</li>`;
+    }).join("");
+    return `<div class="itin"><div class="head"><span class="price">${price}</span> `
+      + `<span class="meta">${itin.departure.slice(11,16)}→${itin.arrival.slice(11,16)}</span></div>`
+      + `<ul class="legs">${legs}</ul></div>`;
+  }
+
+  function renderResponse(resp) {
+    if (!resp.itineraries || !resp.itineraries.length) return '<p class="empty">No priced journey found.</p>';
+    const warn = (resp.warnings && resp.warnings.length)
+      ? '<div class="warnbox"><ul>' + resp.warnings.map(w => "<li>" + esc(w) + "</li>").join("") + "</ul></div>" : "";
+    return warn + resp.itineraries.map(renderItinerary).join("");
+  }
+
+  async function runJson(url) {
+    button.disabled = true;
+    document.getElementById("fares").disabled = true;
+    results.innerHTML = "";
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { results.innerHTML = '<p class="banner">' + esc((await res.json()).detail || res.status) + "</p>"; return null; }
+      return await res.json();
+    } catch (err) {
+      results.innerHTML = '<p class="banner">Request failed: ' + esc(err) + "</p>";
+      return null;
+    } finally {
+      button.disabled = false;
+      document.getElementById("fares").disabled = false;
+      status.textContent = "";
+    }
+  }
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const returnDate = form.return_date.value;
+    if (returnDate) {
+      status.textContent = "Pricing both directions…";
+      const p = modeParams();
+      p.set("date", form.date.value);
+      p.set("return", returnDate);
+      const data = await runJson("/api/round-trip?" + p.toString());
+      if (!data) return;
+      const total = data.total_price_sek != null
+        ? `<div class="rt-total">Round-trip total: ${Math.round(data.total_price_sek)} SEK</div>` : "";
+      results.innerHTML = total
+        + `<div class="rt-head">Outbound · ${form.date.value}</div>` + renderResponse(data.outbound)
+        + `<div class="rt-head">Return · ${returnDate}</div>` + renderResponse(data.inbound);
+      return;
+    }
     button.disabled = true;
     status.textContent = "Routing, then pricing the survivors…";
     results.innerHTML = "";
@@ -206,11 +291,31 @@
       const response = await fetch("/search", { method: "POST", body: new FormData(form) });
       results.innerHTML = await response.text();
     } catch (err) {
-      results.innerHTML = '<p class="banner">Search failed: ' + err + "</p>";
+      results.innerHTML = '<p class="banner">Search failed: ' + esc(err) + "</p>";
     } finally {
       button.disabled = false;
       status.textContent = "";
     }
+  });
+
+  document.getElementById("fares").addEventListener("click", async () => {
+    status.textContent = "Pricing each of the next 7 days… (first run is slow)";
+    const p = modeParams();
+    p.set("start", form.date.value);
+    p.set("days", "7");
+    const data = await runJson("/api/fares?" + p.toString());
+    if (!data) return;
+    const best = data.cheapest ? data.cheapest.date : null;
+    const cells = data.days.map(d => {
+      const price = d.price_sek != null ? Math.round(d.price_sek) + " SEK" : "—";
+      const dt = new Date(d.date + "T00:00");
+      const label = dt.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+      const modes = (d.modes || []).join("+");
+      return `<div class="fare-day${d.date === best ? " best" : ""}"><div class="d">${label}</div>`
+        + `<div class="p">${price}</div><div class="m">${esc(modes)}</div></div>`;
+    }).join("");
+    results.innerHTML = `<div class="rt-head">Cheapest day · ${esc(form.origin.value)} → ${esc(form.destination.value)}</div>`
+      + `<div class="fare-cal">${cells}</div>`;
   });
 </script>
 </body>
