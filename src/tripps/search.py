@@ -31,7 +31,7 @@ from .models import (
     Stop,
     TransportMode,
 )
-from .passes import PassAdapter, honored_operators
+from .passes import PassAdapter, TickitalRental, honored_operators
 from .pricing.flights import FlightAdapter
 from .pricing.freerider import FreeriderAdapter
 from .pricing.orchestrator import PricingOrchestrator
@@ -279,6 +279,7 @@ class Planner:
         constraints: SearchConstraints | None = None,
         offers: list[FreeriderOffer] | None = None,
         held_cards: list[str] | None = None,
+        tickital_rentals: list[TickitalRental] | None = None,
         now: datetime | None = None,
         departure_after: datetime | None = None,
     ) -> tuple[SearchResponse, PlannerStats]:
@@ -325,8 +326,8 @@ class Planner:
             elif isinstance(adapter, FlightAdapter):
                 adapter.load(used_flights)
             elif isinstance(adapter, PassAdapter):
-                # Bind the held travel cards and compute coverage over this timetable.
-                adapter.prepare(network, held_cards or [])
+                # Bind the held travel cards + tickital rentals, coverage over this timetable.
+                adapter.prepare(network, held_cards or [], tickital_rentals or [])
 
         depart_at = departure_after or constraints.earliest_departure
         depart_seconds = (
@@ -366,9 +367,13 @@ class Planner:
         # Pass-aware routing: a held card can make a leg free, but the price floor is derived
         # from distance and would prune a covered-cheap itinerary before it is priced. Zeroing
         # the floor for every operator a held card honors keeps those journeys on the frontier;
-        # zero is a valid lower bound, so the floor invariant still holds.
+        # zero is a valid lower bound, so the floor invariant still holds. A tickital rental
+        # frees the same operators, but only on dates inside its window, so it contributes only
+        # when this search date is in-window.
         floors = self.floors
-        card_ops = honored_operators(held_cards) if held_cards else frozenset()
+        pass_ids = list(held_cards or [])
+        pass_ids += [r.provider_id for r in (tickital_rentals or []) if r.active_on(service_date)]
+        card_ops = honored_operators(pass_ids) if pass_ids else frozenset()
         if card_ops:
             floors = floors.with_operators_zeroed(card_ops)
 
@@ -487,6 +492,7 @@ async def round_trip(
     constraints: SearchConstraints | None = None,
     offers: list[FreeriderOffer] | None = None,
     held_cards: list[str] | None = None,
+    tickital_rentals: list[TickitalRental] | None = None,
 ) -> RoundTrip:
     """Search there and back, each on its own date's timetable, and combine the totals.
 
@@ -496,12 +502,12 @@ async def round_trip(
     out_planner = make_planner(outbound_date)
     out_resp, _ = await out_planner.search(
         origin, destination, outbound_date, constraints=constraints, offers=offers,
-        held_cards=held_cards,
+        held_cards=held_cards, tickital_rentals=tickital_rentals,
     )
     in_planner = make_planner(return_date)
     in_resp, _ = await in_planner.search(
         destination, origin, return_date, constraints=constraints, offers=offers,
-        held_cards=held_cards,
+        held_cards=held_cards, tickital_rentals=tickital_rentals,
     )
     return RoundTrip(outbound=out_resp, inbound=in_resp)
 
@@ -531,6 +537,7 @@ async def cheapest_over_window(
     constraints: SearchConstraints | None = None,
     offers: list[FreeriderOffer] | None = None,
     held_cards: list[str] | None = None,
+    tickital_rentals: list[TickitalRental] | None = None,
 ) -> list[DayFare]:
     """The cheapest priced itinerary for each day in a window - a fare calendar.
 
@@ -545,7 +552,7 @@ async def cheapest_over_window(
         planner = make_planner(day)
         response, _ = await planner.search(
             origin, destination, day, constraints=constraints, offers=offers,
-            held_cards=held_cards,
+            held_cards=held_cards, tickital_rentals=tickital_rentals,
         )
         results.append(DayFare(date=day, cheapest=_cheapest_priced(response)))
     return results

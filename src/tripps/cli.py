@@ -24,7 +24,7 @@ from .ingest.freerider import (
 )
 from .ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable, load_timetable_cached
 from .models import SearchConstraints, TransportMode
-from .passes import PassAdapter
+from .passes import PassAdapter, TickitalRental
 from .pricing.flights import FlightAdapter
 from .pricing.flixbus import FlixBusAdapter
 from .pricing.freerider import FreeriderAdapter
@@ -113,6 +113,11 @@ async def _freerider(as_json: bool) -> int:
             f"{price:16} until {offer.latest_return:%m-%d %H:%M}  {offer.car_model[:24]}"
         )
     return 0
+
+
+def _cli_rentals(db) -> list[TickitalRental]:
+    """Registered tickital rentals as pass objects the planner understands."""
+    return [TickitalRental.from_row(r) for r in db.list_tickital_rentals()]
 
 
 def _build_adapters(settings, db):
@@ -281,6 +286,7 @@ async def _search(args: argparse.Namespace) -> int:
             result = await round_trip(
                 factory, args.origin, args.destination, service_date, return_date,
                 constraints=constraints, offers=offers, held_cards=db.list_cards(),
+                tickital_rentals=_cli_rentals(db),
             )
             print(f"\nOutbound  {args.origin} -> {args.destination}  {service_date}\n")
             _print_response(result.outbound)
@@ -294,7 +300,7 @@ async def _search(args: argparse.Namespace) -> int:
         else:
             response, run_stats = await factory(service_date).search(
                 args.origin, args.destination, service_date, constraints=constraints, offers=offers,
-                held_cards=db.list_cards(),
+                held_cards=db.list_cards(), tickital_rentals=_cli_rentals(db),
             )
             print(f"\n{response.origin.name} -> {response.destination.name} on {response.date}\n")
             _print_response(response)
@@ -331,6 +337,7 @@ async def _fares(args: argparse.Namespace) -> int:
         fares = await cheapest_over_window(
             factory, args.origin, args.destination, start, args.days,
             constraints=constraints, offers=offers, held_cards=db.list_cards(),
+            tickital_rentals=_cli_rentals(db),
         )
     except LookupError as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -489,6 +496,63 @@ def _cards(args: argparse.Namespace) -> int:
     return 0
 
 
+def _rentals(args: argparse.Namespace) -> int:
+    """Manage tickital second-hand rentals: a provider's card, priced, over a date window."""
+    from .passes import load_cards
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    cards = load_cards()
+    db = Database(settings.db_path)
+    try:
+        if args.rentals_action == "add":
+            if args.provider_id not in cards:
+                print(
+                    f"error: unknown provider '{args.provider_id}' (see `tripps cards providers`)",
+                    file=sys.stderr,
+                )
+                return 1
+            try:
+                valid_from = date.fromisoformat(args.valid_from)
+                valid_to = date.fromisoformat(args.valid_to)
+            except ValueError as exc:
+                print(f"error: bad date ({exc})", file=sys.stderr)
+                return 1
+            if valid_to < valid_from:
+                print("error: --to is before --from", file=sys.stderr)
+                return 1
+            rid = db.add_tickital_rental(
+                provider_id=args.provider_id,
+                price_ore=round(args.price * 100),
+                valid_from=valid_from,
+                valid_to=valid_to,
+                note=args.note or "",
+            )
+            name = cards[args.provider_id].name
+            print(f"registered rental #{rid}: {name} {args.price:.0f} SEK, {valid_from}..{valid_to}")
+            print(
+                f"  warning: renting a period ticket violates {name}'s terms; the ticket can "
+                "be blocked. For your own comparison only."
+            )
+        elif args.rentals_action == "remove":
+            print("removed" if db.remove_tickital_rental(args.rental_id) else "not found")
+        else:  # list
+            rows = db.list_tickital_rentals()
+            if not rows:
+                print("no tickital rentals; add one with `tripps rentals add <id> ...`")
+            for r in rows:
+                c = cards.get(r["provider_id"])
+                name = c.name if c else r["provider_id"]
+                print(
+                    f"  #{r['id']:<3} {name:26} {r['price_ore'] / 100:6.0f} SEK  "
+                    f"{r['valid_from']}..{r['valid_to']}"
+                    + (f"  {r['note']}" if r["note"] else "")
+                )
+    finally:
+        db.close()
+    return 0
+
+
 def _calibrate(min_samples: int) -> int:
     """Recompute per-operator price floors from logged fares and persist them."""
     from .calibration import DEFAULT_FLOORS, run_calibration
@@ -613,6 +677,20 @@ def main(argv: list[str] | None = None) -> int:
     cd_rm = cd_sub.add_parser("remove", help="unregister a card")
     cd_rm.add_argument("provider_id")
 
+    rn = sub.add_parser(
+        "rentals", help="register tickital second-hand period-ticket rentals (windowed, priced)"
+    )
+    rn_sub = rn.add_subparsers(dest="rentals_action", required=True)
+    rn_sub.add_parser("list", help="show your registered rentals")
+    rn_add = rn_sub.add_parser("add", help="register a rental: provider, price, and date window")
+    rn_add.add_argument("provider_id", help="a provider id (see `tripps cards providers`)")
+    rn_add.add_argument("price", type=float, help="rental price in SEK")
+    rn_add.add_argument("--from", dest="valid_from", required=True, help="valid-from date YYYY-MM-DD")
+    rn_add.add_argument("--to", dest="valid_to", required=True, help="valid-to date YYYY-MM-DD")
+    rn_add.add_argument("--note", default=None, help="free-text note (e.g. the listing)")
+    rn_rm = rn_sub.add_parser("remove", help="unregister a rental by id")
+    rn_rm.add_argument("rental_id", type=int)
+
     wa = sub.add_parser("watch", help="watch a Freerider route for free cars")
     wa_sub = wa.add_subparsers(dest="watch_action", required=True)
     wa_add = wa_sub.add_parser("add", help="register a route to watch")
@@ -643,6 +721,8 @@ def main(argv: list[str] | None = None) -> int:
         return _calibrate(args.min_samples)
     if args.command == "cards":
         return _cards(args)
+    if args.command == "rentals":
+        return _rentals(args)
     if args.command == "watch":
         return asyncio.run(_watch(args))
     return 1

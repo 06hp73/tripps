@@ -13,7 +13,7 @@ import sqlite3
 import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from .models import Leg, PriceConfidence, Quote
@@ -117,6 +117,19 @@ CREATE TABLE IF NOT EXISTS travel_card (
     provider_id TEXT PRIMARY KEY,
     added_at    TEXT NOT NULL
 );
+
+-- Second-hand period tickets rented via tickital: a provider's card, valid only over a date
+-- window, at a stated rental price. Covered legs price at 0 within the window (see passes.py).
+CREATE TABLE IF NOT EXISTS tickital_rental (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    provider_id TEXT NOT NULL,
+    price_ore   INTEGER NOT NULL,
+    valid_from  TEXT NOT NULL,
+    valid_to    TEXT NOT NULL,
+    note        TEXT,
+    created_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_rental_window ON tickital_rental(valid_from, valid_to);
 
 -- Per-operator price floors calibrated from reprice_delta, replacing the hand-set defaults.
 -- These feed back into the router's price lower bound: tighter (but still safe) floors mean
@@ -508,6 +521,55 @@ class Database:
                 "SELECT provider_id FROM travel_card ORDER BY added_at"
             ).fetchall()
         return [r["provider_id"] for r in rows]
+
+    # --- tickital rentals -------------------------------------------------
+
+    def add_tickital_rental(
+        self,
+        *,
+        provider_id: str,
+        price_ore: int,
+        valid_from: date,
+        valid_to: date,
+        note: str = "",
+    ) -> int:
+        with self._write() as conn:
+            cur = conn.execute(
+                """
+                INSERT INTO tickital_rental
+                    (provider_id, price_ore, valid_from, valid_to, note, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    provider_id,
+                    price_ore,
+                    valid_from.isoformat(),
+                    valid_to.isoformat(),
+                    note,
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+            return int(cur.lastrowid)
+
+    def remove_tickital_rental(self, rental_id: int) -> bool:
+        with self._write() as conn:
+            cur = conn.execute("DELETE FROM tickital_rental WHERE id = ?", (rental_id,))
+            return cur.rowcount > 0
+
+    def list_tickital_rentals(self) -> list[sqlite3.Row]:
+        with self._lock:
+            return self._conn.execute(
+                "SELECT * FROM tickital_rental ORDER BY valid_from, id"
+            ).fetchall()
+
+    def active_tickital_rentals(self, on_date: date) -> list[sqlite3.Row]:
+        day = on_date.isoformat()
+        with self._lock:
+            return self._conn.execute(
+                "SELECT * FROM tickital_rental WHERE valid_from <= ? AND valid_to >= ? "
+                "ORDER BY valid_from, id",
+                (day, day),
+            ).fetchall()
 
     # --- calibrated floors ------------------------------------------------
 

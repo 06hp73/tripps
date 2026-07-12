@@ -71,6 +71,12 @@
   .card-list .rgn { font-size: .8rem; color: var(--muted); }
   .card-list .add { font-size: .82rem; color: var(--accent); }
   .card-list li.held .add { color: var(--free); }
+  .chip.warn { background: rgba(191, 138, 0, .14); color: #b8860b; border-color: #b8860b; }
+  .chip.warn button { color: #b8860b; }
+  .rental-form { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .6rem; }
+  .rental-form select, .rental-form input { width: auto; flex: 1 1 8rem; margin-bottom: 0; }
+  .rental-form button { padding: .5rem .9rem; }
+  .warn-note { color: #b8860b; }
   .full { grid-column: 1 / -1; }
   button {
     padding: .7rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent);
@@ -170,6 +176,23 @@
         <input type="text" id="card-search" placeholder="Search region or provider…" autocomplete="off">
         <ul id="card-list" class="card-list"></ul>
         <p class="opt">Covered legs (e.g. Öresundståg within Skåne with a Skånetrafiken card) price at 0. Assumes an all-zone period ticket; SJ is never auto-freed.</p>
+      </div>
+    </div>
+
+    <div class="full">
+      <span class="checks-label">Tickital rentals</span>
+      <button type="button" id="rentals-toggle" class="link-btn">none registered ▾</button>
+      <div id="rental-chips" class="card-chips"></div>
+      <div id="rental-picker" class="card-picker" hidden>
+        <div class="rental-form">
+          <select id="rental-provider"></select>
+          <input type="number" id="rental-price" min="0" step="1" placeholder="price SEK">
+          <input type="date" id="rental-from" title="valid from">
+          <input type="date" id="rental-to" title="valid to">
+          <button type="button" id="rental-add" class="secondary">Add</button>
+        </div>
+        <ul id="rental-list" class="card-list"></ul>
+        <p class="opt warn-note">A tickital rental is a second-hand period ticket: covered legs price at 0 within its date window. Renting a period ticket violates the operator's terms and the ticket can be blocked; its period cost is not added to the trip total, so it only beats singles across enough covered travel. Registered by hand — tickital has no public listings.</p>
       </div>
     </div>
 
@@ -322,6 +345,80 @@
   });
   cardSearch.addEventListener("input", renderCardList);
   loadProviders();
+
+  // --- tickital rentals -----------------------------------------------
+  // A rental is a second-hand period ticket, valid over a window, priced. Covered legs come
+  // back at 0 within the window; the period cost + a terms warning ride along on the leg note.
+  let rentals = [];
+  const rentalToggle = document.getElementById("rentals-toggle");
+  const rentalPicker = document.getElementById("rental-picker");
+  const rentalChips = document.getElementById("rental-chips");
+  const rentalList = document.getElementById("rental-list");
+  const rentalProvider = document.getElementById("rental-provider");
+  const rentalPrice = document.getElementById("rental-price");
+  const rentalFrom = document.getElementById("rental-from");
+  const rentalTo = document.getElementById("rental-to");
+
+  function renderRentalChips() {
+    rentalToggle.textContent = rentals.length ? `${rentals.length} registered ▾` : "none registered ▾";
+    rentalChips.innerHTML = rentals.map(r =>
+      `<span class="chip warn">${esc(r.provider_name)} ${r.price_sek.toFixed(0)} SEK`
+      + `<button data-id="${r.id}" title="remove">×</button></span>`).join("");
+    rentalChips.querySelectorAll(".chip button").forEach(b =>
+      b.addEventListener("click", () => removeRental(b.dataset.id)));
+  }
+
+  function renderRentalList() {
+    rentalList.innerHTML = rentals.map(r =>
+      `<li data-id="${r.id}"><span><b>${esc(r.provider_name)}</b> `
+      + `<span class="rgn">${esc(r.valid_from)} → ${esc(r.valid_to)}</span></span>`
+      + `<span class="add">${r.price_sek.toFixed(0)} SEK · remove ×</span></li>`).join("");
+    rentalList.querySelectorAll("li").forEach(li =>
+      li.addEventListener("click", () => removeRental(li.dataset.id)));
+  }
+
+  function fillProviderSelect() {
+    rentalProvider.innerHTML = providers.map(p =>
+      `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+  }
+
+  async function loadRentals() {
+    try {
+      const res = await fetch("/api/rentals");
+      rentals = (await res.json()).rentals || [];
+    } catch (_) { rentals = []; }
+    renderRentalChips();
+    renderRentalList();
+  }
+
+  async function addRental() {
+    const body = {
+      provider_id: rentalProvider.value,
+      price_sek: parseFloat(rentalPrice.value || "0"),
+      valid_from: rentalFrom.value,
+      valid_to: rentalTo.value,
+    };
+    if (!body.provider_id || !body.valid_from || !body.valid_to) return;
+    try {
+      const res = await fetch("/api/rentals", {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      if (!res.ok) { const e = await res.json().catch(() => ({})); alert(e.detail || "could not add rental"); return; }
+    } catch (_) { return; }
+    rentalPrice.value = "";
+    await loadRentals();
+  }
+
+  async function removeRental(id) {
+    try { await fetch("/api/rentals/" + encodeURIComponent(id), { method: "DELETE" }); } catch (_) { return; }
+    await loadRentals();
+  }
+
+  rentalToggle.addEventListener("click", () => {
+    rentalPicker.hidden = !rentalPicker.hidden;
+    if (!rentalPicker.hidden) fillProviderSelect();
+  });
+  document.getElementById("rental-add").addEventListener("click", addRental);
+  loadRentals();
 
   function modeParams() {
     // local_transit is always allowed (feeder legs); the checkboxes pick the travel modes.

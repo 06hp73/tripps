@@ -39,6 +39,7 @@ from ..models import (
     SearchConstraints,
     TransportMode,
 )
+from ..passes import TICKITAL_FARE_CLASS
 from ..routing.floors import PriceFloorModel
 from ..routing.journey import (
     collapse_equivalent,
@@ -234,6 +235,14 @@ class PricingOrchestrator:
             quote = leg.quote
             if quote is None:
                 continue
+            if quote.fare_class == TICKITAL_FARE_CLASS and quote.note:
+                # The rental zeroes the leg, but its period cost is real and its legality is
+                # not. Surface both once per itinerary (dedup collapses the covered legs).
+                warnings.append(
+                    quote.note + " Its period cost is not added to the trip total, so a "
+                    "rental only beats single tickets if enough covered travel falls in the "
+                    "window."
+                )
             if quote.confidence is PriceConfidence.STALE:
                 warnings.append(
                     f"Price for the {leg.operator or leg.mode.value} leg is stale "

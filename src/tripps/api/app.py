@@ -36,7 +36,7 @@ from ..ingest.freerider import (
 )
 from ..ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable_cached
 from ..models import SearchConstraints, TransportMode
-from ..passes import PassAdapter, PassCoverage, load_cards
+from ..passes import PassAdapter, PassCoverage, TickitalRental, load_cards
 from ..pricing.flights import FlightAdapter
 from ..pricing.flixbus import FlixBusAdapter
 from ..pricing.freerider import FreeriderAdapter
@@ -394,6 +394,11 @@ def _constraints(
     )
 
 
+def _rentals(db) -> list[TickitalRental]:
+    """All registered tickital rentals, as pass objects the planner understands."""
+    return [TickitalRental.from_row(r) for r in db.list_tickital_rentals()]
+
+
 async def _run_search(state: AppState, origin, destination, service_date, constraints):
     planner = state.planner_for(service_date)
     try:
@@ -404,6 +409,7 @@ async def _run_search(state: AppState, origin, destination, service_date, constr
             constraints=constraints,
             offers=state.freerider_offers,
             held_cards=state.db.list_cards(),
+            tickital_rentals=_rentals(state.db),
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -470,7 +476,7 @@ async def api_round_trip(
         result = await round_trip(
             _make_planner(state), origin, destination, out_date, back_date,
             constraints=constraints, offers=state.freerider_offers,
-            held_cards=state.db.list_cards(),
+            held_cards=state.db.list_cards(), tickital_rentals=_rentals(state.db),
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -506,7 +512,7 @@ async def api_fares(
         fares = await cheapest_over_window(
             _make_planner(state), origin, destination, start_date, days,
             constraints=constraints, offers=state.freerider_offers,
-            held_cards=state.db.list_cards(),
+            held_cards=state.db.list_cards(), tickital_rentals=_rentals(state.db),
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -641,6 +647,77 @@ async def api_cards_remove(request: Request, provider_id: str) -> JSONResponse:
     if not state.db.remove_card(provider_id):
         raise HTTPException(404, f"card not registered: {provider_id}")
     return JSONResponse({"removed": provider_id})
+
+
+def _rental_json(row) -> dict:
+    cards = load_cards()
+    card = cards.get(row["provider_id"])
+    return {
+        "id": row["id"],
+        "provider_id": row["provider_id"],
+        "provider_name": card.name if card else row["provider_id"],
+        "price_sek": row["price_ore"] / 100,
+        "valid_from": row["valid_from"],
+        "valid_to": row["valid_to"],
+        "note": row["note"] or "",
+    }
+
+
+@app.get("/api/rentals")
+async def api_rentals_list(request: Request) -> JSONResponse:
+    state = _state(request)
+    return JSONResponse(
+        {"rentals": [_rental_json(r) for r in state.db.list_tickital_rentals()]}
+    )
+
+
+@app.post("/api/rentals")
+async def api_rentals_add(request: Request) -> JSONResponse:
+    """Register a second-hand tickital rental: a provider's card, priced, over a date window.
+
+    Registered by hand from what the user sees in the tickital app (it has no scrapable
+    listings surface). The response carries the terms-of-service warning so it is never a
+    silent side effect.
+    """
+    state = _state(request)
+    body = await request.json()
+    provider_id = body.get("provider_id")
+    if provider_id not in load_cards():
+        raise HTTPException(400, f"unknown provider: {provider_id}")
+    try:
+        price_ore = round(float(body["price_sek"]) * 100)
+        valid_from = date.fromisoformat(body["valid_from"])
+        valid_to = date.fromisoformat(body["valid_to"])
+    except (KeyError, ValueError, TypeError) as exc:
+        raise HTTPException(400, f"bad rental: {exc}") from exc
+    if price_ore < 0:
+        raise HTTPException(400, "price must not be negative")
+    if valid_to < valid_from:
+        raise HTTPException(400, "valid_to is before valid_from")
+    rental_id = state.db.add_tickital_rental(
+        provider_id=provider_id,
+        price_ore=price_ore,
+        valid_from=valid_from,
+        valid_to=valid_to,
+        note=str(body.get("note", "")),
+    )
+    return JSONResponse(
+        {
+            "added": rental_id,
+            "warning": (
+                f"Renting a period ticket violates {load_cards()[provider_id].name}'s terms; "
+                "the ticket can be blocked. Registered for your own comparison only."
+            ),
+        }
+    )
+
+
+@app.delete("/api/rentals/{rental_id}")
+async def api_rentals_remove(request: Request, rental_id: int) -> JSONResponse:
+    state = _state(request)
+    if not state.db.remove_tickital_rental(rental_id):
+        raise HTTPException(404, f"rental not found: {rental_id}")
+    return JSONResponse({"removed": rental_id})
 
 
 @app.post("/api/watch")
