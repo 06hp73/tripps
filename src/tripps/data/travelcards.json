@@ -29,7 +29,18 @@
   "region_agencies": [
    "Dalatrafik"
   ],
-  "coverage_note": "Since 2024-06-01 all Dalatrafik tickets valid on TiB/SJ/Tågab for the Dalarna part of the journey + nearest town across the border. 'SJ' includes long-distance here but ONLY intra-Dalarna — gate to Dalarna stops; do not treat all SJ legs free.",
+  "border_stops": [
+   "740020094",
+   "740000218",
+   "740000903",
+   "740000280",
+   "740000214",
+   "740000195",
+   "740000244",
+   "740000638",
+   "740001563"
+  ],
+  "coverage_note": "Since 2024-06-01 the blue county period ticket is valid on Tåg i Bergslagen to the nearest kommun-centrum across the border (dalatrafik.se tib-lansgrans, verified 2026-07: 'kan du åka med Tåg i Bergslagen till närmaste kommuncentrum över länsgränsen'). Seeded those named stations that are NOT already in Dalarna: Fagersta Norra, Hofors, Karbenning, Kopparberg, Sala, Sandviken, Storvik, Ställdalen, Torsåker. Fagersta C is already in-region. 'SJ' would be intra-Dalarna only and is NOT honored here (over-coverage risk on the SJ agency).",
   "confidence": "verified-in-docs"
  },
  {
@@ -286,7 +297,11 @@
   "region_agencies": [
    "Länstrafiken Örebro"
   ],
-  "coverage_note": "Own bus absent from feed. TiB and Mälartåg within Örebro län only; cross-county rail needs Movingo.",
+  "border_stops": [
+   "740000291",
+   "740000186"
+  ],
+  "coverage_note": "Own bus absent from feed; TiB/Mälartåg within Örebro län. Since 2023-12-11 the whole-county period ticket is automatically valid on Tåg i Bergslagen across the border to Ludvika (Dalarna, 740000291) and Skinnskatteberg (Västmanland, 740000186) - Länstrafiken Örebro press release: 'behöver inte göra någonting ... Den nya giltigheten läggs till automatiskt'. Travel BEYOND those two stations is paid, so only they are seeded. Cross-county rail further out needs Movingo.",
   "confidence": "verified-in-docs"
  },
  {
@@ -358,7 +373,10 @@
   "region_agencies": [
    "VL"
   ],
-  "coverage_note": "Own bus absent from feed. SJ validity is intra-Västmanland stretches only (NOT general SJ). + nearest town across border. Cross-county rail needs Movingo.",
+  "border_stops": [
+   "740000133"
+  ],
+  "coverage_note": "Own bus absent from feed. The VL länsbiljett is valid on Tåg i Bergslagen to the nearest kommun-centrum in an adjacent county (vl.se tågbiljetter, verified 2026-07: 'kan du dessutom resa till närmsta kommun-centrum i angränsande län. Som till exempel på sträckorna Fagersta – Örebro eller Sala – Avesta'). Seeded Örebro C (740000133); Avesta Krylbo is already in-region. Avesta centrum (a separate halt) is NOT seeded - unverified for the base ticket. SJ validity is intra-Västmanland only and not honored here.",
   "confidence": "verified-in-docs"
  }
 ]

@@ -74,16 +74,46 @@ def test_border_stop_does_not_free_a_leg_deeper_into_the_neighbour():
     assert not cov.covers("sk", _leg("Öresundståg", LUND, KARLSHAMN))
 
 
-def test_only_ul_has_seeded_border_stops():
-    # Cross-border is opt-in and verified per card; only UL is seeded so far. Every other card
-    # keeps an empty allow-list, so none can over-cover.
+def test_seeded_border_stops_are_exactly_the_verified_set():
+    # Cross-border is opt-in and verified per card. Only the four cards with an official,
+    # cited FREE extension are seeded; every other card keeps an empty allow-list so none can
+    # over-cover. This test pins the set so a careless edit that frees a paid leg fails loudly.
     from tripps.passes import load_cards
 
-    seeded = {c.id for c in load_cards().values() if c.border_stops}
-    assert seeded == {"ul-uppsala"}
-    assert load_cards()["ul-uppsala"].border_stops == frozenset(
-        {"740000210", "740000027", "740000556"}
+    seeded = {c.id: c.border_stops for c in load_cards().values() if c.border_stops}
+    assert set(seeded) == {"ul-uppsala", "dalatrafik", "lanstrafiken-orebro", "vl-vastmanland"}
+    assert seeded["ul-uppsala"] == frozenset({"740000210", "740000027", "740000556"})
+    assert seeded["dalatrafik"] == frozenset(
+        {"740020094", "740000218", "740000903", "740000280", "740000214",
+         "740000195", "740000244", "740000638", "740001563"}
     )
+    assert seeded["lanstrafiken-orebro"] == frozenset({"740000291", "740000186"})
+    assert seeded["vl-vastmanland"] == frozenset({"740000133"})
+
+
+def test_dalatrafik_ticket_valid_one_town_across_the_border_on_tib():
+    # Falun (in Dalarna) -> Sala (Västmanland, a seeded border stop) on Tåg i Bergslagen.
+    from tripps.passes import PassCoverage, load_cards
+
+    FALUN = Stop(id="740000060", name="Falun C", lat=60.61, lon=15.63)
+    SALA = Stop(id="740000214", name="Sala station", lat=59.92, lon=16.60)
+    HOFORS = Stop(id="740000218", name="Hofors station", lat=60.55, lon=16.28)
+    b = TimetableBuilder()
+    for s in (FALUN, SALA, HOFORS):
+        b.add_stop(s)
+    b.add_trip(
+        RouteInfo(id="tib", mode=TransportMode.TRAIN, operator="Tåg i Bergslagen"),
+        ["740000060", "740000214"], Trip(id="t", arrivals=[0, 600], departures=[0, 600]),
+    )
+    agency_stops = {
+        "Dalatrafik": ["740000060"],
+        "Tåg i Bergslagen": ["740000060", "740000214", "740000218"],
+    }
+    cov = PassCoverage(b.build(), cards={"dalatrafik": load_cards()["dalatrafik"]}, agency_stops=agency_stops)
+    assert cov.covers("dalatrafik", _leg("Tåg i Bergslagen", FALUN, SALA))  # in-region -> border stop
+    assert cov.covers("dalatrafik", _leg("Tåg i Bergslagen", SALA, FALUN))  # reverse
+    # Sala -> Hofors: neither endpoint in Dalarna (both border-side) -> not covered.
+    assert not cov.covers("dalatrafik", _leg("Tåg i Bergslagen", SALA, HOFORS))
 
 
 # UL cross-border seed: a real registry card exercised over a synthetic feed using the real
