@@ -31,7 +31,7 @@ from .models import (
     Stop,
     TransportMode,
 )
-from .passes import PassAdapter
+from .passes import PassAdapter, honored_operators
 from .pricing.flights import FlightAdapter
 from .pricing.freerider import FreeriderAdapter
 from .pricing.orchestrator import PricingOrchestrator
@@ -363,7 +363,16 @@ class Planner:
         if not query.origins or not query.targets:
             raise LookupError("origin and destination did not resolve onto the network")
 
-        result = run_mcraptor(network, self.floors, query)
+        # Pass-aware routing: a held card can make a leg free, but the price floor is derived
+        # from distance and would prune a covered-cheap itinerary before it is priced. Zeroing
+        # the floor for every operator a held card honors keeps those journeys on the frontier;
+        # zero is a valid lower bound, so the floor invariant still holds.
+        floors = self.floors
+        card_ops = honored_operators(held_cards) if held_cards else frozenset()
+        if card_ops:
+            floors = floors.with_operators_zeroed(card_ops)
+
+        result = run_mcraptor(network, floors, query)
         stats.rounds = result.rounds_run
         if result.bag_capped:
             stats.notes.append("label bags were capped; results may be approximate")

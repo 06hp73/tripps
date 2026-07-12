@@ -91,6 +91,15 @@ class PriceFloorModel(PriceFloor):
     def with_operator(self, operator: str, floor: ModeFloor) -> PriceFloorModel:
         return PriceFloorModel(self._table, {**self._operators, operator: floor})
 
+    def with_operators_zeroed(self, operators) -> PriceFloorModel:
+        """A copy where the given operators have a zero floor (for pass-aware routing).
+
+        Zero is a valid lower bound for any leg, so the floor contract (floor <= true price)
+        is preserved even for an operator whose legs are only sometimes covered.
+        """
+        overrides = {**self._operators, **{op: ModeFloor(0, 0) for op in operators}}
+        return PriceFloorModel(self._table, overrides)
+
 
 def zero_floors() -> PriceFloorModel:
     """All bounds zero: routing degenerates to earliest-arrival plus exact injected fares.

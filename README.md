@@ -163,6 +163,15 @@ all-zone card variant, never auto-frees SJ (its agency mixes SJ Regional with hi
 and prefers to charge over wrongly zeroing a leg. A covered leg is shown, not hidden, at 0
 SEK with an "Included with your Skånetrafiken period ticket" note.
 
+Each card's region is the set of stops served by its home agency, extracted once from the
+*full* GTFS feed (all route types, `data/tt-cache/agency-stops-*.json`) — county PTAs whose
+only routes are local buses are absent from the intercity routing network, so their regions
+must come from the whole feed. All 22 providers are supported, including the cross-region
+passes Movingo and Norrlandsresan (modelled as the union of their constituent PTAs' regions).
+Routing is pass-aware: when a card is held, the router's price floor is zeroed for the
+operators it honors (zero is a valid lower bound), so a genuinely-free covered itinerary — a
+multi-leg Kristianstad→Lund→Ystad trip inside Skåne — is not pruned before it can be priced.
+
 **Mode selection.** The web UI's "Travel by" row and the CLI's `--modes train,bus,ferry,
 freerider,flight` (and the `modes=` API param) choose which long-distance modes a search may
 use; walk and local-transit feeders are always allowed. Journeys are combinations of the

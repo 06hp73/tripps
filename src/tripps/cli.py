@@ -22,7 +22,7 @@ from .ingest.freerider import (
     parse_offers,
     schema_drift,
 )
-from .ingest.gtfs import GtfsConfig, load_timetable, load_timetable_cached
+from .ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable, load_timetable_cached
 from .models import SearchConstraints, TransportMode
 from .passes import PassAdapter
 from .pricing.flights import FlightAdapter
@@ -116,8 +116,14 @@ async def _freerider(as_json: bool) -> int:
 
 
 def _build_adapters(settings, db):
+    agency_stops = (
+        extract_agency_stops(settings.gtfs_zip_path, settings.data_dir / "tt-cache")
+        if settings.gtfs_zip_path.exists()
+        else None
+    )
     return [
-        PassAdapter(),  # first: a held travel card zeroes covered legs before paid sources
+        # first: a held travel card zeroes covered legs before paid sources
+        PassAdapter(agency_stops=agency_stops),
         FlixBusAdapter(
             base_url=settings.flixbus_base,
             user_agent=settings.user_agent,

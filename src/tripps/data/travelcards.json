@@ -203,7 +203,9 @@
    "Västtrafik"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Hallandstrafiken"
+  ],
   "coverage_note": "Zone-based, own bus absent from feed. 'Västtrafik' here means Västtågen WITHIN Halland only — including VG's home agency is safe ONLY under strict region-stops gating on Halland-internal stops (needs station-level fencing). Pågatåg into Halland is Skånetrafiken agency, not honored.",
   "confidence": "verified-in-docs"
  },
@@ -217,7 +219,9 @@
    "Krösatågen"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Länstrafiken Kronoberg"
+  ],
   "coverage_note": "Zone-based. Own bus network is NOT an agency in the intercity feed. SJ Regional valid within their area only (over-coverage risk: 'SJ' agency also = high-speed). Gate all to Kronoberg stops.",
   "confidence": "verified-in-docs"
  },
@@ -226,11 +230,13 @@
   "name": "Länstrafiken Norrbotten",
   "region": "Norrbotten län",
   "honored_operators": [
-   "Länstrafiken i Norrbotten",
+   "Länstrafiken Norrbotten",
    "Norrtåg"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Länstrafiken Norrbotten"
+  ],
   "coverage_note": "Norrtåg within Norrbotten (Älvsbyn–Luleå, Luleå–Boden–Haparanda, Boden–Gällivare–Kiruna). Cross-county via Norrlandsresan.",
   "confidence": "reported-secondhand"
  },
@@ -243,7 +249,9 @@
    "Norrtåg"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Länstrafiken Västerbotten"
+  ],
   "coverage_note": "Norrtåg within Västerbotten (Umeå–Vännäs, Umeå–Örnsköldsvik stretch, Umeå–Lycksele/Hällnäs). Boundary stations not station-verified. Cross-county needs Norrlandsresan.",
   "confidence": "reported-secondhand"
  },
@@ -255,7 +263,9 @@
    "Norrtåg"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Länstrafiken Jämtland"
+  ],
   "coverage_note": "Own bus absent from feed — only Norrtåg maps. Norrtåg Storlien–Åre–Östersund–Bräcke within Jämtland. Cross-county needs Norrlandsresan.",
   "confidence": "verified-in-docs"
  },
@@ -268,7 +278,9 @@
    "Mälartåg"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Länstrafiken Örebro"
+  ],
   "coverage_note": "Own bus absent from feed. TiB and Mälartåg within Örebro län only; cross-county rail needs Movingo.",
   "confidence": "verified-in-docs"
  },
@@ -284,7 +296,14 @@
    "Östgötatrafiken"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "SL",
+   "UL",
+   "VL",
+   "Sörmlandstrafiken",
+   "Länstrafiken Örebro",
+   "Östgötatrafiken"
+  ],
   "coverage_note": "SPECIAL — really a relation/route product, not a region polygon. Sold per sträcka OR 'Alla sträckor'. SJ = Regional on Movingo-flagged departures only (never X2000/other fast/night). Bundles local traffic (SL/UL/VL/Sörmland/Örebro/Östgöta) along the relation. Uppsala–Knivsta–Arlanda/Märsta carries UL validity only, not SL. 5/30 flex excludes SJ. region-stops over the 6-county union over-approximates the all-routes variant; per-relation cards need route modeling (capture chosen sträcka).",
   "confidence": "verified-in-docs"
  },
@@ -296,10 +315,15 @@
    "Norrtåg",
    "Din Tur",
    "Länstrafiken Västerbotten",
-   "Länstrafiken i Norrbotten"
+   "Länstrafiken Norrbotten"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Din Tur",
+   "Länstrafiken Västerbotten",
+   "Länstrafiken Norrbotten",
+   "Länstrafiken Jämtland"
+  ],
   "coverage_note": "Shared 30-day card, not tied to one PTA. Frees Norrtåg anywhere across Norrbotten/Västerbotten/Västernorrland/Jämtland + the listed PTA buses (also Skellefteå Buss / Luleå Lokaltrafik / Länstrafiken Jämtland buses, absent from feed). Model as a 4-county region-stops union. Only 'en del av' ticket types accepted — verify accepted subset.",
   "confidence": "reported-secondhand"
  },
@@ -311,7 +335,9 @@
    "Mälartåg"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "Sörmlandstrafiken"
+  ],
   "coverage_note": "Own bus absent from feed. Mälartåg between stations within Södermanland only; cross-county needs Movingo.",
   "confidence": "verified-in-docs"
  },
@@ -324,7 +350,9 @@
    "Tåg i Bergslagen"
   ],
   "coverage_model": "region-stops",
-  "region_agencies": [],
+  "region_agencies": [
+   "VL"
+  ],
   "coverage_note": "Own bus absent from feed. SJ validity is intra-Västmanland stretches only (NOT general SJ). + nearest town across border. Cross-county rail needs Movingo.",
   "confidence": "verified-in-docs"
  }

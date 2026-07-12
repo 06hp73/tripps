@@ -74,6 +74,23 @@ class TravelCard:
     confidence: str = "reported-secondhand"
 
 
+def honored_operators(card_ids) -> frozenset[str]:
+    """Operators any of the given held cards frees, for zeroing the router's price floors.
+
+    Used by pass-aware routing: the router optimizes a price lower bound, and zero is a valid
+    lower bound for a leg a held card might cover, so honored operators get a floor of 0 and
+    the router stops treating covered legs as expensive. Globally-excluded (premium) operators
+    are removed, since no card frees them.
+    """
+    cards = load_cards()
+    ops: set[str] = set()
+    for card_id in card_ids or ():
+        card = cards.get(card_id)
+        if card is not None:
+            ops |= card.honored_operators
+    return frozenset(ops - GLOBAL_EXCLUSIONS)
+
+
 @lru_cache(maxsize=1)
 def load_cards() -> dict[str, TravelCard]:
     raw = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
@@ -100,13 +117,26 @@ class PassCoverage:
     reused, because it is stable across service dates.
     """
 
-    def __init__(self, timetable, cards: dict[str, TravelCard] | None = None) -> None:
+    def __init__(
+        self,
+        timetable,
+        cards: dict[str, TravelCard] | None = None,
+        agency_stops: dict[str, list[str]] | None = None,
+    ) -> None:
         self._cards = cards or load_cards()
+        # Prefer the full-feed agency->stops map when supplied: it includes county PTAs whose
+        # only routes are local buses (absent from the intercity routing timetable), which is
+        # exactly what defines those cards' regions. Otherwise derive from the timetable's own
+        # routes (enough for the intercity PTAs, and all a test needs).
         by_agency: dict[str, set[str]] = defaultdict(set)
-        for route in timetable.routes:
-            operator = route.info.operator or ""
-            for stop_index in route.stops:
-                by_agency[operator].add(timetable.stops[stop_index].id)
+        if agency_stops is not None:
+            for agency, stop_ids in agency_stops.items():
+                by_agency[agency] = set(stop_ids)
+        else:
+            for route in timetable.routes:
+                operator = route.info.operator or ""
+                for stop_index in route.stops:
+                    by_agency[operator].add(timetable.stops[stop_index].id)
         self._region_stops: dict[str, frozenset[str]] = {}
         for card in self._cards.values():
             stops: set[str] = set()
@@ -160,7 +190,8 @@ class PassAdapter(PriceAdapter):
     modes = frozenset(TransportMode)
     provides_price = True
 
-    def __init__(self) -> None:
+    def __init__(self, agency_stops: dict[str, list[str]] | None = None) -> None:
+        self._agency_stops = agency_stops
         self._coverage: PassCoverage | None = None
         self._coverage_key: int | None = None
         self._held: frozenset[str] = frozenset()
@@ -173,7 +204,7 @@ class PassAdapter(PriceAdapter):
         """
         self._held = frozenset(held_ids or ())
         if self._held and (self._coverage is None or self._coverage_key != id(timetable)):
-            self._coverage = PassCoverage(timetable)
+            self._coverage = PassCoverage(timetable, agency_stops=self._agency_stops)
             self._coverage_key = id(timetable)
 
     def _card_for(self, leg: Leg) -> TravelCard | None:

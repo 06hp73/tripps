@@ -365,6 +365,95 @@ def load_timetable(
     return timetable, stats
 
 
+def extract_agency_stops(
+    zip_path: Path | str, cache_dir: Path | None = None
+) -> dict[str, list[str]]:
+    """Map every agency to the set of stops it serves, over the FULL feed (all route types).
+
+    The routing timetable is filtered to intercity modes, so a county PTA whose only routes
+    are local buses has no stops there. Travel-card coverage needs those stops to define the
+    card's region, so this scans the whole feed. Stop ids are collapsed to parent stations,
+    exactly as the timetable does, so the ids line up with a routed leg's `from_stop.id`.
+
+    Cached to JSON keyed by the feed's mtime: it is a full pass over `stop_times.txt` (~10 s),
+    but the result is a few tens of KB and only changes when the feed does.
+    """
+    zip_path = Path(zip_path)
+    if cache_dir is not None:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        mtime = int(zip_path.stat().st_mtime)
+        path = cache_dir / f"agency-stops-v{_TIMETABLE_CACHE_VERSION}-{mtime}.json"
+        if path.exists():
+            try:
+                import json
+
+                return json.loads(path.read_text(encoding="utf-8"))
+            except Exception as exc:  # noqa: BLE001 - a corrupt cache must not be fatal
+                log.warning("agency-stops cache %s unreadable, recomputing: %s", path, exc)
+
+    served = _compute_agency_stops(zip_path)
+    result = {agency: sorted(stops) for agency, stops in served.items()}
+    if cache_dir is not None:
+        import json
+
+        tmp = path.with_suffix(".tmp")
+        try:
+            tmp.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
+            tmp.replace(path)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not write agency-stops cache %s: %s", path, exc)
+    return result
+
+
+def _compute_agency_stops(zip_path: Path) -> dict[str, set[str]]:
+    config = GtfsConfig()
+    with zipfile.ZipFile(zip_path) as zf:
+        agencies = {
+            row["agency_id"]: row.get("agency_name", row["agency_id"])
+            for row in _read_csv(zf, "agency.txt")
+            if row.get("agency_id")
+        }
+        default_agency = next(iter(agencies.values()), None) if len(agencies) == 1 else None
+
+        # route_id -> agency name, over ALL route types (not just intercity).
+        route_agency: dict[str, str] = {}
+        for row in _read_csv(zf, "routes.txt"):
+            agency = agencies.get(row.get("agency_id", ""), default_agency)
+            if row.get("route_id") and agency:
+                route_agency[row["route_id"]] = agency
+
+        # trip_id -> agency name.
+        trip_agency: dict[str, str] = {}
+        for route_id, trip_id in _iter_columns(zf, "trips.txt", ["route_id", "trip_id"]):
+            agency = route_agency.get(route_id)
+            if agency:
+                trip_agency[trip_id] = agency
+
+        stops_by_id, alias = _load_stops(zf, config)
+
+        served: dict[str, set[str]] = defaultdict(set)
+        if "stop_times.txt" in zf.namelist():
+            with zf.open("stop_times.txt") as raw:
+                text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
+                reader = csv.reader(text)
+                header = next(reader, None)
+                if header is not None:
+                    col = {c: i for i, c in enumerate(header)}
+                    ci_trip = col["trip_id"]
+                    ci_stop = col["stop_id"]
+                    width = len(header)
+                    for row in reader:
+                        if len(row) < width:
+                            continue
+                        agency = trip_agency.get(row[ci_trip])
+                        if agency is None:
+                            continue
+                        stop_id = alias.get(row[ci_stop], row[ci_stop])
+                        if stop_id in stops_by_id:
+                            served[agency].add(stop_id)
+    return served
+
+
 def load_timetable_cached(
     zip_path: Path | str,
     service_date: date,

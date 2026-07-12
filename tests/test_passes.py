@@ -171,3 +171,106 @@ async def test_pass_adapter_with_no_cards_supports_nothing():
 
 def test_pass_adapter_provides_price():
     assert PassAdapter().provides_price is True
+
+
+# --- pass-aware routing (follow-up 1) --------------------------------------
+
+
+def test_honored_operators_unions_held_cards_minus_exclusions():
+    from tripps.passes import honored_operators
+
+    ops = honored_operators(["skanetrafiken"])
+    assert "Öresundståg" in ops and "Skånetrafiken" in ops
+    assert "SJ" not in ops  # excluded / never auto-freed
+    assert honored_operators([]) == frozenset()
+
+
+def test_with_operators_zeroed_gives_covered_operators_a_zero_floor():
+    from tripps.routing.floors import PriceFloorModel
+
+    base = PriceFloorModel()
+    train_floor_before = base.floor_ore(TransportMode.TRAIN, "Öresundståg", 100)
+    assert train_floor_before > 0
+
+    zeroed = base.with_operators_zeroed({"Öresundståg"})
+    assert zeroed.floor_ore(TransportMode.TRAIN, "Öresundståg", 100) == 0
+    # A non-honored operator keeps its floor; the change is scoped.
+    assert zeroed.floor_ore(TransportMode.TRAIN, "SJ", 100) == train_floor_before
+
+
+# --- full-feed agency stops (follow-up 2) ----------------------------------
+
+
+def test_agency_stops_from_full_feed_defines_a_region(tmp_path):
+    """A card whose home agency is only local buses (absent from the routing timetable) still
+    gets a region from the full-feed agency-stops map."""
+    import zipfile
+
+    from tripps.ingest.gtfs import extract_agency_stops
+    from tripps.passes import TravelCard
+
+    from .test_gtfs import (
+        AGENCY,
+        CALENDAR,
+        CALENDAR_DATES,
+        ROUTES,
+        STOP_TIMES,
+        STOPS,
+        TRANSFERS,
+        TRIPS,
+    )
+
+    feed = tmp_path / "mini.zip"
+    with zipfile.ZipFile(feed, "w") as zf:
+        for name, body in [
+            ("agency.txt", AGENCY), ("stops.txt", STOPS), ("routes.txt", ROUTES),
+            ("calendar.txt", CALENDAR), ("calendar_dates.txt", CALENDAR_DATES),
+            ("trips.txt", TRIPS), ("stop_times.txt", STOP_TIMES), ("transfers.txt", TRANSFERS),
+        ]:
+            zf.writestr(name, body)
+
+    agency_stops = extract_agency_stops(feed, cache_dir=tmp_path / "cache")
+    # The mini feed's local bus operator (SL) is a route_type 700 line excluded from the
+    # intercity timetable, yet its stops appear in the full-feed map.
+    assert "Storstockholms Lokaltrafik" in agency_stops
+    assert agency_stops["Storstockholms Lokaltrafik"]
+
+    # A synthetic card keyed on that agency resolves to a region from the map.
+    cards = {"local": TravelCard(
+        id="local", name="Local", region="test",
+        honored_operators=frozenset({"Destination Gotland"}),  # a consortium-like operator
+        coverage_model="region-stops", region_agencies=frozenset({"Storstockholms Lokaltrafik"}),
+    )}
+    cov = PassCoverage(_timetable(), cards=cards, agency_stops=agency_stops)
+    assert cov.is_supported("local")
+
+
+def test_agency_stops_cache_is_reused(tmp_path):
+    import zipfile
+
+    from tripps.ingest.gtfs import extract_agency_stops
+
+    from .test_gtfs import (
+        AGENCY,
+        CALENDAR,
+        CALENDAR_DATES,
+        ROUTES,
+        STOP_TIMES,
+        STOPS,
+        TRANSFERS,
+        TRIPS,
+    )
+
+    feed = tmp_path / "mini.zip"
+    with zipfile.ZipFile(feed, "w") as zf:
+        for name, body in [
+            ("agency.txt", AGENCY), ("stops.txt", STOPS), ("routes.txt", ROUTES),
+            ("calendar.txt", CALENDAR), ("calendar_dates.txt", CALENDAR_DATES),
+            ("trips.txt", TRIPS), ("stop_times.txt", STOP_TIMES), ("transfers.txt", TRANSFERS),
+        ]:
+            zf.writestr(name, body)
+    cache = tmp_path / "cache"
+    first = extract_agency_stops(feed, cache_dir=cache)
+    assert list(cache.glob("agency-stops-*.json"))
+    second = extract_agency_stops(feed, cache_dir=cache)
+    assert first == second

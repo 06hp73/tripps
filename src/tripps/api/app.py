@@ -34,7 +34,7 @@ from ..ingest.freerider import (
     parse_offers,
     schema_drift,
 )
-from ..ingest.gtfs import GtfsConfig, load_timetable_cached
+from ..ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable_cached
 from ..models import SearchConstraints, TransportMode
 from ..passes import PassAdapter, PassCoverage, load_cards
 from ..pricing.flights import FlightAdapter
@@ -103,9 +103,17 @@ class AppState:
         self.flight_provider = (
             GoogleFlightsProvider() if _fast_flights_available() else NullFlightProvider()
         )
+        # Full-feed agency->stops map defines each travel card's region (see passes.py); the
+        # county PTAs whose only routes are local buses are absent from the routing timetable,
+        # so their regions must come from the whole feed. Disk-cached; loaded once here.
+        agency_stops = None
+        if self.settings.gtfs_zip_path.exists():
+            agency_stops = extract_agency_stops(
+                self.settings.gtfs_zip_path, self.settings.data_dir / "tt-cache"
+            )
         adapters = [
             # First: a held travel card zeroes a covered leg before any paid source is asked.
-            PassAdapter(),
+            PassAdapter(agency_stops=agency_stops),
             FlixBusAdapter(
                 base_url=self.settings.flixbus_base,
                 user_agent=self.settings.user_agent,
@@ -578,7 +586,12 @@ async def api_providers(request: Request) -> JSONResponse:
     state = _state(request)
     coverage = None
     if state.current_timetable is not None:
-        coverage = PassCoverage(state.current_timetable)
+        agency_stops = (
+            extract_agency_stops(state.settings.gtfs_zip_path, state.settings.data_dir / "tt-cache")
+            if state.settings.gtfs_zip_path.exists()
+            else None
+        )
+        coverage = PassCoverage(state.current_timetable, agency_stops=agency_stops)
     held = set(state.db.list_cards())
     return JSONResponse(
         {
