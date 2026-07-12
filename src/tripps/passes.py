@@ -26,15 +26,17 @@ passage fee is not modelled; and cross-region passes (Movingo, Norrlandsresan) a
 but not yet honored.
 
 **Tickital rentals.** Tickital (tickital.com) is a peer-to-peer marketplace where people rent
-out an unused regional period ticket. A rental is, for its window, exactly a held period card:
-the marginal cost of a covered leg is again zero. So a registered rental is modelled as a
-*windowed* card - covered legs price at 0 only on dates inside `[valid_from, valid_to]` - and
-its period price plus a blunt warning are surfaced, because renting/reselling a period ticket
-violates several PTAs' terms (Skanetrafiken, SL, Vasttrafik) and the ticket can be blocked.
-Honest limit, stated like the others: the rental's period price is *not* added into a one-off
-trip total, so a rental is only genuinely cheaper than single tickets if enough covered travel
-falls inside its window. Tickital has no scrapable listings surface (an app-only backend), so
-rentals are registered by hand from what the user sees in the app, never scanned live.
+out an unused regional period ticket. A rental is NOT an owned pass - it costs money - so it
+is not zeroed here. It is priced as a *coupon*: `TickitalAdapter` (after the paid sources)
+gives a covered leg the rental's period price only when no real fare source can, and the
+orchestrator's itinerary-level reconciliation then charges the rental's period price ONCE for
+the covered legs of a journey, but only when that beats buying single tickets for them (or
+when a covered leg has no purchasable single at all). Its terms risk is surfaced bluntly,
+because renting/reselling a period ticket violates several PTAs' terms (Skanetrafiken, SL,
+Vasttrafik) and the ticket can be blocked. The period cost is a one-time cost: code that sums
+more than one itinerary (round trip, fare calendar) dedups it by `Quote.coupon_rental_id`.
+Tickital has no scrapable listings surface (an app-only backend), so rentals are registered by
+hand from what the user sees in the app, never scanned live.
 """
 
 from __future__ import annotations
@@ -84,6 +86,13 @@ class TravelCard:
     region_agencies: frozenset[str]
     coverage_note: str = ""
     confidence: str = "reported-secondhand"
+    #: Curated named boundary stops this card is explicitly valid to across a county line, by
+    #: GTFS stop_id. A leg with one endpoint in region and the other in this set is covered.
+    #: Empty by default: cross-border validity is negotiated per PTA-pair, not a general "one
+    #: stop over" rule, so nothing extends unless a verified stop is listed. Note that the
+    #: region set already includes any boundary station the card's OWN agency runs to, so this
+    #: is only for stations served solely by a neighbour's agency under a named agreement.
+    border_stops: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -148,6 +157,7 @@ def load_cards() -> dict[str, TravelCard]:
             region_agencies=frozenset(entry.get("region_agencies", [])),
             coverage_note=entry.get("coverage_note", ""),
             confidence=entry.get("confidence", "reported-secondhand"),
+            border_stops=frozenset(entry.get("border_stops", [])),
         )
     return cards
 
@@ -214,7 +224,19 @@ class PassCoverage:
         if card.coverage_model == "operator-only":
             return True
         region = self._region_stops.get(card_id) or frozenset()
-        return leg.from_stop.id in region and leg.to_stop.id in region
+        frm, to = leg.from_stop.id, leg.to_stop.id
+        if frm in region and to in region:
+            return True
+        # Named cross-border extension: exactly one endpoint in region and the other a curated
+        # boundary stop this card is explicitly valid to. A leg with NEITHER endpoint in region
+        # lies entirely in the neighbour and is never freed. `border_stops` is empty for every
+        # card by default, so this branch changes nothing until a verified stop is listed.
+        border = card.border_stops
+        if border and (
+            (frm in region and to in border) or (to in region and frm in border)
+        ):
+            return True
+        return False
 
     def covering_card(self, held_ids, leg: Leg) -> TravelCard | None:
         """The first held card that covers this leg, or None."""
@@ -224,21 +246,28 @@ class PassCoverage:
         return None
 
 
-#: Marks a quote whose zero price comes from a tickital rental rather than an owned card, so
-#: the orchestrator can raise the period-cost + terms-of-service warning for it.
+#: Marks a quote produced by a tickital rental (the coupon-charged leg and its zeroed
+#: siblings), so the orchestrator can raise the period-cost + terms-of-service warning.
 TICKITAL_FARE_CLASS = "tickital rental"
+
+#: Quote.source for the tickital adapter. Distinct from PassAdapter's "travelcard" so the
+#: coupon can tell a rental fallback from an owned-card zero, and so floor-violation checks
+#: skip it the same way they skip owned cards.
+TICKITAL_SOURCE = "tickital"
 
 
 class PassAdapter(PriceAdapter):
-    """Prices a leg at 0 when a held travel card - or an active tickital rental - covers it.
+    """Prices a leg at 0 when a held (owned) travel card covers it.
 
     Placed FIRST in the pricing chain: `_adapter_for` returns the first adapter whose
     `supports` is True, so a covered leg is priced free here and never reaches SJ/Tora/etc. A
     leg no held card covers is not supported, and pricing falls through to the paid adapters.
 
-    Owned cards win over tickital rentals when both cover a leg: an owned card is free with no
-    strings, a rental costs money and carries a terms warning, so the cheaper-and-cleaner note
-    is preferred.
+    Tickital rentals are NOT handled here - they are a paid second-hand ticket, not an owned
+    pass, so they go through `TickitalAdapter` (placed after the paid sources) and an
+    itinerary-level coupon, which charges the rental's period price once only when it beats
+    buying singles. An owned card, by contrast, is genuinely free for the holder, so it zeroes
+    the leg unconditionally here.
     """
 
     name = "travelcard"
@@ -250,69 +279,112 @@ class PassAdapter(PriceAdapter):
         self._coverage: PassCoverage | None = None
         self._coverage_key: int | None = None
         self._held: frozenset[str] = frozenset()
-        self._rentals: list[TickitalRental] = []
 
-    def prepare(self, timetable, held_ids, rentals=None) -> None:
-        """Bind held cards + tickital rentals and (re)compute coverage, cached by identity.
+    def prepare(self, timetable, held_ids) -> None:
+        """Bind the held cards and (re)compute coverage for this timetable, cached by identity.
 
-        The Planner calls this per search. Coverage (the per-card region-stop sets) is derived
-        from the whole registry and the timetable, not from which cards are held, so it is
-        recomputed only when the timetable object actually changes - repeat searches stay cheap.
+        Coverage (the per-card region-stop sets) is derived from the whole registry and the
+        timetable, not from which cards are held, so it is recomputed only when the timetable
+        object actually changes - repeat searches stay cheap.
         """
         self._held = frozenset(held_ids or ())
-        self._rentals = list(rentals or [])
-        if (self._held or self._rentals) and (
-            self._coverage is None or self._coverage_key != id(timetable)
-        ):
+        if self._held and (self._coverage is None or self._coverage_key != id(timetable)):
             self._coverage = PassCoverage(timetable, agency_stops=self._agency_stops)
             self._coverage_key = id(timetable)
 
-    def _card_for(self, leg: Leg) -> tuple[TravelCard, TickitalRental | None] | None:
-        """The card (and, if it is a rental, the rental) that frees this leg, or None.
-
-        Owned cards are checked first so they take precedence; then any tickital rental whose
-        window contains the leg's departure date.
-        """
-        if self._coverage is None:
+    def _card_for(self, leg: Leg) -> TravelCard | None:
+        if not self._held or self._coverage is None:
             return None
-        if self._held:
-            card = self._coverage.covering_card(self._held, leg)
-            if card is not None:
-                return (card, None)
-        if self._rentals:
-            day = leg.departure.date()
-            for rental in self._rentals:
-                if rental.active_on(day) and self._coverage.covers(rental.provider_id, leg):
-                    card = self._coverage.card(rental.provider_id)
-                    if card is not None:
-                        return (card, rental)
-        return None
+        return self._coverage.covering_card(self._held, leg)
 
     def supports(self, leg: Leg) -> bool:
         return self._card_for(leg) is not None
 
     async def quote_leg(self, leg: Leg) -> Quote:
-        found = self._card_for(leg)
-        if found is None:
+        card = self._card_for(leg)
+        if card is None:
             return Quote.unavailable(self.name, note="not covered by a held card")
-        card, rental = found
-        if rental is None:
-            return Quote(
-                source=self.name,
-                amount_ore=0,
-                confidence=PriceConfidence.EXACT,
-                fare_class="travel card",
-                note=f"Included with your {card.name} period ticket",
-            )
-        price_sek = rental.price_ore / 100
         return Quote(
             source=self.name,
             amount_ore=0,
             confidence=PriceConfidence.EXACT,
+            fare_class="travel card",
+            note=f"Included with your {card.name} period ticket",
+        )
+
+
+def tickital_note(card: TravelCard, rental: TickitalRental) -> str:
+    """The honest one-line note carried on a rental-priced leg (and dedup key for warnings).
+
+    Kept byte-identical between the adapter's fallback quote and the coupon's rewrite so the
+    orchestrator's warning collapses to exactly one line. Says the rental is charged once for
+    the covered legs, and states the terms risk - it does not claim it beat singles, because
+    the same string is used both when it did and when it was the only priceable option.
+    """
+    price_sek = rental.price_ore / 100
+    return (
+        f"Covered by a tickital {card.name} rental: {price_sek:.0f} SEK for "
+        f"{rental.valid_from:%b %d}-{rental.valid_to:%b %d}, charged once for the covered "
+        f"legs. Renting or reselling a period ticket violates {card.name}'s terms and the "
+        f"ticket can be blocked."
+    )
+
+
+class TickitalAdapter(PriceAdapter):
+    """Fallback price for a leg an active tickital rental covers.
+
+    Placed LAST before the deeplink adapter: a covered leg on an operator that HAS a paid
+    source (e.g. Oresundstag via Tora) is priced by that source first, so the itinerary-level
+    coupon can compare the rental against the real single fare. Only a covered leg no paid
+    source can price (Skanetrafiken, Pagatag) reaches this adapter, which prices it at the
+    rental's period price so the itinerary stays priceable instead of being dropped. The
+    coupon in the orchestrator then rewrites the covered legs to charge the rental once.
+    """
+
+    name = TICKITAL_SOURCE
+    modes = frozenset(TransportMode)
+    provides_price = True
+
+    def __init__(self, agency_stops: dict[str, list[str]] | None = None) -> None:
+        self._agency_stops = agency_stops
+        self._coverage: PassCoverage | None = None
+        self._coverage_key: int | None = None
+        self._rentals: list[TickitalRental] = []
+
+    def prepare(self, timetable, rentals) -> None:
+        self._rentals = list(rentals or [])
+        if self._rentals and (self._coverage is None or self._coverage_key != id(timetable)):
+            self._coverage = PassCoverage(timetable, agency_stops=self._agency_stops)
+            self._coverage_key = id(timetable)
+
+    def has_rentals(self) -> bool:
+        return bool(self._rentals)
+
+    def rental_for(self, leg: Leg) -> tuple[TravelCard, TickitalRental] | None:
+        """The first active rental whose region covers this leg's date and endpoints, or None."""
+        if self._coverage is None or not self._rentals:
+            return None
+        day = leg.departure.date()
+        for rental in self._rentals:
+            if rental.active_on(day) and self._coverage.covers(rental.provider_id, leg):
+                card = self._coverage.card(rental.provider_id)
+                if card is not None:
+                    return (card, rental)
+        return None
+
+    def supports(self, leg: Leg) -> bool:
+        return self.rental_for(leg) is not None
+
+    async def quote_leg(self, leg: Leg) -> Quote:
+        found = self.rental_for(leg)
+        if found is None:
+            return Quote.unavailable(self.name, note="no active rental covers this leg")
+        card, rental = found
+        return Quote(
+            source=self.name,
+            amount_ore=rental.price_ore,
+            confidence=PriceConfidence.EXACT,
             fare_class=TICKITAL_FARE_CLASS,
-            note=(
-                f"Covered by a tickital {card.name} rental - {price_sek:.0f} SEK for "
-                f"{rental.valid_from:%b %d}-{rental.valid_to:%b %d}. Renting a period ticket "
-                f"violates {card.name}'s terms and the ticket can be blocked."
-            ),
+            note=tickital_note(card, rental),
+            coupon_rental_id=rental.id,
         )

@@ -39,7 +39,12 @@ from ..models import (
     SearchConstraints,
     TransportMode,
 )
-from ..passes import TICKITAL_FARE_CLASS
+from ..passes import (
+    TICKITAL_FARE_CLASS,
+    TICKITAL_SOURCE,
+    TickitalAdapter,
+    tickital_note,
+)
 from ..routing.floors import PriceFloorModel
 from ..routing.journey import (
     collapse_equivalent,
@@ -47,6 +52,7 @@ from ..routing.journey import (
     pattern_key,
     spread_by_departure,
 )
+from ..surcharges import apply_arlanda_fee
 from .base import BudgetExceeded, CallBudget
 from .freerider import FreeriderAdapter
 
@@ -55,6 +61,15 @@ log = logging.getLogger(__name__)
 #: Quote source used by the travel-card pass adapter; recognised here so a card-covered free
 #: leg is not mistaken for a price-floor violation.
 PASS_SOURCE = "travelcard"
+
+#: Sources whose amount is below the routing floor by design - an owned card zeroes a leg, a
+#: tickital rental fallback carries a whole period price on one leg - so neither is a floor
+#: violation nor a fare sample for calibration.
+_FLOOR_EXEMPT_SOURCES = frozenset({PASS_SOURCE, TICKITAL_SOURCE})
+
+#: Confidences firm enough to decide "the rental beats the singles". A stale or estimated
+#: single is too soft to justify pushing a traveller into a terms-risky rental.
+_FIRM_CONFIDENCES = frozenset({PriceConfidence.EXACT, PriceConfidence.CACHED})
 
 #: Ordering of confidences when the UI must pick "the weakest link".
 _CONFIDENCE_RANK = {
@@ -81,6 +96,10 @@ class _Context:
 
     call_budget: CallBudget
     violations: list[str] = field(default_factory=list)
+    #: Operators whose routing floor the search zeroed (held cards + active rentals). A leg on
+    #: one of these was routed with a 0 floor, so a paid quote below the calibrated floor
+    #: pruned nothing and must not be reported as a floor violation.
+    zeroed_operators: frozenset[str] = frozenset()
 
 
 class PricingOrchestrator:
@@ -172,9 +191,12 @@ class PricingOrchestrator:
         """A floor above the true price means McRAPTOR could have pruned the cheapest trip."""
         if not quote.is_priced or quote.amount_ore is None or not self._prices_a_real_ticket(leg):
             return
-        if quote.source == PASS_SOURCE:
-            # A travel card zeroes the leg for the holder; that is below the floor by design,
-            # not a routing bug, so it is not a floor violation.
+        if quote.source in _FLOOR_EXEMPT_SOURCES or leg.operator in ctx.zeroed_operators:
+            # A travel card zeroes the leg for the holder, and a tickital rental fallback
+            # carries a whole period price on one leg; both are below (or unlike) the per-leg
+            # floor by design, not a routing bug. Likewise an operator whose routing floor the
+            # search zeroed (a card/rental honours it) was routed with a 0 lower bound, so a
+            # paid quote below the calibrated floor pruned nothing - not a violation.
             return
         floor = self.floors.floor_ore(leg.mode, leg.operator, leg_distance_km(leg))
         if floor > quote.amount_ore:
@@ -186,7 +208,7 @@ class PricingOrchestrator:
         """Log (floor, actual) so the routing bound can be calibrated and audited."""
         if self.db is None or not quote.is_priced or quote.amount_ore is None:
             return
-        if not self._prices_a_real_ticket(leg) or source == PASS_SOURCE:
+        if not self._prices_a_real_ticket(leg) or source in _FLOOR_EXEMPT_SOURCES:
             return
         distance = leg_distance_km(leg)
         floor = self.floors.floor_ore(leg.mode, leg.operator, distance)
@@ -213,11 +235,97 @@ class PricingOrchestrator:
                 continue
             priced.append(leg.model_copy(update={"quote": next(quote_iter)}))
 
+        # Reconcile the whole itinerary now that every leg has a quote: fold a tickital
+        # rental into one charge, then add the Arlanda C passage fee (which a period pass does
+        # not cover) on top. Both run after per-leg pricing and before warnings.
+        priced = self._apply_rental_coupon(priced)
+        priced, arlanda_warning = apply_arlanda_fee(priced)
+
         warnings = list(itin.warnings)
+        if arlanda_warning is not None:
+            warnings.append(arlanda_warning)
         warnings.extend(self._warnings_for(priced))
         return Itinerary(
             legs=priced, warnings=warnings, floor_price_ore=itin.floor_price_ore
         )
+
+    def _apply_rental_coupon(self, priced: list[Leg]) -> list[Leg]:
+        """Charge a tickital rental once per itinerary, and only when it beats the singles.
+
+        Covered legs arrive here already priced - by a real paid single, or (when no paid
+        source could) by the `TickitalAdapter` fallback whose amount is the rental's period
+        price. For each rental, group the legs it covers, then decide:
+
+        * if any covered leg has no purchasable single - a tickital fallback quote, or a paid
+          operator that returned UNAVAILABLE - the rental is the ONLY complete pricing, so it
+          is applied regardless of price and of the other legs' confidence;
+        * otherwise apply the rental only when its period price is *strictly* below the sum of
+          the covered legs' singles AND those singles are firm (EXACT/CACHED); a stale or
+          estimated single is too soft to push a traveller into a terms-risky rental.
+
+        When applied, the period price lands once on the first covered leg and the rest are
+        zeroed, so the naive per-leg total sums to exactly one rental price. Legs an owned card
+        already zeroed (source == PASS_SOURCE) are skipped, so a rental never re-charges a leg
+        a card covers, and each leg lands in at most one rental group (first match wins).
+        """
+        tickital = next((a for a in self.adapters if isinstance(a, TickitalAdapter)), None)
+        if tickital is None or not tickital.has_rentals():
+            return priced
+
+        groups: dict[object, list[int]] = {}
+        cards: dict[object, tuple] = {}
+        for i, leg in enumerate(priced):
+            if leg.mode is TransportMode.WALK:
+                continue
+            quote = leg.quote
+            if quote is not None and quote.source == PASS_SOURCE:
+                continue  # already free via an owned card; never fold into a rental group
+            match = tickital.rental_for(leg)
+            if match is None:
+                continue
+            card, rental = match
+            key = rental.id if rental.id is not None else id(rental)
+            groups.setdefault(key, []).append(i)
+            cards[key] = (card, rental)
+        if not groups:
+            return priced
+
+        result = list(priced)
+        for key, idxs in groups.items():
+            card, rental = cards[key]
+            single_idx = [
+                j
+                for j in idxs
+                if (q := result[j].quote) is not None
+                and q.is_priced
+                and q.source != TICKITAL_SOURCE
+            ]
+            has_fallback = len(single_idx) < len(idxs)  # a covered leg with no purchasable single
+            firm = all(result[j].quote.confidence in _FIRM_CONFIDENCES for j in single_idx)
+            singles_sum = sum(result[j].quote.amount_ore for j in single_idx)
+
+            if has_fallback:
+                apply = True
+            else:
+                apply = firm and rental.price_ore < singles_sum
+            if not apply:
+                continue
+
+            note = tickital_note(card, rental)
+            for pos, j in enumerate(idxs):
+                result[j] = result[j].model_copy(
+                    update={
+                        "quote": Quote(
+                            source=TICKITAL_SOURCE,
+                            amount_ore=rental.price_ore if pos == 0 else 0,
+                            confidence=PriceConfidence.EXACT,
+                            fare_class=TICKITAL_FARE_CLASS,
+                            note=note if pos == 0 else None,
+                            coupon_rental_id=rental.id,
+                        )
+                    }
+                )
+        return result
 
     def _warnings_for(self, legs: list[Leg]) -> list[str]:
         warnings: list[str] = []
@@ -236,13 +344,10 @@ class PricingOrchestrator:
             if quote is None:
                 continue
             if quote.fare_class == TICKITAL_FARE_CLASS and quote.note:
-                # The rental zeroes the leg, but its period cost is real and its legality is
-                # not. Surface both once per itinerary (dedup collapses the covered legs).
-                warnings.append(
-                    quote.note + " Its period cost is not added to the trip total, so a "
-                    "rental only beats single tickets if enough covered travel falls in the "
-                    "window."
-                )
+                # After the coupon, only the one charged leg carries a note (its zeroed
+                # siblings get note=None), so this fires exactly once per rental. The note
+                # already states the one-time cost and the terms risk.
+                warnings.append(quote.note)
             if quote.confidence is PriceConfidence.STALE:
                 warnings.append(
                     f"Price for the {leg.operator or leg.mode.value} leg is stale "
@@ -264,6 +369,7 @@ class PricingOrchestrator:
         *,
         max_results: int = 5,
         require_priced: bool = True,
+        zeroed_operators: frozenset[str] | None = None,
     ) -> PricingResult:
         """Price the most promising candidates, then rank by true total price.
 
@@ -301,7 +407,10 @@ class PricingOrchestrator:
         feasible = spread_by_departure(feasible, self.budget.max_departures_per_pattern)
         to_price, deferred = _select_to_price(feasible, self.budget.max_candidates_to_price)
 
-        ctx = _Context(call_budget=CallBudget.from_settings(self.budget))
+        ctx = _Context(
+            call_budget=CallBudget.from_settings(self.budget),
+            zeroed_operators=zeroed_operators or frozenset(),
+        )
         for adapter in self.adapters:
             setter = getattr(adapter, "set_budget", None)
             if setter is not None:

@@ -24,7 +24,7 @@ from .ingest.freerider import (
 )
 from .ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable, load_timetable_cached
 from .models import SearchConstraints, TransportMode
-from .passes import PassAdapter, TickitalRental
+from .passes import PassAdapter, TickitalAdapter, TickitalRental
 from .pricing.flights import FlightAdapter
 from .pricing.flixbus import FlixBusAdapter
 from .pricing.freerider import FreeriderAdapter
@@ -38,6 +38,7 @@ from .search import (
     cheapest_over_window,
     round_trip,
     summarize,
+    window_rental_notes,
 )
 from .timeutil import now_local
 
@@ -145,6 +146,9 @@ def _build_adapters(settings, db):
         StaticFareAdapter.from_file(settings.data_dir / "fares.json")
         if (settings.data_dir / "fares.json").exists()
         else StaticFareAdapter(),
+        # second-to-last: a rental prices only a covered leg no paid source could, so the
+        # coupon can compare against real singles; last of all is the booking-link fallback.
+        TickitalAdapter(agency_stops=agency_stops),
         DeeplinkAdapter(),
     ]
 
@@ -297,6 +301,8 @@ async def _search(args: argparse.Namespace) -> int:
                 "\nround-trip total: "
                 + (f"{total / 100:.0f} SEK" if total is not None else "unavailable")
             )
+            for note in result.warnings:
+                print(f"  - {note}")
         else:
             response, run_stats = await factory(service_date).search(
                 args.origin, args.destination, service_date, constraints=constraints, offers=offers,
@@ -356,6 +362,8 @@ async def _fares(args: argparse.Namespace) -> int:
         modes = "+".join(dict.fromkeys(m.value for m in f.cheapest.modes if m.value != "walk"))
         mark = " <- cheapest" if f.price_ore == best else ""
         print(f"  {f.date:%a %b %d}   {f.price_sek:5.0f} SEK  {f.cheapest.departure:%H:%M}  {modes}{mark}")
+    for note in window_rental_notes(fares, _cli_rentals(db)):
+        print(f"  - {note}")
     db.close()
     return 0
 
@@ -480,18 +488,27 @@ def _cards(args: argparse.Namespace) -> int:
             print(f"error: unknown provider '{args.provider_id}' (see `tripps cards providers`)", file=sys.stderr)
             db.close()
             return 1
-        db.add_card(args.provider_id)
-        print(f"registered: {cards[args.provider_id].name}")
+        all_zone = not args.partial_zone
+        db.add_card(args.provider_id, all_zone=all_zone)
+        name = cards[args.provider_id].name
+        if all_zone:
+            print(f"registered: {name}")
+        else:
+            print(
+                f"registered (partial zone): {name} - priced as paid, not auto-freed, because "
+                "per-zone coverage can't be verified from the timetable data"
+            )
     elif args.cards_action == "remove":
         removed = db.remove_card(args.provider_id)
         print("removed" if removed else "not registered")
     else:  # list
-        held = db.list_cards()
-        if not held:
+        rows = db.list_card_rows()
+        if not rows:
             print("no cards registered; add one with `tripps cards add <id>`")
-        for cid in held:
-            c = cards.get(cid)
-            print(f"  {cid:26} {c.name if c else '(unknown)'}")
+        for row in rows:
+            c = cards.get(row["provider_id"])
+            tag = "" if row["all_zone"] else "  (partial zone: priced as paid)"
+            print(f"  {row['provider_id']:26} {c.name if c else '(unknown)'}{tag}")
     db.close()
     return 0
 
@@ -674,6 +691,11 @@ def main(argv: list[str] | None = None) -> int:
     cd_sub.add_parser("list", help="show your registered cards")
     cd_add = cd_sub.add_parser("add", help="register a card by provider id")
     cd_add.add_argument("provider_id")
+    cd_add.add_argument(
+        "--partial-zone",
+        action="store_true",
+        help="a partial (not all-zone) ticket: registered but priced as paid, never auto-freed",
+    )
     cd_rm = cd_sub.add_parser("remove", help="unregister a card")
     cd_rm.add_argument("provider_id")
 

@@ -36,7 +36,13 @@ from ..ingest.freerider import (
 )
 from ..ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable_cached
 from ..models import SearchConstraints, TransportMode
-from ..passes import PassAdapter, PassCoverage, TickitalRental, load_cards
+from ..passes import (
+    PassAdapter,
+    PassCoverage,
+    TickitalAdapter,
+    TickitalRental,
+    load_cards,
+)
 from ..pricing.flights import FlightAdapter
 from ..pricing.flixbus import FlixBusAdapter
 from ..pricing.freerider import FreeriderAdapter
@@ -51,6 +57,7 @@ from ..search import (
     cheapest_over_window,
     round_trip,
     summarize,
+    window_rental_notes,
 )
 from ..timeutil import now_local
 from ..watcher import (
@@ -132,6 +139,9 @@ class AppState:
             FreeriderAdapter(cost_model=FreeriderCostModel()),
             FlightAdapter(),
             _fare_table(self.settings),
+            # Second-to-last: a rental prices only a covered leg no paid source could, so the
+            # itinerary coupon still has real singles to compare against.
+            TickitalAdapter(agency_stops=agency_stops),
             # Last: anything a real price source could not answer becomes a booking link.
             DeeplinkAdapter(),
         ]
@@ -486,6 +496,7 @@ async def api_round_trip(
             "outbound": result.outbound.model_dump(mode="json"),
             "inbound": result.inbound.model_dump(mode="json"),
             "total_price_sek": (result.total_price_ore / 100) if result.total_price_ore else None,
+            "warnings": result.warnings,
         }
     )
 
@@ -508,11 +519,12 @@ async def api_fares(
     constraints = _constraints(
         max_hours, max_transfers, include_freerider, modes, None, start_date
     )
+    rentals = _rentals(state.db)
     try:
         fares = await cheapest_over_window(
             _make_planner(state), origin, destination, start_date, days,
             constraints=constraints, offers=state.freerider_offers,
-            held_cards=state.db.list_cards(), tickital_rentals=_rentals(state.db),
+            held_cards=state.db.list_cards(), tickital_rentals=rentals,
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -521,6 +533,7 @@ async def api_fares(
         {
             "origin": origin,
             "destination": destination,
+            "notes": window_rental_notes(fares, rentals),
             "days": [
                 {
                     "date": f.date.isoformat(),
@@ -598,7 +611,9 @@ async def api_providers(request: Request) -> JSONResponse:
             else None
         )
         coverage = PassCoverage(state.current_timetable, agency_stops=agency_stops)
-    held = set(state.db.list_cards())
+    # held covers full + partial holdings; partial (all_zone=0) cards are marked so the UI can
+    # show they are registered but not auto-freed.
+    held = {r["provider_id"]: bool(r["all_zone"]) for r in state.db.list_card_rows()}
     return JSONResponse(
         {
             "providers": [
@@ -607,6 +622,7 @@ async def api_providers(request: Request) -> JSONResponse:
                     "name": c.name,
                     "region": c.region,
                     "held": c.id in held,
+                    "all_zone": held.get(c.id, True),
                     "supported": coverage.is_supported(c.id) if coverage else True,
                     "note": c.coverage_note,
                 }
@@ -623,8 +639,12 @@ async def api_cards_list(request: Request) -> JSONResponse:
     return JSONResponse(
         {
             "cards": [
-                {"id": cid, "name": cards[cid].name if cid in cards else cid}
-                for cid in state.db.list_cards()
+                {
+                    "id": r["provider_id"],
+                    "name": cards[r["provider_id"]].name if r["provider_id"] in cards else r["provider_id"],
+                    "all_zone": bool(r["all_zone"]),
+                }
+                for r in state.db.list_card_rows()
             ]
         }
     )
@@ -637,8 +657,17 @@ async def api_cards_add(request: Request) -> JSONResponse:
     provider_id = body.get("provider_id")
     if provider_id not in load_cards():
         raise HTTPException(400, f"unknown provider: {provider_id}")
-    state.db.add_card(provider_id)
-    return JSONResponse({"added": provider_id})
+    # A partial-zone holding is registered but not auto-freed - its exact zones cannot be
+    # verified from feed data, so its legs are priced as paid rather than wrongly zeroed.
+    all_zone = bool(body.get("all_zone", True))
+    state.db.add_card(provider_id, all_zone=all_zone)
+    resp = {"added": provider_id, "all_zone": all_zone}
+    if not all_zone:
+        resp["note"] = (
+            "Registered as a partial-zone ticket: its legs are priced as paid, not auto-freed, "
+            "because per-zone coverage can't be verified from the timetable data."
+        )
+    return JSONResponse(resp)
 
 
 @app.delete("/api/cards/{provider_id}")

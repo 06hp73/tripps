@@ -91,6 +91,7 @@
                 {% else %}
                   {{ "%.0f"|format(leg.quote.amount_sek) }} SEK
                 {% endif %}
+                {% if leg.quote.surcharge_ore %}<br><span class="meta">+{{ (leg.quote.surcharge_ore / 100)|round|int }} SEK station fee</span>{% endif %}
                 <br><span class="badge {{ leg.quote.confidence.value }}">{{ leg.quote.confidence.value }}</span>
               {% else %}
                 <span class="badge unavailable">no price</span>

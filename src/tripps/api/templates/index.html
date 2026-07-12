@@ -175,7 +175,8 @@
       <div id="card-picker" class="card-picker" hidden>
         <input type="text" id="card-search" placeholder="Search region or provider…" autocomplete="off">
         <ul id="card-list" class="card-list"></ul>
-        <p class="opt">Covered legs (e.g. Öresundståg within Skåne with a Skånetrafiken card) price at 0. Assumes an all-zone period ticket; SJ is never auto-freed.</p>
+        <label class="opt" style="display:block"><input type="checkbox" id="card-partial"> I only hold part of the zones (partial ticket)</label>
+        <p class="opt">Covered legs (e.g. Öresundståg within Skåne with a Skånetrafiken card) price at 0. Assumes an all-zone period ticket; SJ is never auto-freed. A partial-zone ticket is registered but priced as paid (its exact zones can't be verified from the data).</p>
       </div>
     </div>
 
@@ -291,12 +292,14 @@
   const cardChips = document.getElementById("card-chips");
   const cardSearch = document.getElementById("card-search");
   const cardList = document.getElementById("card-list");
+  const cardPartial = document.getElementById("card-partial");
 
   function renderChips() {
     const held = providers.filter(p => p.held);
     cardToggle.textContent = held.length ? `${held.length} registered ▾` : "none registered ▾";
     cardChips.innerHTML = held.map(p =>
-      `<span class="chip">${esc(p.name)}<button data-id="${esc(p.id)}" title="remove">×</button></span>`).join("");
+      `<span class="chip${p.all_zone === false ? " warn" : ""}">${esc(p.name)}${p.all_zone === false ? " (partial)" : ""}`
+      + `<button data-id="${esc(p.id)}" title="remove">×</button></span>`).join("");
     cardChips.querySelectorAll(".chip button").forEach(b =>
       b.addEventListener("click", () => toggleCard(b.dataset.id, false)));
   }
@@ -307,7 +310,8 @@
       !q || p.name.toLowerCase().includes(q) || (p.region || "").toLowerCase().includes(q));
     cardList.innerHTML = shown.map(p => {
       const cls = p.held ? "held" : (p.supported ? "" : "limited");
-      const action = p.held ? "✓ registered" : (p.supported ? "+ add" : "coverage n/a");
+      const partial = p.held && p.all_zone === false;
+      const action = p.held ? (partial ? "✓ partial" : "✓ registered") : (p.supported ? "+ add" : "coverage n/a");
       return `<li class="${cls}" data-id="${esc(p.id)}" data-ok="${p.supported ? 1 : 0}">`
         + `<span><b>${esc(p.name)}</b> <span class="rgn">${esc(p.region)}</span></span>`
         + `<span class="add">${action}</span></li>`;
@@ -329,12 +333,14 @@
   }
 
   async function toggleCard(id, add) {
+    const allZone = !(add && cardPartial.checked);
     try {
-      if (add) await fetch("/api/cards", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider_id: id }) });
+      if (add) await fetch("/api/cards", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider_id: id, all_zone: allZone }) });
       else await fetch("/api/cards/" + encodeURIComponent(id), { method: "DELETE" });
     } catch (_) { return; }
     const p = providers.find(x => x.id === id);
-    if (p) p.held = add;
+    if (p) { p.held = add; p.all_zone = add ? allZone : true; }
+    if (add) cardPartial.checked = false;
     renderChips();
     renderCardList();
   }
@@ -442,13 +448,15 @@
     return itin.legs.filter(l => l.mode !== "walk").map(l => {
       const cost = l.quote && l.quote.amount_ore != null
         ? (l.quote.amount_ore === 0 ? "free" : Math.round(l.quote.amount_ore / 100) + " SEK") : "no price";
+      const surcharge = l.quote && l.quote.surcharge_ore
+        ? ` <span class="incl">+${Math.round(l.quote.surcharge_ore / 100)} SEK station fee</span>` : "";
       const book = l.quote && l.quote.deeplink
         ? ` · <a class="book" href="${esc(l.quote.deeplink)}" target="_blank" rel="noopener noreferrer">book →</a>` : "";
       const op = l.operator ? ` <span class="meta">(${esc(l.operator)})</span>` : "";
       const incl = l.quote && l.quote.source === "travelcard" && l.quote.note
         ? ` <span class="incl">${esc(l.quote.note)}</span>` : "";
       return `<li>${l.departure.slice(11,16)}–${l.arrival.slice(11,16)} <b>${esc(l.mode)}</b>${op} `
-        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}${incl}${book}</li>`;
+        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}${surcharge}${incl}${book}</li>`;
     }).join("");
   }
 

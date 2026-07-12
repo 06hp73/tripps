@@ -113,9 +113,13 @@ CREATE TABLE IF NOT EXISTS freerider_hit (
 CREATE INDEX IF NOT EXISTS idx_hit_seen ON freerider_hit(seen_at);
 
 -- Travel cards (regional period tickets) the user holds; covered legs price at 0.
+-- all_zone: 1 = a full/all-zone ticket (auto-frees covered legs); 0 = a partial-zone ticket,
+-- whose exact zones are not modellable from feed data (no zone_id anywhere), so it is NOT
+-- auto-freed and its legs are priced as paid - the conservative direction that never lies.
 CREATE TABLE IF NOT EXISTS travel_card (
     provider_id TEXT PRIMARY KEY,
-    added_at    TEXT NOT NULL
+    added_at    TEXT NOT NULL,
+    all_zone    INTEGER NOT NULL DEFAULT 1
 );
 
 -- Second-hand period tickets rented via tickital: a provider's card, valid only over a date
@@ -183,7 +187,24 @@ class Database:
         self._conn.execute("PRAGMA synchronous=NORMAL")
         with self._lock:
             self._conn.executescript(SCHEMA)
+            self._migrate()
             self._conn.commit()
+
+    def _migrate(self) -> None:
+        """Idempotent additive migrations for tables created before a column existed.
+
+        `CREATE TABLE IF NOT EXISTS` never adds a column to an existing table, so a DB from an
+        earlier version keeps its old shape. Add columns here, guarded by a table_info check so
+        re-running is a no-op.
+        """
+        cols = {
+            row["name"]
+            for row in self._conn.execute("PRAGMA table_info(travel_card)").fetchall()
+        }
+        if "all_zone" not in cols:
+            self._conn.execute(
+                "ALTER TABLE travel_card ADD COLUMN all_zone INTEGER NOT NULL DEFAULT 1"
+            )
 
     def close(self) -> None:
         with self._lock:
@@ -503,11 +524,14 @@ class Database:
 
     # --- travel cards -----------------------------------------------------
 
-    def add_card(self, provider_id: str) -> None:
+    def add_card(self, provider_id: str, *, all_zone: bool = True) -> None:
         with self._write() as conn:
             conn.execute(
-                "INSERT OR IGNORE INTO travel_card (provider_id, added_at) VALUES (?, ?)",
-                (provider_id, datetime.now(UTC).isoformat()),
+                """
+                INSERT INTO travel_card (provider_id, added_at, all_zone) VALUES (?, ?, ?)
+                ON CONFLICT(provider_id) DO UPDATE SET all_zone = excluded.all_zone
+                """,
+                (provider_id, datetime.now(UTC).isoformat(), 1 if all_zone else 0),
             )
 
     def remove_card(self, provider_id: str) -> bool:
@@ -516,11 +540,24 @@ class Database:
             return cur.rowcount > 0
 
     def list_cards(self) -> list[str]:
+        """Provider ids that auto-free covered legs: all-zone holdings only.
+
+        A partial-zone holding (all_zone = 0) is deliberately excluded, so it never zeroes a
+        leg whose zone we cannot verify - the honest, never-over-cover direction. Use
+        `list_card_rows()` to show every held card, partial ones included.
+        """
         with self._lock:
             rows = self._conn.execute(
-                "SELECT provider_id FROM travel_card ORDER BY added_at"
+                "SELECT provider_id FROM travel_card WHERE all_zone = 1 ORDER BY added_at"
             ).fetchall()
         return [r["provider_id"] for r in rows]
+
+    def list_card_rows(self) -> list[sqlite3.Row]:
+        """Every held card with its all_zone flag, for display (partial ones included)."""
+        with self._lock:
+            return self._conn.execute(
+                "SELECT provider_id, all_zone FROM travel_card ORDER BY added_at"
+            ).fetchall()
 
     # --- tickital rentals -------------------------------------------------
 

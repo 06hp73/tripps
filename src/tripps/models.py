@@ -120,13 +120,31 @@ class Quote(BaseModel):
     fetched_at: datetime | None = None
     ttl_seconds: int | None = None
     note: str | None = None
+    #: Set on the leg(s) a tickital rental coupon rewrote (the charged leg and its zeroed
+    #: siblings all carry the same id). The stable key that lets a caller summing more than one
+    #: itinerary - round trip, fare calendar - charge a one-time period cost once, by identity
+    #: rather than by matching an amount two distinct rentals could share.
+    coupon_rental_id: int | None = None
+    #: A station fee added on top of the fare (Arlanda C passage), kept SEPARATE from
+    #: `amount_ore` on purpose: it is applied after pricing, whoever priced the leg, and a
+    #: pass or rental does not cover it. Keeping it out of `amount_ore` means the coupon's
+    #: `amount_ore == rental.price_ore` identity survives a surcharge landing on the charged
+    #: leg. It IS part of the itinerary total (see `Itinerary.total_price_ore`).
+    surcharge_ore: int | None = None
 
-    @field_validator("amount_ore")
+    @field_validator("amount_ore", "surcharge_ore")
     @classmethod
     def _non_negative(cls, v: int | None) -> int | None:
         if v is not None and v < 0:
             raise ValueError(f"negative price: {v}")
         return v
+
+    @property
+    def total_ore(self) -> int | None:
+        """The fare plus any surcharge, or None if the fare itself is unpriced."""
+        if self.amount_ore is None:
+            return None
+        return self.amount_ore + (self.surcharge_ore or 0)
 
     @property
     def is_priced(self) -> bool:
@@ -251,7 +269,7 @@ class Itinerary(BaseModel):
         if not self.fully_priced:
             return None
         return sum(
-            leg.quote.amount_ore
+            leg.quote.amount_ore + (leg.quote.surcharge_ore or 0)
             for leg in self.legs
             if leg.mode is not TransportMode.WALK and leg.quote is not None
         )

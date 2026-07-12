@@ -31,7 +31,7 @@ from .models import (
     Stop,
     TransportMode,
 )
-from .passes import PassAdapter, TickitalRental, honored_operators
+from .passes import PassAdapter, TickitalAdapter, TickitalRental, honored_operators
 from .pricing.flights import FlightAdapter
 from .pricing.freerider import FreeriderAdapter
 from .pricing.orchestrator import PricingOrchestrator
@@ -326,8 +326,12 @@ class Planner:
             elif isinstance(adapter, FlightAdapter):
                 adapter.load(used_flights)
             elif isinstance(adapter, PassAdapter):
-                # Bind the held travel cards + tickital rentals, coverage over this timetable.
-                adapter.prepare(network, held_cards or [], tickital_rentals or [])
+                # Owned cards only - they zero covered legs before any paid source.
+                adapter.prepare(network, held_cards or [])
+            elif isinstance(adapter, TickitalAdapter):
+                # Rentals are a paid fallback + itinerary-level coupon, priced after the real
+                # sources; bind them here over this timetable.
+                adapter.prepare(network, tickital_rentals or [])
 
         depart_at = departure_after or constraints.earliest_departure
         depart_seconds = (
@@ -397,6 +401,9 @@ class Planner:
             constraints,
             max_results=self.options.max_results,
             require_priced=self.options.require_priced,
+            # Operators whose floor was zeroed above: a paid quote below their calibrated floor
+            # pruned nothing (the router used 0), so it must not read as a floor violation.
+            zeroed_operators=card_ops,
         )
         stats.priced = len(priced.itineraries)
         stats.upstream_calls = priced.calls_made
@@ -465,6 +472,9 @@ def _cheapest_priced(response: SearchResponse) -> Itinerary | None:
 class RoundTrip:
     outbound: SearchResponse
     inbound: SearchResponse
+    #: The rentals in force for this round trip, needed to dedup a one-time period cost that
+    #: each direction's coupon charges independently. Populated by `round_trip()`.
+    tickital_rentals: list[TickitalRental] = field(default_factory=list)
 
     @property
     def cheapest_outbound(self) -> Itinerary | None:
@@ -474,12 +484,59 @@ class RoundTrip:
     def cheapest_inbound(self) -> Itinerary | None:
         return _cheapest_priced(self.inbound)
 
+    def _price_of(self, rental_id: int) -> int | None:
+        return next((r.price_ore for r in self.tickital_rentals if r.id == rental_id), None)
+
+    def _charged_rentals(self, itin: Itinerary | None) -> set[int]:
+        """Rental ids whose one-time period cost is actually charged in this itinerary.
+
+        The coupon marks every rewritten leg with `coupon_rental_id`, but only the single
+        charged leg carries the full `price_ore` (its siblings are zeroed), so matching on the
+        amount picks the charge exactly once and by identity - two rentals with an equal price
+        stay distinct.
+        """
+        if itin is None:
+            return set()
+        charged: set[int] = set()
+        for leg in itin.legs:
+            q = leg.quote
+            if q is None or q.coupon_rental_id is None:
+                continue
+            price = self._price_of(q.coupon_rental_id)
+            if price is not None and q.amount_ore == price:
+                charged.add(q.coupon_rental_id)
+        return charged
+
+    @property
+    def shared_rentals(self) -> set[int]:
+        """Rentals charged in BOTH directions; their period cost is one-time, not per-direction."""
+        return self._charged_rentals(self.cheapest_outbound) & self._charged_rentals(
+            self.cheapest_inbound
+        )
+
     @property
     def total_price_ore(self) -> int | None:
         out, back = self.cheapest_outbound, self.cheapest_inbound
         if out is None or back is None or out.total_price_ore is None or back.total_price_ore is None:
             return None
-        return out.total_price_ore + back.total_price_ore
+        total = out.total_price_ore + back.total_price_ore
+        for rental_id in self.shared_rentals:
+            price = self._price_of(rental_id)
+            if price is not None:
+                total -= price  # count the one-time period cost once, not once per direction
+        return total
+
+    @property
+    def warnings(self) -> list[str]:
+        notes: list[str] = []
+        for rental_id in sorted(self.shared_rentals):
+            price = self._price_of(rental_id)
+            if price is not None:
+                notes.append(
+                    f"A tickital rental's one-time period cost of {price / 100:.0f} SEK is "
+                    "counted once across the outbound and inbound totals, not on both."
+                )
+        return notes
 
 
 async def round_trip(
@@ -509,7 +566,9 @@ async def round_trip(
         destination, origin, return_date, constraints=constraints, offers=offers,
         held_cards=held_cards, tickital_rentals=tickital_rentals,
     )
-    return RoundTrip(outbound=out_resp, inbound=in_resp)
+    return RoundTrip(
+        outbound=out_resp, inbound=in_resp, tickital_rentals=list(tickital_rentals or [])
+    )
 
 
 @dataclass(slots=True)
@@ -556,6 +615,46 @@ async def cheapest_over_window(
         )
         results.append(DayFare(date=day, cheapest=_cheapest_priced(response)))
     return results
+
+
+def window_rental_notes(fares: list[DayFare], rentals: list[TickitalRental] | None) -> list[str]:
+    """Notes flagging a tickital rental charged on 2+ days of a fare calendar.
+
+    Each in-window day is an independent search that charges the full one-time period cost, so
+    the same figure appearing on several days would misread as a per-day expense. This says the
+    cost is shared across the window: choosing an extra in-window day costs about 0 more.
+    """
+    if not rentals:
+        return []
+    price_of = {r.id: r.price_ore for r in rentals if r.id is not None}
+    days_charged: dict[int, int] = {}
+    for fare in fares:
+        if fare.cheapest is None:
+            continue
+        for rental_id in _charged_rental_ids(fare.cheapest, price_of):
+            days_charged[rental_id] = days_charged.get(rental_id, 0) + 1
+    notes: list[str] = []
+    for rental_id, count in sorted(days_charged.items()):
+        if count >= 2:
+            notes.append(
+                f"A tickital rental's one-time period cost of {price_of[rental_id] / 100:.0f} "
+                f"SEK is shown on {count} days, but it is paid once for the whole window - an "
+                "extra in-window day costs about 0 more, not the full figure."
+            )
+    return notes
+
+
+def _charged_rental_ids(itin: Itinerary, price_of: dict[int, int]) -> set[int]:
+    """Rental ids charged (the full-price leg, not a zeroed sibling) in one itinerary."""
+    charged: set[int] = set()
+    for leg in itin.legs:
+        q = leg.quote
+        if q is None or q.coupon_rental_id is None:
+            continue
+        price = price_of.get(q.coupon_rental_id)
+        if price is not None and q.amount_ore == price:
+            charged.add(q.coupon_rental_id)
+    return charged
 
 
 def resolve_stops(timetable: Timetable, query: str, limit: int = 8) -> list[Stop]:
