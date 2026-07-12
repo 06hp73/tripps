@@ -74,6 +74,35 @@ def test_border_stop_does_not_free_a_leg_deeper_into_the_neighbour():
     assert not cov.covers("sk", _leg("Öresundståg", LUND, KARLSHAMN))
 
 
+# --- zone-combination hint (partial cross-border coverage) ------------------
+
+
+def test_partially_covers_a_leg_that_crosses_the_border():
+    cov = PassCoverage(_timetable(), cards={"sk": _card()})  # no border stops
+    # Lund (in Skåne) -> Sölvesborg (Blekinge): exactly one endpoint in region, not covered.
+    assert cov.partially_covers("sk", _leg("Öresundståg", LUND, SOLVESBORG))
+    assert cov.partially_covers("sk", _leg("Öresundståg", SOLVESBORG, LUND))  # either direction
+
+
+def test_fully_covered_or_fully_outside_is_not_partial():
+    cov = PassCoverage(_timetable(), cards={"sk": _card()})
+    assert not cov.partially_covers("sk", _leg("Öresundståg", MALMO, LUND))  # both in region
+    assert not cov.partially_covers("sk", _leg("Öresundståg", SOLVESBORG, KARLSHAMN))  # both out
+
+
+def test_a_seeded_border_stop_is_covered_not_merely_partial():
+    cov = PassCoverage(_timetable(), cards={"sk": _card(border_stops=frozenset({"SOLV"}))})
+    # With Sölvesborg seeded, the leg is fully covered, so it is not flagged as partial.
+    assert cov.covers("sk", _leg("Öresundståg", LUND, SOLVESBORG))
+    assert not cov.partially_covers("sk", _leg("Öresundståg", LUND, SOLVESBORG))
+
+
+def test_partial_coverage_needs_an_honored_operator():
+    cov = PassCoverage(_timetable(), cards={"sk": _card()})
+    # Västtrafik is not honored by this card, so a border-crossing on it is not "partial".
+    assert not cov.partially_covers("sk", _leg("Västtrafik", LUND, SOLVESBORG))
+
+
 def test_seeded_border_stops_are_exactly_the_verified_set():
     # Cross-border is opt-in and verified per card. Only the four cards with an official,
     # cited FREE extension are seeded; every other card keeps an empty allow-list so none can

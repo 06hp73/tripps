@@ -42,6 +42,7 @@ from ..models import (
 from ..passes import (
     TICKITAL_FARE_CLASS,
     TICKITAL_SOURCE,
+    PassAdapter,
     TickitalAdapter,
     tickital_note,
 )
@@ -332,6 +333,7 @@ class PricingOrchestrator:
         freerider = next(
             (a for a in self.adapters if isinstance(a, FreeriderAdapter)), None
         )
+        passcard = next((a for a in self.adapters if isinstance(a, PassAdapter)), None)
         for leg in legs:
             if leg.mode is TransportMode.FREERIDER and freerider is not None:
                 warnings.extend(freerider.warnings_for(leg))
@@ -343,6 +345,22 @@ class PricingOrchestrator:
             quote = leg.quote
             if quote is None:
                 continue
+            # A held card that partially covers this leg (crosses its county border): we charge
+            # the full fare because zone-combination pricing is not modelled, but say the card
+            # may reduce it. Only when the leg is actually charged (not already free via a pass).
+            if (
+                passcard is not None
+                and quote.is_priced
+                and quote.source not in (PASS_SOURCE, TICKITAL_SOURCE)
+            ):
+                partial = passcard.partial_card(leg)
+                if partial is not None:
+                    warnings.append(
+                        f"Your {partial.name} card may reduce the {leg.operator or leg.mode.value} "
+                        f"fare {leg.from_stop.name} to {leg.to_stop.name}: it crosses your card's "
+                        "county border, and cross-border zone-combination pricing is not modelled, "
+                        "so the leg is shown at full fare."
+                    )
             if quote.fare_class == TICKITAL_FARE_CLASS and quote.note:
                 # After the coupon, only the one charged leg carries a note (its zeroed
                 # siblings get note=None), so this fires exactly once per rental. The note

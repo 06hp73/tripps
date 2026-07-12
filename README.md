@@ -213,9 +213,10 @@ API: `POST/GET/DELETE /api/watch`.
 bound* (`floors.py`), shipped with deliberately loose defaults; every phase-2 price is logged
 to `reprice_delta`, and this command fits a tighter per-operator floor from that history —
 `per_km = min(actual/distance)`, `base = min(actual - per_km·distance)`, both provably at or
-below every observed fare, then discounted 10% for headroom. Tighter floors mean a smaller
-Pareto frontier and fewer upstream price calls. Run it periodically once real searches have
-accumulated; the floor-violation detector catches and self-corrects any overshoot.
+below every observed fare, then discounted 25% (`SAFETY_MARGIN = 0.75`) for headroom against a
+future fare cheaper than anything yet seen. Tighter floors mean a smaller Pareto frontier and
+fewer upstream price calls. Run it periodically once real searches have accumulated; the
+floor-violation detector catches and self-corrects any overshoot.
 
 Endpoints: `GET /` (UI), `GET /status` (ops dashboard), `POST /search`, `GET /api/search`,
 `GET /api/stops`, `GET /api/freerider`, `GET /health`, `GET /api/canary`.

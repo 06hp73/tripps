@@ -245,6 +245,28 @@ class PassCoverage:
                 return self._cards.get(card_id)
         return None
 
+    def partially_covers(self, card_id: str, leg: Leg) -> bool:
+        """True when a held card honors this leg's operator and EXACTLY ONE endpoint is in the
+        card's region, but the leg is not fully covered.
+
+        That is a leg crossing the card's county border: most Swedish PTAs let a period ticket
+        span the border only by paying for the extra zones (zone-combination), which is not
+        modelled here, so the leg is charged in full. This flags that the shown fare may be
+        reducible with the card - an honest hint, never a discount.
+        """
+        card = self._cards.get(card_id)
+        if card is None or leg.mode is TransportMode.WALK:
+            return False
+        operator = leg.operator or ""
+        if operator in GLOBAL_EXCLUSIONS or operator not in card.honored_operators:
+            return False
+        if card.coverage_model != "region-stops":
+            return False  # operator-only cards have no zone/border concept
+        if self.covers(card_id, leg):
+            return False  # already free (in-region, or a seeded border stop)
+        region = self._region_stops.get(card_id) or frozenset()
+        return (leg.from_stop.id in region) != (leg.to_stop.id in region)
+
 
 #: Marks a quote produced by a tickital rental (the coupon-charged leg and its zeroed
 #: siblings), so the orchestrator can raise the period-cost + terms-of-service warning.
@@ -296,6 +318,19 @@ class PassAdapter(PriceAdapter):
         if not self._held or self._coverage is None:
             return None
         return self._coverage.covering_card(self._held, leg)
+
+    def partial_card(self, leg: Leg) -> TravelCard | None:
+        """A held card that partially covers this leg (crosses its county border), for a hint.
+
+        Used by the orchestrator to tell the traveller their card may reduce a full-fare leg
+        via a zone-combination add-on we do not price. Returns None when no held card applies.
+        """
+        if not self._held or self._coverage is None:
+            return None
+        for card_id in self._held:
+            if self._coverage.partially_covers(card_id, leg):
+                return self._coverage.card(card_id)
+        return None
 
     def supports(self, leg: Leg) -> bool:
         return self._card_for(leg) is not None

@@ -213,6 +213,34 @@ def test_coupon_no_op_without_rentals():
     assert out is legs  # nothing bound, returns the same list
 
 
+def test_zone_combination_hint_fires_for_a_partially_covered_leg():
+    from tripps.passes import PassAdapter
+
+    pa = PassAdapter()
+    pa.prepare(_timetable(), ["skanetrafiken"])
+    orch = PricingOrchestrator(adapters=[pa])
+    # Malmö (Skåne) -> Göteborg (out of Skåne) on Öresundståg, priced by a paid source.
+    partial = _priced("Öresundståg", MALMO, GOTEBORG, 23700, source="tora")
+    warnings = orch._warnings_for([partial])
+    assert any("Skånetrafiken card may reduce" in w for w in warnings)
+
+
+def test_no_zone_hint_for_a_fully_covered_or_uncovered_leg():
+    from tripps.passes import PassAdapter
+
+    pa = PassAdapter()
+    pa.prepare(_timetable(), ["skanetrafiken"])
+    orch = PricingOrchestrator(adapters=[pa])
+    # Fully in-region (would be free anyway): no hint.
+    full = _priced("Öresundståg", MALMO, LUND, 4800, source="tora")
+    assert not any("may reduce" in w for w in orch._warnings_for([full]))
+    # A leg already zeroed by the card (source travelcard) must not get the hint either.
+    covered = _leg("Öresundståg", MALMO, GOTEBORG).model_copy(
+        update={"quote": Quote(source=PASS_SOURCE, amount_ore=0, confidence=PriceConfidence.EXACT)}
+    )
+    assert not any("may reduce" in w for w in orch._warnings_for([covered]))
+
+
 def test_no_floor_violation_for_a_zeroed_rental_operator():
     # A rental-covered leg now priced by a paid source (Tora) below the calibrated floor: the
     # router used a 0 floor for that operator, so it pruned nothing and this is not a violation.
