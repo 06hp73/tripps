@@ -316,11 +316,8 @@ def _fast_flights_available() -> bool:
 
 
 def _fare_table(settings: Settings) -> StaticFareAdapter:
-    """Load `data/fares.json` when present. Absent by default, and that is deliberate."""
-    path = settings.data_dir / "fares.json"
-    if path.exists():
-        return StaticFareAdapter.from_file(path)
-    return StaticFareAdapter()
+    """Packaged published fares (Flygbussarna) plus an optional data-dir override."""
+    return StaticFareAdapter.load(settings.data_dir / "fares.json")
 
 
 @asynccontextmanager
@@ -820,29 +817,56 @@ async def api_watch_delete(request: Request, watch_id: int) -> JSONResponse:
     return JSONResponse({"deactivated": watch_id})
 
 
-@app.get("/health")
-async def health(request: Request) -> JSONResponse:
-    state = _state(request)
-    violations = state.db.floor_violations()
+def _health_snapshot(state: AppState) -> dict:
+    """The health facts, shared by the JSON `/health` and the HTML `/status` page."""
     all_health = state.db.get_health()
     # Split the scheduled-canary rows out from the live per-request source health.
     canaries = {k.removeprefix("canary:"): v for k, v in all_health.items() if k.startswith("canary:")}
     sources = {k: v for k, v in all_health.items() if not k.startswith("canary:")}
-    return JSONResponse(
+    return {
+        "status": "ok" if not state.errors else "degraded",
+        "errors": state.errors,
+        "timetable_date": state.timetable_date.isoformat() if state.timetable_date else None,
+        "timetable_dates_cached": [d.isoformat() for d in state._timetables],
+        "stops": state.current_timetable.num_stops if state.current_timetable else 0,
+        "trips": state.current_timetable.num_trips if state.current_timetable else 0,
+        "freerider_offers": len(state.freerider_offers),
+        "sources": sources,
+        "canaries": canaries,
+        "flight_scraper": "available" if _fast_flights_available() else "not installed",
+        # A floor above a real fare means the router may have pruned the cheapest trip.
+        "price_floor_violations": len(state.db.floor_violations()),
+    }
+
+
+@app.get("/health")
+async def health(request: Request) -> JSONResponse:
+    return JSONResponse(_health_snapshot(_state(request)))
+
+
+@app.get("/status", response_class=HTMLResponse)
+async def status_page(request: Request) -> HTMLResponse:
+    """A human-readable operations dashboard: adapter health, floor violations, calibration."""
+    state = _state(request)
+    snap = _health_snapshot(state)
+    violations = state.db.floor_violations()
+    # Per-operator reprice sample counts (how much calibration data has accrued).
+    obs = state.db.reprice_observations()
+    obs_counts: dict[str, int] = {}
+    for row in obs:
+        obs_counts[row["operator"]] = obs_counts.get(row["operator"], 0) + 1
+    floors = state.db.get_operator_floors()
+    return TEMPLATES.TemplateResponse(
+        request,
+        "status.html",
         {
-            "status": "ok" if not state.errors else "degraded",
-            "errors": state.errors,
-            "timetable_date": state.timetable_date.isoformat() if state.timetable_date else None,
-            "timetable_dates_cached": [d.isoformat() for d in state._timetables],
-            "stops": state.current_timetable.num_stops if state.current_timetable else 0,
-            "trips": state.current_timetable.num_trips if state.current_timetable else 0,
-            "freerider_offers": len(state.freerider_offers),
-            "sources": sources,
-            "canaries": canaries,
-            "flight_scraper": "available" if _fast_flights_available() else "not installed",
-            # A floor above a real fare means the router may have pruned the cheapest trip.
-            "price_floor_violations": len(violations),
-        }
+            "snap": snap,
+            "violations": [dict(v) for v in violations[:20]],
+            "violation_count": len(violations),
+            "obs_counts": dict(sorted(obs_counts.items(), key=lambda kv: -kv[1])),
+            "obs_total": len(obs),
+            "floors": [dict(f) for f in floors],
+        },
     )
 
 

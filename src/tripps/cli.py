@@ -143,9 +143,7 @@ def _build_adapters(settings, db):
         ),
         FreeriderAdapter(cost_model=FreeriderCostModel()),
         FlightAdapter(),
-        StaticFareAdapter.from_file(settings.data_dir / "fares.json")
-        if (settings.data_dir / "fares.json").exists()
-        else StaticFareAdapter(),
+        StaticFareAdapter.load(settings.data_dir / "fares.json"),
         # second-to-last: a rental prices only a covered leg no paid source could, so the
         # coupon can compare against real singles; last of all is the booking-link fallback.
         TickitalAdapter(agency_stops=agency_stops),
@@ -639,6 +637,79 @@ async def _canary(as_json: bool) -> int:
     return 0
 
 
+async def _validate(args: argparse.Namespace) -> int:
+    """Run canonical corridors through the real planner and report pass/warn/fail.
+
+    Opens with adapter canaries (liveness), then routes each corridor. Exits non-zero on a hard
+    failure (a corridor that stops routing, or a price-floor violation).
+    """
+    from .interfaces import HealthState
+    from .monitoring import persist_canaries, run_canaries
+    from .validation import render, run_validation, summarize
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    if not settings.gtfs_zip_path.exists():
+        print(f"error: no GTFS feed at {settings.gtfs_zip_path}; run `tripps fetch-gtfs`", file=sys.stderr)
+        return 2
+
+    service_date = date.fromisoformat(args.date) if args.date else now_local().date()
+    db = Database(settings.db_path)
+
+    print(f"== adapter liveness ({service_date}) ==")
+    canaries = await run_canaries(settings, day=service_date)
+    persist_canaries(db, canaries)
+    for r in canaries:
+        print("  " + r.line())
+    down = [r for r in canaries if r.state is HealthState.DOWN]
+
+    offers = await _fetch_freerider(settings, True)
+    factory, adapters = _cli_planner_factory(
+        settings, db, flights=args.flights, max_results=5
+    )
+    try:
+        results = await run_validation(factory, service_date=service_date, offers=offers)
+    finally:
+        for adapter in adapters:
+            await adapter.aclose()
+        db.close()
+
+    print(f"\n== corridors ({service_date}) ==")
+    for line in render(results):
+        print(line)
+    passed, warned, failed = summarize(results)
+    print(
+        f"\n{passed} pass, {warned} warn, {failed} fail; "
+        f"{len(down)} price source(s) down"
+    )
+
+    if args.as_json:
+        import json
+
+        print(
+            json.dumps(
+                {
+                    "date": service_date.isoformat(),
+                    "canaries": [
+                        {"name": r.name, "state": r.state.value, "detail": r.detail}
+                        for r in canaries
+                    ],
+                    "corridors": [
+                        {
+                            "name": r.corridor.name, "status": r.status,
+                            "itineraries": r.itineraries, "priced": r.priced,
+                            "cheapest_sek": r.cheapest_sek, "modes": r.modes,
+                            "messages": r.messages,
+                        }
+                        for r in results
+                    ],
+                },
+                ensure_ascii=False,
+            )
+        )
+    return 1 if failed else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="tripps", description=__doc__)
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -679,6 +750,13 @@ def main(argv: list[str] | None = None) -> int:
 
     cn = sub.add_parser("canary", help="probe every live price source and report drift")
     cn.add_argument("--json", action="store_true", dest="as_json")
+
+    va = sub.add_parser(
+        "validate", help="run canonical corridors through the planner and report pass/warn/fail"
+    )
+    va.add_argument("--date", default=None, help="service date YYYY-MM-DD (default today)")
+    va.add_argument("--flights", action="store_true", help="include flight pricing (slow)")
+    va.add_argument("--json", action="store_true", dest="as_json")
 
     cal = sub.add_parser(
         "calibrate", help="tighten the routing price floors from logged fares"
@@ -739,6 +817,8 @@ def main(argv: list[str] | None = None) -> int:
         return _serve(args)
     if args.command == "canary":
         return asyncio.run(_canary(args.as_json))
+    if args.command == "validate":
+        return asyncio.run(_validate(args))
     if args.command == "calibrate":
         return _calibrate(args.min_samples)
     if args.command == "cards":

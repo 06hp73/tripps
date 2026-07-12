@@ -138,6 +138,7 @@ uv pip install -e ".[dev,flights]"
 
 ```bash
 .venv/bin/tripps canary                           # probe every live price source, alert on drift
+.venv/bin/tripps validate                         # route canonical corridors, report pass/warn/fail
 .venv/bin/tripps watch add "Uppsala" "Arlanda"    # watch a Freerider route for free cars
 .venv/bin/tripps watch poll --interval 300        # …and announce new ones as they appear
 ```
@@ -149,6 +150,15 @@ Everything is configurable through `TRIPPS_*` environment variables; see `config
 way the planner does and asserts a price still comes back, exiting non-zero if any source is
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
+
+`tripps validate` goes a step further than the canary: it runs a fixed set of canonical
+corridors (Stockholm→Göteborg, Malmö→Umeå, a cross-border UL route, an airport-coach route, …)
+through the *real* planner and checks invariants — every routable corridor returns an
+itinerary, nothing trips a price-floor violation (which would mean the true cheapest was
+pruned), and priced totals are sane. It opens with the canary liveness table, exits non-zero
+on a hard failure, and — because each corridor is a real search — warms the `reprice_delta`
+history that `tripps calibrate` consumes. `GET /status` renders the same operational picture as
+an HTML dashboard: live vs scheduled source health, floor violations, and calibration progress.
 
 **Travel cards.** Register a regional period ticket (Skånetrafiken, Västtrafik, SL, …) and
 its covered legs price at 0, because a period ticket is unlimited travel in its area. The web
@@ -207,8 +217,26 @@ below every observed fare, then discounted 10% for headroom. Tighter floors mean
 Pareto frontier and fewer upstream price calls. Run it periodically once real searches have
 accumulated; the floor-violation detector catches and self-corrects any overshoot.
 
-Endpoints: `GET /` (UI), `POST /search`, `GET /api/search`, `GET /api/stops`,
-`GET /api/freerider`, `GET /health`.
+Endpoints: `GET /` (UI), `GET /status` (ops dashboard), `POST /search`, `GET /api/search`,
+`GET /api/stops`, `GET /api/freerider`, `GET /health`, `GET /api/canary`.
+
+## Deploy
+
+```bash
+export TRIPPS_TRAFIKLAB_GTFS_KEY=...       # free Trafiklab key for the daily GTFS download
+docker compose up --build                  # builds the image, serves on :8000
+```
+
+The image installs the package **editable** (`pip install -e ".[flights]"`) on purpose:
+`config.PROJECT_ROOT` is `parents[2]` of the package, so an editable install keeps it — and the
+data dir — resolving to `/app`, whereas a plain `pip install .` would relocate the package into
+site-packages and break that path. The `[flights]` extra pulls `fast-flights`, which transitively
+provides `primp` (the TLS-fingerprint-impersonating client the Tora rail adapter needs), so
+without it Tora and flights are down. `docker-entrypoint.sh` fetches the feed once into the
+`tripps-data` volume if it is empty, then runs `tripps serve`. That volume also holds the parsed
+timetable cache and the SQLite DB, so a restart does not re-download or re-parse the ~500 MB
+feed. The healthcheck gives a **120 s** start period for the lifespan warmup (feed parse ~15 s +
+Freerider fetch + SJ key). Everything is configurable through `TRIPPS_*` env vars.
 
 ## Layout
 
@@ -233,7 +261,7 @@ src/tripps/
 ## Verification
 
 ```bash
-.venv/bin/python -m pytest tests/ -q     # 148 tests
+.venv/bin/python -m pytest tests/ -q     # 301 tests
 .venv/bin/ruff check src tests
 ```
 
@@ -243,11 +271,23 @@ schema change upstream fails a contract test instead of quietly mispricing a leg
 ## Known gaps
 
 - **Remaining unpriced operators.** Most rail and coach is now priced (SJ directly;
-  Öresundståg, Mälartåg, Skånetrafiken, Tåg i Bergslagen and Vy Bus4You via Tora). What is
-  left — Y-buss, Härjedalingen, Masexpressen, Flygbussarna, and pure local transit — either
-  sells through a different backend or has no obtainable price source, so those legs are
-  routed and shown with a booking link. `StaticFareAdapter` exists to hold published fixed
-  fares and ships empty on purpose.
+  Öresundståg, Mälartåg, Skånetrafiken, Tåg i Bergslagen and Vy Bus4You via Tora; the
+  Flygbussarna airport coaches via the `StaticFareAdapter` fare table in `data/fares.json`).
+  What is left — Y-buss, Härjedalingen, Masexpressen, and pure local transit — either sells
+  through a different backend or has no obtainable price source, so those legs are routed and
+  shown with a booking link.
+  - **Ybuss / minor Turnit-tenant coaches** are the clearest gap: `booking.ybuss.se` is a
+    Turnit SPA behind a TLS-fingerprint WAF with no public fares API, and its coach fares are
+    yield-managed (so no honest fixed table). Pricing them would need a browser capture of the
+    booking XHR per tenant; until that exists they stay link-out. Vy Bus4You, the largest
+    Turnit coach, is already priced via Tora.
+- **Zone-combination fares for partial cross-border card travel are not modelled.** A regional
+  card that crosses a county border usually pays for the extra *zones* traversed, but the
+  national GTFS feed strips all zone data (no `zone_id`, no fare files), and there are ~15
+  different PTA zone systems, none CC0. So tripps prices those cross-border legs at the full
+  single fare (conservative) rather than a zone-combined discount. The genuinely *free* named
+  cross-border extensions (UL, Dalatrafik, Länstrafiken Örebro, VL — verified against each
+  operator's own site) are modelled as `border_stops` allow-lists in the card registry.
 - Local-transit legs are scheduled but never priced, and say so.
 - The road matrix falls back to a great-circle estimate unless `TRIPPS_OSRM_BASE` is set.
 - Legal: unofficial endpoints and scraping are used here for personal, non-commercial use.

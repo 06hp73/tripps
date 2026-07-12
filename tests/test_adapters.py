@@ -367,3 +367,43 @@ def test_call_budget_stops_runaway_fanout():
     # A different source has its own allowance.
     budget.consume("sj")
     assert budget.spent() == 3
+
+
+# --- static fares (Flygbussarna airport coaches) ---------------------------
+
+
+def _fare_leg(operator, frm, to):
+    dep = datetime(2026, 7, 22, 8, 0, tzinfo=TZ)
+    return Leg(
+        from_stop=Stop(id=frm, name=frm, lat=59.0, lon=17.0),
+        to_stop=Stop(id=to, name=to, lat=59.0, lon=17.0),
+        mode=TransportMode.BUS, operator=operator, departure=dep,
+        arrival=dep.replace(hour=9), service_ref="t",
+    )
+
+
+async def test_packaged_flygbussarna_fare_prices_a_coach_leg():
+    from tripps.pricing.operators import StaticFareAdapter
+
+    adapter = StaticFareAdapter.load()  # packaged fares only
+    assert len(adapter._rows) >= 12
+    # Göteborg Nils Ericson -> Landvetter, the real router stop ids.
+    leg = _fare_leg("Vy flygbussarna", "740020483", "740000554")
+    assert adapter.supports(leg)
+    quote = await adapter.quote_leg(leg)
+    assert quote.amount_ore == 12900
+    assert quote.confidence is PriceConfidence.ESTIMATED
+    assert "flygbussarna.se" in (quote.deeplink or "")
+
+
+async def test_static_fare_ignores_wrong_operator_and_unknown_od():
+    from tripps.pricing.operators import StaticFareAdapter
+
+    adapter = StaticFareAdapter.load()
+    # right O/D, wrong operator (a FlixBus leg must not borrow a Flygbussarna fare).
+    assert not adapter.supports(_fare_leg("Flixbus", "740020483", "740000554"))
+    # right operator, unlisted O/D falls through to link-out (unavailable + booking url).
+    unknown = _fare_leg("Vy flygbussarna", "740020483", "740000005")
+    assert not adapter.supports(unknown)
+    quote = await adapter.quote_leg(unknown)
+    assert quote.amount_ore is None and quote.deeplink

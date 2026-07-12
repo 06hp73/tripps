@@ -1,0 +1,14 @@
+[
+  {"operator": "Vy flygbussarna", "from_stop": "740043310", "to_stop": "740000622", "amount_ore": 12900, "note": "Arlanda ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740043310", "amount_ore": 12900, "note": "Stockholm City ↔ Arlanda, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740020671", "to_stop": "740000622", "amount_ore": 12900, "note": "Arlanda ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740020671", "amount_ore": 12900, "note": "Stockholm City ↔ Arlanda, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740000554", "to_stop": "740020483", "amount_ore": 12900, "note": "Landvetter ↔ Göteborg, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740020483", "to_stop": "740000554", "amount_ore": 12900, "note": "Göteborg ↔ Landvetter, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740000953", "to_stop": "740072050", "amount_ore": 13900, "note": "Malmö Airport ↔ Malmö C, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740072050", "to_stop": "740000953", "amount_ore": 13900, "note": "Malmö C ↔ Malmö Airport, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740011384", "to_stop": "740000622", "amount_ore": 22900, "note": "Skavsta ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740011384", "amount_ore": 22900, "note": "Stockholm City ↔ Skavsta, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740024556", "to_stop": "740000622", "amount_ore": 22900, "note": "Västerås Airport ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
+  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740024556", "amount_ore": 22900, "note": "Stockholm City ↔ Västerås Airport, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."}
+]

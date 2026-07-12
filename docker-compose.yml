@@ -1,0 +1,18 @@
+services:
+  tripps:
+    build: .
+    image: tripps:latest
+    ports:
+      - "8000:8000"
+    environment:
+      # Free Trafiklab key for the one daily GTFS Sweden download. Put it in a .env file
+      # next to this compose file, or export it before `docker compose up`.
+      TRIPPS_TRAFIKLAB_GTFS_KEY: ${TRIPPS_TRAFIKLAB_GTFS_KEY:-}
+    volumes:
+      # Persist the 67 MB feed, its parsed timetable cache, and the SQLite DB across restarts,
+      # so a container restart does not re-download and re-parse the whole feed.
+      - tripps-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  tripps-data:

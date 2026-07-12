@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tripps — status</title>
+  <style>
+    :root {
+      --bg: #0f1115; --card: #171a21; --line: #262b36; --fg: #e6e8ec; --muted: #99a0ad;
+      --accent: #7aa2f7; --ok: #7bd88f; --warn: #e0af68; --down: #f7768e; --off: #6b7280;
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg:#f6f7f9; --card:#fff; --line:#e2e5ea; --fg:#1a1d23; --muted:#5a616e; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg);
+           font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+    h2 { font-size: 1.05rem; margin: 1.6rem 0 .6rem; }
+    a { color: var(--accent); }
+    .sub { color: var(--muted); margin: 0 0 1rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .6rem; }
+    .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .7rem .9rem; }
+    .kpi .n { font-size: 1.5rem; font-weight: 700; }
+    .kpi .l { color: var(--muted); font-size: .8rem; }
+    .pill { display: inline-flex; align-items: center; gap: .4rem; border: 1px solid var(--line);
+            border-radius: 999px; padding: .2rem .7rem; margin: .2rem .3rem .2rem 0; font-size: .85rem; }
+    .dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--off); }
+    .ok .dot { background: var(--ok); } .down .dot { background: var(--down); }
+    .degraded .dot, .warn .dot { background: var(--warn); } .disabled .dot { background: var(--off); }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 600; }
+    .muted { color: var(--muted); }
+    .bad { color: var(--down); }
+    .scroll { overflow-x: auto; }
+    button { font: inherit; background: var(--accent); color: #0b0d12; border: 0;
+             border-radius: 7px; padding: .5rem 1rem; cursor: pointer; }
+    .toprow { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="toprow">
+    <div>
+      <h1>tripps status</h1>
+      <p class="sub">Operations dashboard · <a href="/">← back to search</a></p>
+    </div>
+    <span class="pill {{ 'ok' if snap.status == 'ok' else 'degraded' }}"><span class="dot"></span>{{ snap.status }}</span>
+  </div>
+
+  {% if snap.errors %}
+    <div class="card" style="border-color: var(--down)">
+      <b class="bad">Startup errors</b>
+      <ul>{% for e in snap.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+  {% endif %}
+
+  <h2>Timetable</h2>
+  <div class="grid">
+    <div class="kpi"><div class="n">{{ snap.stops }}</div><div class="l">stops</div></div>
+    <div class="kpi"><div class="n">{{ snap.trips }}</div><div class="l">trips</div></div>
+    <div class="kpi"><div class="n">{{ snap.freerider_offers }}</div><div class="l">Freerider cars</div></div>
+    <div class="kpi"><div class="n">{{ snap.timetable_dates_cached|length }}</div><div class="l">dates cached</div></div>
+    <div class="kpi"><div class="n {{ 'bad' if snap.price_floor_violations else '' }}">{{ snap.price_floor_violations }}</div><div class="l">floor violations</div></div>
+  </div>
+  <p class="muted" style="margin-top:.5rem">
+    Active date: {{ snap.timetable_date or '—' }} ·
+    Flight scraper: {{ snap.flight_scraper }}
+  </p>
+
+  <h2>Price sources <button id="canary" type="button" style="float:right">Run canary</button></h2>
+  <div class="card">
+    <div><b>Live (per-request)</b><br>
+      {% for name, st in snap.sources.items() %}
+        <span class="pill {{ st }}"><span class="dot"></span>{{ name }} · {{ st }}</span>
+      {% else %}<span class="muted">no live health recorded yet</span>{% endfor %}
+    </div>
+    <div style="margin-top:.8rem"><b>Canaries (scheduled probes)</b><br>
+      {% for name, st in snap.canaries.items() %}
+        <span class="pill {{ st }}"><span class="dot"></span>{{ name }} · {{ st }}</span>
+      {% else %}<span class="muted">no canary run recorded — click “Run canary”</span>{% endfor %}
+    </div>
+  </div>
+
+  <h2>Floor calibration</h2>
+  <p class="muted">{{ obs_total }} reprice samples logged; the router uses calibrated floors where an operator has enough.</p>
+  <div class="scroll card">
+    {% if floors %}
+    <table>
+      <tr><th>operator</th><th>mode</th><th>base (SEK)</th><th>per km (öre)</th><th>samples</th></tr>
+      {% for f in floors %}
+      <tr><td>{{ f.operator }}</td><td>{{ f.mode }}</td><td>{{ "%.0f"|format(f.base_ore / 100) }}</td><td>{{ f.per_km_ore }}</td><td>{{ f.samples }}</td></tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <span class="muted">No calibrated floors yet — run <code>tripps validate</code> or real searches to accrue samples, then <code>tripps calibrate</code>.</span>
+    {% endif %}
+    {% if obs_counts %}
+    <p class="muted" style="margin:.8rem 0 0">Samples per operator: {% for op, n in obs_counts.items() %}{{ op }} ({{ n }}){% if not loop.last %}, {% endif %}{% endfor %}</p>
+    {% endif %}
+  </div>
+
+  <h2>Recent floor violations {% if violation_count %}<span class="bad">({{ violation_count }})</span>{% endif %}</h2>
+  <div class="scroll card">
+    {% if violations %}
+    <p class="muted">A floor above a real fare means the router may have pruned the genuinely cheapest journey.</p>
+    <table>
+      <tr><th>when</th><th>operator</th><th>mode</th><th>floor (öre)</th><th>actual (öre)</th></tr>
+      {% for v in violations %}
+      <tr><td class="muted">{{ v.recorded_at[:16] }}</td><td>{{ v.operator or '—' }}</td><td>{{ v.mode }}</td><td class="bad">{{ v.floor_ore }}</td><td>{{ v.actual_ore }}</td></tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <span class="ok" style="color:var(--ok)">None — no floor has exceeded a real fare.</span>
+    {% endif %}
+  </div>
+</main>
+<script>
+  document.getElementById("canary").addEventListener("click", async (e) => {
+    e.target.textContent = "Running…"; e.target.disabled = true;
+    try { await fetch("/api/canary"); } catch (_) {}
+    location.reload();
+  });
+</script>
+</body>
+</html>

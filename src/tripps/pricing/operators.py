@@ -63,6 +63,10 @@ BOOKING_URLS: dict[str, str] = {
 #: send someone whose operator we do not recognise.
 FALLBACK_BOOKING_URL = "https://www.resrobot.se"
 
+#: Fares that ship with the package (currently the Flygbussarna airport-coach fixed fares).
+#: These are published fixed-price O/D fares, so a table is a faithful representation.
+PACKAGED_FARES = Path(__file__).resolve().parent.parent / "data" / "fares.json"
+
 
 def booking_url(operator: str | None) -> str:
     if not operator:
@@ -104,6 +108,20 @@ class StaticFareAdapter(PriceAdapter):
     def from_file(cls, path: Path | str) -> StaticFareAdapter:
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         return cls([FareRow(**row) for row in payload])
+
+    @classmethod
+    def load(cls, *extra_paths: Path | str) -> StaticFareAdapter:
+        """The packaged fares, plus any override files that exist (later rows win the key).
+
+        The packaged table holds published fixed fares (Flygbussarna); a deployment can add a
+        `fares.json` in its data dir to extend or override without touching the package.
+        """
+        rows: list[FareRow] = []
+        for path in (PACKAGED_FARES, *extra_paths):
+            p = Path(path)
+            if p.exists():
+                rows.extend(FareRow(**row) for row in json.loads(p.read_text(encoding="utf-8")))
+        return cls(rows)
 
     def _row(self, leg: Leg) -> FareRow | None:
         return self._rows.get((leg.operator or "", leg.from_stop.id, leg.to_stop.id))
