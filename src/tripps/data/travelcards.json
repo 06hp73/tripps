@@ -125,7 +125,12 @@
   "region_agencies": [
    "UL"
   ],
-  "coverage_note": "County-wide (zones abolished). Mälartåg to first station across each border: Sala, Gävle, Märsta/Arlanda (NOT onward into SL network). 'SL' is free ONLY on the Uppsala–Knivsta–Arlanda segment, NOT the wider SL network — must be segment-gated, not operator-only. Arlanda C passage fee applies on top.",
+  "border_stops": [
+   "740000210",
+   "740000027",
+   "740000556"
+  ],
+  "coverage_note": "County-wide (zones abolished). A UL ticket is valid on Mälartåg to the first station across each border - Gävle C (740000210), Märsta (740000027), Arlanda C (740000556) - but NOT onward into the SL/X-trafik network (that needs a UL+SL combination ticket). Verified at ul.se/travel-across-county-borders (2026-07): 'For journeys with line 501, 510 and Mälartåg to/from Gävleborg county, all UL tickets are valid'. Sala is omitted here because UL's own agency already serves it (in-region, covered without a border stop). Arlanda C: the ride is covered but the station passage fee is added on top (see surcharges.py).",
   "confidence": "verified-in-docs"
  },
  {

@@ -74,10 +74,59 @@ def test_border_stop_does_not_free_a_leg_deeper_into_the_neighbour():
     assert not cov.covers("sk", _leg("Öresundståg", LUND, KARLSHAMN))
 
 
-def test_registry_cards_have_empty_border_stops_by_default():
+def test_only_ul_has_seeded_border_stops():
+    # Cross-border is opt-in and verified per card; only UL is seeded so far. Every other card
+    # keeps an empty allow-list, so none can over-cover.
     from tripps.passes import load_cards
 
-    assert all(not c.border_stops for c in load_cards().values())
+    seeded = {c.id for c in load_cards().values() if c.border_stops}
+    assert seeded == {"ul-uppsala"}
+    assert load_cards()["ul-uppsala"].border_stops == frozenset(
+        {"740000210", "740000027", "740000556"}
+    )
+
+
+# UL cross-border seed: a real registry card exercised over a synthetic feed using the real
+# GTFS stop_ids the registry references.
+UPPSALA = Stop(id="740000005", name="Uppsala C", lat=59.86, lon=17.65)
+GAVLE = Stop(id="740000210", name="Gävle Centralstation", lat=60.68, lon=17.13)
+STOCKHOLM = Stop(id="740000001", name="Stockholm C", lat=59.33, lon=18.06)
+ARLANDA = Stop(id="740000556", name="Arlanda Centralstation", lat=59.65, lon=17.93)
+
+
+def _ul_coverage():
+    from tripps.passes import PassCoverage, load_cards
+
+    b = TimetableBuilder()
+    for s in (UPPSALA, GAVLE, STOCKHOLM, ARLANDA):
+        b.add_stop(s)
+    b.add_trip(
+        RouteInfo(id="ml", mode=TransportMode.TRAIN, operator="Mälartåg"),
+        ["740000005", "740000556", "740000210"],
+        Trip(id="m1", arrivals=[0, 600, 1200], departures=[0, 600, 1200]),
+    )
+    # UL's home agency serves only Uppsala here -> that is its region.
+    agency_stops = {"UL": ["740000005"], "Mälartåg": ["740000005", "740000556", "740000210", "740000001"]}
+    return PassCoverage(b.build(), cards={"ul-uppsala": load_cards()["ul-uppsala"]}, agency_stops=agency_stops)
+
+
+def test_ul_ticket_valid_to_gavle_across_the_border():
+    cov = _ul_coverage()
+    assert cov.covers("ul-uppsala", _leg("Mälartåg", UPPSALA, GAVLE))
+    assert cov.covers("ul-uppsala", _leg("Mälartåg", GAVLE, UPPSALA))  # reverse too
+
+
+def test_ul_ticket_valid_to_arlanda_ride():
+    cov = _ul_coverage()
+    assert cov.covers("ul-uppsala", _leg("Mälartåg", UPPSALA, ARLANDA))
+
+
+def test_ul_ticket_not_valid_onward_into_the_sl_network():
+    cov = _ul_coverage()
+    # Uppsala -> Stockholm: Stockholm is neither in region nor a border stop (needs a combo).
+    assert not cov.covers("ul-uppsala", _leg("Mälartåg", UPPSALA, STOCKHOLM))
+    # Gävle -> Stockholm: neither endpoint in region.
+    assert not cov.covers("ul-uppsala", _leg("Mälartåg", GAVLE, STOCKHOLM))
 
 
 # --- partial-zone holdings -------------------------------------------------
