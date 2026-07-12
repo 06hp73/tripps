@@ -65,6 +65,12 @@ MATCH_TOLERANCE = timedelta(minutes=5)
 #: passengerListId expiry so a multi-leg search does not re-search per leg.
 DAY_CACHE_TTL_SECONDS = 900
 
+#: Budget key for the cached day-search calls (search POST + departures GET). Kept SEPARATE
+#: from the per-departure offer calls (`SOURCE`) so that setting up several origin/destination
+#: pairs does not starve the price lookups - a long route touches many O/D pairs, and with one
+#: shared key those setup calls exhausted the whole SJ budget before any fare was fetched.
+DAY_BUDGET_KEY = f"{SOURCE}:day"
+
 _KEY_RE = re.compile(r'Ocp-Apim-Subscription-Key["\x60]\s*:\s*["\x60]([a-f0-9]{32})["\x60]')
 _BUNDLE_RE = re.compile(r'assets/(main-[A-Za-z0-9_]+\.js)')
 
@@ -259,6 +265,7 @@ class SJAdapter(HttpPriceAdapter):
                     "passengers": [{"passengerCategory": {"type": "ADULT"}}],
                 },
                 key,
+                budget_key=DAY_BUDGET_KEY,
             )
             search_id, plid = parse_search(search)
             if not search_id or not plid:
@@ -266,15 +273,15 @@ class SJAdapter(HttpPriceAdapter):
 
             listing = await self.get_json(
                 f"{self.api_base}/departures/search/{search_id}",
-                budget_key=self.name,
+                budget_key=DAY_BUDGET_KEY,
             )
             departures = parse_departures(listing if isinstance(listing, dict) else {})
             self._day_cache[cache_key] = (time.monotonic(), plid, departures)
             return plid, departures
 
-    async def _post_json(self, url: str, body: dict, key: str) -> dict:
+    async def _post_json(self, url: str, body: dict, key: str, *, budget_key: str | None = None) -> dict:
         if self._budget is not None:
-            self._budget.consume(self.name)  # raises BudgetExceeded
+            self._budget.consume(budget_key or self.name)  # raises BudgetExceeded
         await self._limiter.acquire()
         client = await self.http()
         resp = await client.post(url, json=body, headers=self._headers(key))

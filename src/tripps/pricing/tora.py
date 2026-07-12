@@ -179,8 +179,12 @@ class ToraAdapter(HttpPriceAdapter):
         min_interval: float = 0.2,
         day_cache_ttl: float = DAY_CACHE_TTL_SECONDS,
         currency: str = "SEK",
+        # Bound per-request latency. Tora normally answers in ~1-2 s; without a cap, primp's
+        # own default let a slow request hang ~30 s, which both flaked the canary and could
+        # eat most of a search's phase-2 deadline on one leg. 15 s is generous but bounded.
+        timeout: float = 15.0,
     ) -> None:
-        super().__init__(user_agent=user_agent, min_interval=min_interval)
+        super().__init__(user_agent=user_agent, min_interval=min_interval, timeout=timeout)
         self.offers_url = offers_url
         self.operators = operators
         self.currency = currency
@@ -206,7 +210,8 @@ class ToraAdapter(HttpPriceAdapter):
 
         if self._primp is None:
             self._primp = Client(
-                impersonate=_IMPERSONATE, impersonate_os="macos", referer=True
+                impersonate=_IMPERSONATE, impersonate_os="macos", referer=True,
+                timeout=self._timeout,
             )
         body = {
             "currency": self.currency,

@@ -153,6 +153,28 @@ async def test_day_search_is_reused_across_legs(sj_search, sj_departures, sj_off
 
 
 @respx.mock
+async def test_day_setup_and_offers_use_separate_budget_keys(sj_search, sj_departures, sj_offers):
+    """Setup calls (search + departures) draw from a different budget key than the per-departure
+    offer calls, so a long route touching many O/D pairs does not starve its own price lookups."""
+    from tripps.pricing.sj import DAY_BUDGET_KEY, SOURCE
+
+    _mock_sj(respx.mock, sj_search, sj_departures, sj_offers)
+    adapter = SJAdapter(min_interval=0.0, key="testkey")
+    budget = CallBudget(limit=12)
+    adapter.set_budget(budget)
+
+    deps = [d for d in parse_departures(sj_departures) if d.is_direct]
+    if not deps:
+        pytest.skip("fixture has no direct departure")
+    await adapter.quote_leg(_leg(deps[0].departure, deps[0].arrival))
+    await adapter.aclose()
+
+    assert DAY_BUDGET_KEY != SOURCE
+    assert budget.used.get(DAY_BUDGET_KEY) == 2  # POST /search + GET /departures/search
+    assert budget.used.get(SOURCE) == 1  # one GET /offers
+
+
+@respx.mock
 async def test_no_matching_departure_is_unavailable(sj_search, sj_departures, sj_offers):
     _mock_sj(respx.mock, sj_search, sj_departures, sj_offers)
     adapter = SJAdapter(min_interval=0.0, key="testkey")

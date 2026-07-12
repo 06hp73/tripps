@@ -215,3 +215,35 @@ async def test_budget_exhaustion_does_not_mark_the_source_down(payload):
     assert quote.confidence is PriceConfidence.UNAVAILABLE
     assert "exhausted" in (quote.note or "")
     assert health.state.value == "ok", "budget exhaustion must not read as a dead source"
+
+
+def test_primp_client_is_built_with_a_bounded_timeout(monkeypatch):
+    """A slow/hung Tora request must be bounded, or it flakes the canary and can eat a whole
+    search's phase-2 deadline. The adapter's timeout is passed to the primp client."""
+    import primp
+
+    captured: dict = {}
+
+    class _FakeClient:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+        def post(self, url, headers=None, content=None):
+            class _R:
+                status_code = 200
+                text = '{"journeys": []}'
+
+            return _R()
+
+    monkeypatch.setattr(primp, "Client", _FakeClient)
+    adapter = ToraAdapter(timeout=9.0)
+    assert adapter._timeout == 9.0
+    adapter._fetch_offers_sync(
+        "740000003", "740000002", datetime(2026, 7, 22, 8, 0, tzinfo=TZ)
+    )
+    assert captured.get("timeout") == 9.0
+
+
+def test_default_tora_timeout_is_bounded():
+    # Comfortably under the phase-2 deadline so one slow leg cannot consume the whole search.
+    assert ToraAdapter()._timeout <= 20.0

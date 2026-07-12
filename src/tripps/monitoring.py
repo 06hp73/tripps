@@ -118,9 +118,15 @@ async def _probe_sj(settings: Settings, day: date) -> tuple[HealthState, str]:
         direct = [d for d in departures if d.is_direct]
         if not direct:
             return HealthState.DEGRADED, "no direct Stockholm-Göteborg departures"
-        price = await adapter._offer_price_ore(direct[0].departure_id, plid)
+        # One departure can be individually sold out; SJ is up if ANY of the first few direct
+        # departures returns a purchasable fare. Probing only the earliest gave false DEGRADEDs.
+        price = None
+        for dep in direct[:3]:
+            price = await adapter._offer_price_ore(dep.departure_id, plid)
+            if price is not None:
+                break
         if price is None:
-            return HealthState.DEGRADED, "offers returned no purchasable fare"
+            return HealthState.DEGRADED, "first direct departures returned no purchasable fare"
         return HealthState.OK, f"{len(direct)} direct departures, from {price / 100:.0f} SEK"
     finally:
         await adapter.aclose()
