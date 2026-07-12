@@ -51,6 +51,10 @@ from .freerider import FreeriderAdapter
 
 log = logging.getLogger(__name__)
 
+#: Quote source used by the travel-card pass adapter; recognised here so a card-covered free
+#: leg is not mistaken for a price-floor violation.
+PASS_SOURCE = "travelcard"
+
 #: Ordering of confidences when the UI must pick "the weakest link".
 _CONFIDENCE_RANK = {
     PriceConfidence.EXACT: 0,
@@ -167,6 +171,10 @@ class PricingOrchestrator:
         """A floor above the true price means McRAPTOR could have pruned the cheapest trip."""
         if not quote.is_priced or quote.amount_ore is None or not self._prices_a_real_ticket(leg):
             return
+        if quote.source == PASS_SOURCE:
+            # A travel card zeroes the leg for the holder; that is below the floor by design,
+            # not a routing bug, so it is not a floor violation.
+            return
         floor = self.floors.floor_ore(leg.mode, leg.operator, leg_distance_km(leg))
         if floor > quote.amount_ore:
             ctx.violations.append(
@@ -177,7 +185,7 @@ class PricingOrchestrator:
         """Log (floor, actual) so the routing bound can be calibrated and audited."""
         if self.db is None or not quote.is_priced or quote.amount_ore is None:
             return
-        if not self._prices_a_real_ticket(leg):
+        if not self._prices_a_real_ticket(leg) or source == PASS_SOURCE:
             return
         distance = leg_distance_km(leg)
         floor = self.floors.floor_ore(leg.mode, leg.operator, distance)

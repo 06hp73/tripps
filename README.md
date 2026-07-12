@@ -150,6 +150,19 @@ way the planner does and asserts a price still comes back, exiting non-zero if a
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
 
+**Travel cards.** Register a regional period ticket (Skånetrafiken, Västtrafik, SL, …) and
+its covered legs price at 0, because a period ticket is unlimited travel in its area. The web
+UI has a searchable scroll-list of every provider; the CLI is `tripps cards add/list/remove`
+(and `/api/providers`, `/api/cards`). The load-bearing rule, verified against every PTA's own
+ticket pages: **the operator name alone is never enough.** The same consortium train
+(Öresundståg, Krösatåg, Mälartåg, Tåg i Bergslagen, Norrtåg) is honored by many cards, each
+only within its own region, so a card that honors a consortium operator frees a leg only when
+*both* endpoints lie in the card's served stops — a Skånetrafiken card frees Öresundståg
+Malmö→Lund but not Malmö→Göteborg. Coverage is deliberately conservative: it assumes the
+all-zone card variant, never auto-frees SJ (its agency mixes SJ Regional with high-speed),
+and prefers to charge over wrongly zeroing a leg. A covered leg is shown, not hidden, at 0
+SEK with an "Included with your Skånetrafiken period ticket" note.
+
 **Mode selection.** The web UI's "Travel by" row and the CLI's `--modes train,bus,ferry,
 freerider,flight` (and the `modes=` API param) choose which long-distance modes a search may
 use; walk and local-transit feeders are always allowed. Journeys are combinations of the
@@ -200,6 +213,8 @@ src/tripps/
     floors.py          price lower bounds. Deliberately too low, never too high.
     synthetic.py       Freerider offers -> scheduled trips. No algorithm changes needed.
     journey.py         labels -> itineraries; candidate spread and collapse.
+  passes.py            travel-card coverage engine + PassAdapter (region-gated free legs)
+  data/travelcards.json  22-provider registry (honored operators + region model)
   ingest/              gtfs, freerider, flights, airports (OurAirports-derived)
   pricing/             flixbus, sj, tora, freerider, flights, operators (link-out), orchestrator
   search.py            Planner: resolve, overlay, route, price, rank.

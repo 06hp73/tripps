@@ -10,3 +10,6 @@ __pycache__/
 # Anchored with a leading slash: an unanchored `data/` would also swallow
 # src/tripps/data/airports.json, which is packaged code, not a build artefact.
 /data/
+
+# serena MCP tooling
+.serena/

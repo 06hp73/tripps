@@ -52,6 +52,25 @@
                   color: var(--fg); margin: 0; display: flex; gap: .45rem; align-items: center; }
   .checks-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em;
                   color: var(--muted); align-self: center; margin-right: .25rem; }
+  .link-btn { background: none; border: none; color: var(--accent); font: inherit;
+              cursor: pointer; padding: 0; text-decoration: underline; }
+  .card-chips { display: inline-flex; gap: .4rem; flex-wrap: wrap; margin-left: .5rem; vertical-align: middle; }
+  .chip { display: inline-flex; align-items: center; gap: .35rem; background: var(--free-bg);
+          color: var(--free); border: 1px solid var(--free); border-radius: 999px;
+          padding: .15rem .6rem; font-size: .82rem; }
+  .chip button { background: none; border: none; color: var(--free); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0; }
+  .card-picker { margin-top: .6rem; border: 1px solid var(--line); border-radius: 10px; padding: .75rem; background: var(--card); }
+  .card-picker input { width: 100%; padding: .5rem .6rem; border: 1px solid var(--line);
+                       border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; margin-bottom: .5rem; }
+  .card-list { list-style: none; margin: 0; padding: 0; max-height: 15rem; overflow-y: auto; }
+  .card-list li { display: flex; justify-content: space-between; align-items: center; gap: .5rem;
+                  padding: .45rem .5rem; border-radius: 6px; cursor: pointer; }
+  .card-list li:hover { background: var(--bg); }
+  .card-list li.held { color: var(--free); }
+  .card-list li.limited { opacity: .55; cursor: default; }
+  .card-list .rgn { font-size: .8rem; color: var(--muted); }
+  .card-list .add { font-size: .82rem; color: var(--accent); }
+  .card-list li.held .add { color: var(--free); }
   .full { grid-column: 1 / -1; }
   button {
     padding: .7rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent);
@@ -80,6 +99,7 @@
   .itin .legs li { padding: .4rem 0; border-top: 1px solid var(--line); font-size: .92rem; }
   a.book { color: var(--accent); text-decoration: none; font-weight: 600; }
   a.book:hover { text-decoration: underline; }
+  .incl { color: var(--free); font-size: .82rem; }
   .rt-head { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.25rem 0 .5rem; }
   .rt-total { font-size: 1.3rem; font-weight: 700; margin: 1rem 0; }
   .note { color: var(--muted); font-size: .85rem; }
@@ -140,6 +160,17 @@
       <label><input type="checkbox" name="mode_ferry" checked> Ferry</label>
       <label><input type="checkbox" name="mode_freerider" checked> Freerider <span class="opt">({{ freerider_count }} cars)</span></label>
       <label><input type="checkbox" name="mode_flight"> Flight <span class="opt">(slow)</span></label>
+    </div>
+
+    <div class="full">
+      <span class="checks-label">My travel cards</span>
+      <button type="button" id="cards-toggle" class="link-btn">none registered</button>
+      <div id="card-chips" class="card-chips"></div>
+      <div id="card-picker" class="card-picker" hidden>
+        <input type="text" id="card-search" placeholder="Search region or provider…" autocomplete="off">
+        <ul id="card-list" class="card-list"></ul>
+        <p class="opt">Covered legs (e.g. Öresundståg within Skåne with a Skånetrafiken card) price at 0. Assumes an all-zone period ticket; SJ is never auto-freed.</p>
+      </div>
     </div>
 
     <div class="full">
@@ -228,6 +259,70 @@
 
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+  // --- travel cards ---------------------------------------------------
+  // Held cards are stored server-side and auto-applied to every search; covered legs come
+  // back priced at 0. The picker is a searchable, scrollable list of every regional provider.
+  let providers = [];
+  const cardToggle = document.getElementById("cards-toggle");
+  const cardPicker = document.getElementById("card-picker");
+  const cardChips = document.getElementById("card-chips");
+  const cardSearch = document.getElementById("card-search");
+  const cardList = document.getElementById("card-list");
+
+  function renderChips() {
+    const held = providers.filter(p => p.held);
+    cardToggle.textContent = held.length ? `${held.length} registered ▾` : "none registered ▾";
+    cardChips.innerHTML = held.map(p =>
+      `<span class="chip">${esc(p.name)}<button data-id="${esc(p.id)}" title="remove">×</button></span>`).join("");
+    cardChips.querySelectorAll(".chip button").forEach(b =>
+      b.addEventListener("click", () => toggleCard(b.dataset.id, false)));
+  }
+
+  function renderCardList() {
+    const q = cardSearch.value.trim().toLowerCase();
+    const shown = providers.filter(p =>
+      !q || p.name.toLowerCase().includes(q) || (p.region || "").toLowerCase().includes(q));
+    cardList.innerHTML = shown.map(p => {
+      const cls = p.held ? "held" : (p.supported ? "" : "limited");
+      const action = p.held ? "✓ registered" : (p.supported ? "+ add" : "coverage n/a");
+      return `<li class="${cls}" data-id="${esc(p.id)}" data-ok="${p.supported ? 1 : 0}">`
+        + `<span><b>${esc(p.name)}</b> <span class="rgn">${esc(p.region)}</span></span>`
+        + `<span class="add">${action}</span></li>`;
+    }).join("");
+    cardList.querySelectorAll("li").forEach(li => li.addEventListener("click", () => {
+      const p = providers.find(x => x.id === li.dataset.id);
+      if (!p || (!p.held && li.dataset.ok !== "1")) return;  // limited cards not selectable
+      toggleCard(p.id, !p.held);
+    }));
+  }
+
+  async function loadProviders() {
+    try {
+      const res = await fetch("/api/providers");
+      providers = (await res.json()).providers || [];
+    } catch (_) { providers = []; }
+    renderChips();
+    renderCardList();
+  }
+
+  async function toggleCard(id, add) {
+    try {
+      if (add) await fetch("/api/cards", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider_id: id }) });
+      else await fetch("/api/cards/" + encodeURIComponent(id), { method: "DELETE" });
+    } catch (_) { return; }
+    const p = providers.find(x => x.id === id);
+    if (p) p.held = add;
+    renderChips();
+    renderCardList();
+  }
+
+  cardToggle.addEventListener("click", () => {
+    cardPicker.hidden = !cardPicker.hidden;
+    if (!cardPicker.hidden) { cardSearch.value = ""; renderCardList(); cardSearch.focus(); }
+  });
+  cardSearch.addEventListener("input", renderCardList);
+  loadProviders();
+
   function modeParams() {
     // local_transit is always allowed (feeder legs); the checkboxes pick the travel modes.
     const modes = ["local_transit"];
@@ -253,8 +348,10 @@
       const book = l.quote && l.quote.deeplink
         ? ` · <a class="book" href="${esc(l.quote.deeplink)}" target="_blank" rel="noopener noreferrer">book →</a>` : "";
       const op = l.operator ? ` <span class="meta">(${esc(l.operator)})</span>` : "";
+      const incl = l.quote && l.quote.source === "travelcard" && l.quote.note
+        ? ` <span class="incl">${esc(l.quote.note)}</span>` : "";
       return `<li>${l.departure.slice(11,16)}–${l.arrival.slice(11,16)} <b>${esc(l.mode)}</b>${op} `
-        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}${book}</li>`;
+        + `${esc(l.from_stop.name)} → ${esc(l.to_stop.name)} · ${cost}${incl}${book}</li>`;
     }).join("");
   }
 

@@ -112,6 +112,12 @@ CREATE TABLE IF NOT EXISTS freerider_hit (
 );
 CREATE INDEX IF NOT EXISTS idx_hit_seen ON freerider_hit(seen_at);
 
+-- Travel cards (regional period tickets) the user holds; covered legs price at 0.
+CREATE TABLE IF NOT EXISTS travel_card (
+    provider_id TEXT PRIMARY KEY,
+    added_at    TEXT NOT NULL
+);
+
 -- Per-operator price floors calibrated from reprice_delta, replacing the hand-set defaults.
 -- These feed back into the router's price lower bound: tighter (but still safe) floors mean
 -- a smaller Pareto frontier and fewer upstream price calls per search.
@@ -481,6 +487,27 @@ class Database:
             return self._conn.execute(
                 "SELECT * FROM freerider_hit ORDER BY seen_at DESC LIMIT ?", (limit,)
             ).fetchall()
+
+    # --- travel cards -----------------------------------------------------
+
+    def add_card(self, provider_id: str) -> None:
+        with self._write() as conn:
+            conn.execute(
+                "INSERT OR IGNORE INTO travel_card (provider_id, added_at) VALUES (?, ?)",
+                (provider_id, datetime.now(UTC).isoformat()),
+            )
+
+    def remove_card(self, provider_id: str) -> bool:
+        with self._write() as conn:
+            cur = conn.execute("DELETE FROM travel_card WHERE provider_id = ?", (provider_id,))
+            return cur.rowcount > 0
+
+    def list_cards(self) -> list[str]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT provider_id FROM travel_card ORDER BY added_at"
+            ).fetchall()
+        return [r["provider_id"] for r in rows]
 
     # --- calibrated floors ------------------------------------------------
 

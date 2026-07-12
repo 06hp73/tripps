@@ -36,6 +36,7 @@ from ..ingest.freerider import (
 )
 from ..ingest.gtfs import GtfsConfig, load_timetable_cached
 from ..models import SearchConstraints, TransportMode
+from ..passes import PassAdapter, PassCoverage, load_cards
 from ..pricing.flights import FlightAdapter
 from ..pricing.flixbus import FlixBusAdapter
 from ..pricing.freerider import FreeriderAdapter
@@ -103,6 +104,8 @@ class AppState:
             GoogleFlightsProvider() if _fast_flights_available() else NullFlightProvider()
         )
         adapters = [
+            # First: a held travel card zeroes a covered leg before any paid source is asked.
+            PassAdapter(),
             FlixBusAdapter(
                 base_url=self.settings.flixbus_base,
                 user_agent=self.settings.user_agent,
@@ -392,6 +395,7 @@ async def _run_search(state: AppState, origin, destination, service_date, constr
             service_date,
             constraints=constraints,
             offers=state.freerider_offers,
+            held_cards=state.db.list_cards(),
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -458,6 +462,7 @@ async def api_round_trip(
         result = await round_trip(
             _make_planner(state), origin, destination, out_date, back_date,
             constraints=constraints, offers=state.freerider_offers,
+            held_cards=state.db.list_cards(),
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -493,6 +498,7 @@ async def api_fares(
         fares = await cheapest_over_window(
             _make_planner(state), origin, destination, start_date, days,
             constraints=constraints, offers=state.freerider_offers,
+            held_cards=state.db.list_cards(),
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -560,6 +566,68 @@ async def api_freerider(request: Request) -> JSONResponse:
             for o in state.freerider_offers
         ]
     )
+
+
+@app.get("/api/providers")
+async def api_providers(request: Request) -> JSONResponse:
+    """Every regional travel-card provider, for the searchable scroll-list.
+
+    `supported` marks whether the card can actually free legs on the current network (its home
+    region resolved to stops); unsupported cards are still listed so the user sees their region.
+    """
+    state = _state(request)
+    coverage = None
+    if state.current_timetable is not None:
+        coverage = PassCoverage(state.current_timetable)
+    held = set(state.db.list_cards())
+    return JSONResponse(
+        {
+            "providers": [
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "region": c.region,
+                    "held": c.id in held,
+                    "supported": coverage.is_supported(c.id) if coverage else True,
+                    "note": c.coverage_note,
+                }
+                for c in sorted(load_cards().values(), key=lambda x: x.name)
+            ]
+        }
+    )
+
+
+@app.get("/api/cards")
+async def api_cards_list(request: Request) -> JSONResponse:
+    state = _state(request)
+    cards = load_cards()
+    return JSONResponse(
+        {
+            "cards": [
+                {"id": cid, "name": cards[cid].name if cid in cards else cid}
+                for cid in state.db.list_cards()
+            ]
+        }
+    )
+
+
+@app.post("/api/cards")
+async def api_cards_add(request: Request) -> JSONResponse:
+    state = _state(request)
+    body = await request.json()
+    provider_id = body.get("provider_id")
+    if provider_id not in load_cards():
+        raise HTTPException(400, f"unknown provider: {provider_id}")
+    state.db.add_card(provider_id)
+    return JSONResponse({"added": provider_id})
+
+
+@app.delete("/api/cards/{provider_id}")
+async def api_cards_remove(request: Request, provider_id: str) -> JSONResponse:
+    state = _state(request)
+    if not state.db.remove_card(provider_id):
+        raise HTTPException(404, f"card not registered: {provider_id}")
+    return JSONResponse({"removed": provider_id})
 
 
 @app.post("/api/watch")

@@ -24,6 +24,7 @@ from .ingest.freerider import (
 )
 from .ingest.gtfs import GtfsConfig, load_timetable, load_timetable_cached
 from .models import SearchConstraints, TransportMode
+from .passes import PassAdapter
 from .pricing.flights import FlightAdapter
 from .pricing.flixbus import FlixBusAdapter
 from .pricing.freerider import FreeriderAdapter
@@ -116,6 +117,7 @@ async def _freerider(as_json: bool) -> int:
 
 def _build_adapters(settings, db):
     return [
+        PassAdapter(),  # first: a held travel card zeroes covered legs before paid sources
         FlixBusAdapter(
             base_url=settings.flixbus_base,
             user_agent=settings.user_agent,
@@ -272,7 +274,7 @@ async def _search(args: argparse.Namespace) -> int:
             return_date = date.fromisoformat(args.return_date)
             result = await round_trip(
                 factory, args.origin, args.destination, service_date, return_date,
-                constraints=constraints, offers=offers,
+                constraints=constraints, offers=offers, held_cards=db.list_cards(),
             )
             print(f"\nOutbound  {args.origin} -> {args.destination}  {service_date}\n")
             _print_response(result.outbound)
@@ -286,6 +288,7 @@ async def _search(args: argparse.Namespace) -> int:
         else:
             response, run_stats = await factory(service_date).search(
                 args.origin, args.destination, service_date, constraints=constraints, offers=offers,
+                held_cards=db.list_cards(),
             )
             print(f"\n{response.origin.name} -> {response.destination.name} on {response.date}\n")
             _print_response(response)
@@ -321,7 +324,7 @@ async def _fares(args: argparse.Namespace) -> int:
     try:
         fares = await cheapest_over_window(
             factory, args.origin, args.destination, start, args.days,
-            constraints=constraints, offers=offers,
+            constraints=constraints, offers=offers, held_cards=db.list_cards(),
         )
     except LookupError as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -445,6 +448,41 @@ async def _watch(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cards(args: argparse.Namespace) -> int:
+    from .passes import load_cards
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    cards = load_cards()
+
+    if args.cards_action == "providers":
+        print(f"{len(cards)} regional providers:\n")
+        for c in sorted(cards.values(), key=lambda x: x.name):
+            print(f"  {c.id:26} {c.name}  ({c.region})")
+        return 0
+
+    db = Database(settings.db_path)
+    if args.cards_action == "add":
+        if args.provider_id not in cards:
+            print(f"error: unknown provider '{args.provider_id}' (see `tripps cards providers`)", file=sys.stderr)
+            db.close()
+            return 1
+        db.add_card(args.provider_id)
+        print(f"registered: {cards[args.provider_id].name}")
+    elif args.cards_action == "remove":
+        removed = db.remove_card(args.provider_id)
+        print("removed" if removed else "not registered")
+    else:  # list
+        held = db.list_cards()
+        if not held:
+            print("no cards registered; add one with `tripps cards add <id>`")
+        for cid in held:
+            c = cards.get(cid)
+            print(f"  {cid:26} {c.name if c else '(unknown)'}")
+    db.close()
+    return 0
+
+
 def _calibrate(min_samples: int) -> int:
     """Recompute per-operator price floors from logged fares and persist them."""
     from .calibration import DEFAULT_FLOORS, run_calibration
@@ -560,6 +598,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     cal.add_argument("--min-samples", type=int, default=8)
 
+    cd = sub.add_parser("cards", help="manage held regional travel cards (free covered legs)")
+    cd_sub = cd.add_subparsers(dest="cards_action", required=True)
+    cd_sub.add_parser("providers", help="list all known regional providers")
+    cd_sub.add_parser("list", help="show your registered cards")
+    cd_add = cd_sub.add_parser("add", help="register a card by provider id")
+    cd_add.add_argument("provider_id")
+    cd_rm = cd_sub.add_parser("remove", help="unregister a card")
+    cd_rm.add_argument("provider_id")
+
     wa = sub.add_parser("watch", help="watch a Freerider route for free cars")
     wa_sub = wa.add_subparsers(dest="watch_action", required=True)
     wa_add = wa_sub.add_parser("add", help="register a route to watch")
@@ -588,6 +635,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_canary(args.as_json))
     if args.command == "calibrate":
         return _calibrate(args.min_samples)
+    if args.command == "cards":
+        return _cards(args)
     if args.command == "watch":
         return asyncio.run(_watch(args))
     return 1
