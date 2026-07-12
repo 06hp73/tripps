@@ -75,6 +75,11 @@ def _ride_leg(tt: Timetable, edge: RideEdge, service_date: date) -> Leg:
         arrival=from_service_seconds(trip.arrivals[edge.alight_pos], service_date),
         service_ref=trip.id,
         headsign=trip.headsign,
+        # The full stop path (board..alight), so combined travel-card coverage can check every
+        # stop the train calls at, not just the endpoints.
+        via_stop_ids=tuple(
+            tt.stops[i].id for i in route.stops[edge.board_pos : edge.alight_pos + 1]
+        ),
     )
 
 

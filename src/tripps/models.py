@@ -179,6 +179,10 @@ class Leg(BaseModel):
     service_ref: str | None = None
     headsign: str | None = None
     quote: Quote | None = None
+    #: Every stop this leg calls at, from board to alight inclusive (GTFS ids). Used to check
+    #: whether the union of held travel cards covers the *whole* path of a through-train, not
+    #: just its endpoints. In-process only - excluded from serialization to keep the API lean.
+    via_stop_ids: tuple[str, ...] = Field(default=(), exclude=True, repr=False)
 
     @field_validator("arrival")
     @classmethod

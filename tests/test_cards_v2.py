@@ -229,3 +229,93 @@ def test_all_zone_column_migrated_onto_an_old_db(tmp_path):
         assert db.list_card_rows()[0]["all_zone"] == 1
     finally:
         db.close()
+
+
+# --- combined multi-card coverage (union across a through-leg's path) --------
+
+SA = Stop(id="SA", name="Alfa", lat=55.0, lon=13.0)
+SB = Stop(id="SB", name="Beta", lat=55.5, lon=13.2)
+SC = Stop(id="SC", name="Gamma", lat=56.0, lon=13.4)
+SD = Stop(id="SD", name="Delta", lat=56.5, lon=13.6)
+SX = Stop(id="SX", name="Xeno", lat=57.0, lon=13.8)  # in no card's region
+
+
+def _combo_cards():
+    reg1 = TravelCard(
+        id="reg1", name="Region One", region="R1",
+        honored_operators=frozenset({"Kust"}), coverage_model="region-stops",
+        region_agencies=frozenset({"Ag1"}),
+    )
+    reg2 = TravelCard(
+        id="reg2", name="Region Two", region="R2",
+        honored_operators=frozenset({"Kust"}), coverage_model="region-stops",
+        region_agencies=frozenset({"Ag2"}),
+    )
+    return {"reg1": reg1, "reg2": reg2}
+
+
+_COMBO_AGENCY_STOPS = {"Ag1": ["SA", "SB"], "Ag2": ["SC", "SD"], "Kust": ["SA", "SB", "SC", "SD"]}
+
+
+def _combo_cov():
+    b = TimetableBuilder()
+    for s in (SA, SB, SC, SD, SX):
+        b.add_stop(s)
+    b.add_trip(
+        RouteInfo(id="k", mode=TransportMode.TRAIN, operator="Kust"),
+        ["SA", "SB", "SC", "SD"], Trip(id="k1", arrivals=[0, 6, 12, 18], departures=[0, 6, 12, 18]),
+    )
+    return PassCoverage(b.build(), cards=_combo_cards(), agency_stops=_COMBO_AGENCY_STOPS)
+
+
+def _through(frm, to, via, operator="Kust"):
+    dep = datetime(2026, 7, 22, 8, 0, tzinfo=TZ)
+    return Leg(
+        from_stop=frm, to_stop=to, mode=TransportMode.TRAIN, operator=operator,
+        departure=dep, arrival=dep.replace(hour=10), service_ref="t", via_stop_ids=tuple(via),
+    )
+
+
+def test_two_cards_jointly_cover_a_through_leg():
+    cov = _combo_cov()
+    combined = cov.combined_cover(["reg1", "reg2"], _through(SA, SD, ["SA", "SB", "SC", "SD"]))
+    assert combined is not None
+    assert {c.id for c in combined} == {"reg1", "reg2"}
+
+
+def test_combined_needs_the_whole_path_covered():
+    cov = _combo_cov()
+    # An intermediate stop (SX) in no held card's region -> not jointly covered.
+    assert cov.combined_cover(["reg1", "reg2"], _through(SA, SD, ["SA", "SB", "SX", "SC", "SD"])) is None
+
+
+def test_combined_needs_two_or_more_cards():
+    cov = _combo_cov()
+    # One card alone cannot reach SC/SD, so there is no combined cover.
+    assert cov.combined_cover(["reg1"], _through(SA, SD, ["SA", "SB", "SC", "SD"])) is None
+
+
+def test_combined_fails_closed_without_a_stop_path():
+    cov = _combo_cov()
+    # No via path -> the middle cannot be verified -> never freed (fail closed).
+    assert cov.combined_cover(["reg1", "reg2"], _through(SA, SD, [])) is None
+
+
+def test_combined_never_frees_a_globally_excluded_operator():
+    cov = _combo_cov()
+    leg = _through(SA, SD, ["SA", "SB", "SC", "SD"], operator="SJ")
+    assert cov.combined_cover(["reg1", "reg2"], leg) is None
+
+
+async def test_pass_adapter_prices_a_jointly_covered_leg_free():
+    from tripps.passes import PassAdapter
+
+    adapter = PassAdapter()
+    adapter._coverage = _combo_cov()  # inject synthetic coverage
+    adapter._held = frozenset({"reg1", "reg2"})
+    leg = _through(SA, SD, ["SA", "SB", "SC", "SD"])
+    assert adapter.supports(leg)
+    quote = await adapter.quote_leg(leg)
+    assert quote.amount_ore == 0
+    assert "jointly cover" in (quote.note or "")
+    assert "Region One" in quote.note and "Region Two" in quote.note

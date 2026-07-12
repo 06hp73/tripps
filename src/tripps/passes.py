@@ -267,6 +267,41 @@ class PassCoverage:
         region = self._region_stops.get(card_id) or frozenset()
         return (leg.from_stop.id in region) != (leg.to_stop.id in region)
 
+    def combined_cover(self, held_ids, leg: Leg) -> list[TravelCard] | None:
+        """The 2+ held cards whose regions JOINTLY cover every stop this leg calls at, or None.
+
+        A through-train can cross several card regions - Öresundståg Lund->Göteborg runs Skåne,
+        Halland, Västra Götaland. If the union of held cards that honor the operator covers the
+        whole path, the marginal cost is zero. This checks the leg's full stop sequence
+        (`via_stop_ids`), not just its endpoints: without the path the middle cannot be
+        verified, so it returns None (fail closed, never over-covering). Single-card coverage is
+        handled by `covers`; this only reports genuinely combined (2+ contributing) coverage.
+        """
+        if leg.mode is TransportMode.WALK or not leg.via_stop_ids:
+            return None
+        operator = leg.operator or ""
+        if operator in GLOBAL_EXCLUSIONS:
+            return None
+        honoring = [
+            card
+            for card_id in held_ids
+            if (card := self._cards.get(card_id)) is not None
+            and operator in card.honored_operators
+            and card.coverage_model == "region-stops"
+        ]
+        if len(honoring) < 2:
+            return None
+        covered_by = {
+            card.id: (self._region_stops.get(card.id, frozenset()) | card.border_stops)
+            for card in honoring
+        }
+        path = set(leg.via_stop_ids)
+        if not path <= set().union(*covered_by.values()):
+            return None
+        # Only the cards that actually contribute a stop on this path, for an honest note.
+        contributing = [card for card in honoring if covered_by[card.id] & path]
+        return contributing if len(contributing) >= 2 else None
+
 
 #: Marks a quote produced by a tickital rental (the coupon-charged leg and its zeroed
 #: siblings), so the orchestrator can raise the period-cost + terms-of-service warning.
@@ -319,6 +354,12 @@ class PassAdapter(PriceAdapter):
             return None
         return self._coverage.covering_card(self._held, leg)
 
+    def _combined_for(self, leg: Leg) -> list[TravelCard] | None:
+        """The held cards that jointly cover this through-leg, when no single card does."""
+        if not self._held or self._coverage is None:
+            return None
+        return self._coverage.combined_cover(self._held, leg)
+
     def partial_card(self, leg: Leg) -> TravelCard | None:
         """A held card that partially covers this leg (crosses its county border), for a hint.
 
@@ -333,19 +374,29 @@ class PassAdapter(PriceAdapter):
         return None
 
     def supports(self, leg: Leg) -> bool:
-        return self._card_for(leg) is not None
+        return self._card_for(leg) is not None or self._combined_for(leg) is not None
 
     async def quote_leg(self, leg: Leg) -> Quote:
         card = self._card_for(leg)
-        if card is None:
-            return Quote.unavailable(self.name, note="not covered by a held card")
-        return Quote(
-            source=self.name,
-            amount_ore=0,
-            confidence=PriceConfidence.EXACT,
-            fare_class="travel card",
-            note=f"Included with your {card.name} period ticket",
-        )
+        if card is not None:
+            return Quote(
+                source=self.name,
+                amount_ore=0,
+                confidence=PriceConfidence.EXACT,
+                fare_class="travel card",
+                note=f"Included with your {card.name} period ticket",
+            )
+        combined = self._combined_for(leg)
+        if combined is not None:
+            names = " + ".join(c.name for c in combined)
+            return Quote(
+                source=self.name,
+                amount_ore=0,
+                confidence=PriceConfidence.EXACT,
+                fare_class="travel card",
+                note=f"Included with your {names} cards, which jointly cover this journey",
+            )
+        return Quote.unavailable(self.name, note="not covered by a held card")
 
 
 def tickital_note(card: TravelCard, rental: TickitalRental) -> str:
