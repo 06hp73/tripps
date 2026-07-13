@@ -193,7 +193,12 @@
   "region_agencies": [
    "X-trafik"
   ],
-  "coverage_note": "Zone-based. Mälartåg only the Gävle–Furuvik stub. SJ only to/from Sundsvall with county/Sundsvall validity; other SJ needs a paid supplement (over-coverage risk on the 'SJ' agency). Region-stops set spans Gävleborg + the Sundsvall X-tåget corridor endpoint.",
+  "border_stops": [
+   "740000704",
+   "740000630",
+   "740000111"
+  ],
+  "coverage_note": "Zone-based. Mälartåg only the Gävle–Furuvik stub. SJ only to/from Sundsvall with county/Sundsvall validity; other SJ needs a paid supplement (over-coverage risk on the 'SJ' agency). Region-stops set spans Gävleborg + the Sundsvall X-tåget corridor endpoint. border_stops: the county-validity 30-day/annual ticket gives free Tåg i Bergslagen travel across the Dalarna border to Fors (740000704), Horndals Bruk (740000630) and Avesta Krylbo (740000111), verified 2026-07 at xtrafik.se/tag-i-bergslagen; Falun is already in-region (X-tåget).",
   "confidence": "verified-in-docs"
  },
  {
@@ -328,7 +333,8 @@
    "Länstrafiken Örebro",
    "Östgötatrafiken"
   ],
-  "coverage_note": "SPECIAL — really a relation/route product, not a region polygon. Sold per sträcka OR 'Alla sträckor'. SJ = Regional on Movingo-flagged departures only (never X2000/other fast/night). Bundles local traffic (SL/UL/VL/Sörmland/Örebro/Östgöta) along the relation. Uppsala–Knivsta–Arlanda/Märsta carries UL validity only, not SL. 5/30 flex excludes SJ. region-stops over the 6-county union over-approximates the all-routes variant; per-relation cards need route modeling (capture chosen sträcka).",
+  "variant_gated": true,
+  "coverage_note": "SPECIAL — really a relation/route product, not a region polygon. VARIANT-GATED: most Movingo tickets are sold per sträcka (relation), so auto-freeing the 6-county union would over-cover a per-relation holder; it is registered as hint-only (never auto-freed) until per-relation modeling captures the chosen sträcka. Sold per sträcka OR 'Alla sträckor'. SJ = Regional on Movingo-flagged departures only (never X2000/other fast/night). Bundles local traffic (SL/UL/VL/Sörmland/Örebro/Östgöta) along the relation. Uppsala–Knivsta–Arlanda/Märsta carries UL validity only, not SL. 5/30 flex excludes SJ. region-stops over the 6-county union over-approximates the all-routes variant; per-relation cards need route modeling (capture chosen sträcka).",
   "confidence": "verified-in-docs"
  },
  {
@@ -348,7 +354,8 @@
    "Länstrafiken Norrbotten",
    "Länstrafiken Jämtland"
   ],
-  "coverage_note": "Shared 30-day card, not tied to one PTA. Frees Norrtåg anywhere across Norrbotten/Västerbotten/Västernorrland/Jämtland + the listed PTA buses (also Skellefteå Buss / Luleå Lokaltrafik / Länstrafiken Jämtland buses, absent from feed). Model as a 4-county region-stops union. Only 'en del av' ticket types accepted — verify accepted subset.",
+  "variant_gated": true,
+  "coverage_note": "Shared 30-day card, not tied to one PTA. VARIANT-GATED: only 'en del av' ticket types are accepted and the accepted subset is unverified, so it is registered as hint-only (never auto-freed) rather than risk over-covering a 4-county union. Frees Norrtåg anywhere across Norrbotten/Västerbotten/Västernorrland/Jämtland + the listed PTA buses (also Skellefteå Buss / Luleå Lokaltrafik / Länstrafiken Jämtland buses, absent from feed). Model as a 4-county region-stops union. Only 'en del av' ticket types accepted — verify accepted subset.",
   "confidence": "reported-secondhand"
  },
  {

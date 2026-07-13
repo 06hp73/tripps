@@ -98,6 +98,11 @@ class TravelCard:
     #: the ticket boundary: SL pendeltag 40 runs to Knivsta and Uppsala C, which need a UL
     #: fare. A leg touching a denied stop is never freed by this card.
     denied_stops: frozenset[str] = frozenset()
+    #: A per-relation / partial product (Movingo, Norrlandsresan) whose exact validity is not a
+    #: region polygon and cannot be verified from the feed. Such a card is registered and shown
+    #: but NEVER auto-frees a leg - modelling its region as a multi-county union would over-cover
+    #: a holder who only bought one relation. Priced as paid with a hint until relation modelling.
+    variant_gated: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,7 +148,7 @@ def honored_operators(card_ids) -> frozenset[str]:
     ops: set[str] = set()
     for card_id in card_ids or ():
         card = cards.get(card_id)
-        if card is not None:
+        if card is not None and not card.variant_gated:
             ops |= card.honored_operators
     return frozenset(ops - GLOBAL_EXCLUSIONS)
 
@@ -164,6 +169,7 @@ def load_cards() -> dict[str, TravelCard]:
             confidence=entry.get("confidence", "reported-secondhand"),
             border_stops=frozenset(entry.get("border_stops", [])),
             denied_stops=frozenset(entry.get("denied_stops", [])),
+            variant_gated=bool(entry.get("variant_gated", False)),
         )
     return cards
 
@@ -216,6 +222,8 @@ class PassCoverage:
         card = self._cards.get(card_id)
         if card is None:
             return False
+        if card.variant_gated:
+            return False  # registered and listed, but hint-only, so mark it unsupported
         if card.coverage_model == "operator-only":
             return True
         return bool(self._region_stops.get(card_id))
@@ -224,6 +232,8 @@ class PassCoverage:
         card = self._cards.get(card_id)
         if card is None or leg.mode is TransportMode.WALK:
             return False
+        if card.variant_gated:
+            return False  # per-relation product; never auto-freed (see TravelCard.variant_gated)
         operator = leg.operator or ""
         if operator in GLOBAL_EXCLUSIONS or operator not in card.honored_operators:
             return False
@@ -298,6 +308,7 @@ class PassCoverage:
             if (card := self._cards.get(card_id)) is not None
             and operator in card.honored_operators
             and card.coverage_model == "region-stops"
+            and not card.variant_gated
         ]
         if len(honoring) < 2:
             return None

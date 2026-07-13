@@ -110,8 +110,9 @@ def test_seeded_border_stops_are_exactly_the_verified_set():
     from tripps.passes import load_cards
 
     seeded = {c.id: c.border_stops for c in load_cards().values() if c.border_stops}
-    assert set(seeded) == {"ul-uppsala", "dalatrafik", "lanstrafiken-orebro", "vl-vastmanland"}
+    assert set(seeded) == {"ul-uppsala", "dalatrafik", "lanstrafiken-orebro", "vl-vastmanland", "x-trafik"}
     assert seeded["ul-uppsala"] == frozenset({"740000210", "740000027", "740000556"})
+    assert seeded["x-trafik"] == frozenset({"740000704", "740000630", "740000111"})
     assert seeded["dalatrafik"] == frozenset(
         {"740020094", "740000218", "740000903", "740000280", "740000214",
          "740000195", "740000244", "740000638", "740001563"}
@@ -349,3 +350,46 @@ def test_sl_card_denies_pendeltag_to_uppsala_but_keeps_valid_legs():
     assert not cov.covers("sl-stockholm", sl(UPPSALA, STHLM))   # from a denied stop
     assert not cov.covers("sl-stockholm", sl(STHLM, KNIVSTA))   # Knivsta is denied too
     assert cov.covers("sl-stockholm", sl(STHLM, SODERTALJE))    # within SL validity, still free
+
+
+# --- variant-gated products (Movingo / Norrlandsresan) never auto-free -------
+
+def test_variant_gated_cards_never_auto_free():
+    from tripps.passes import PassCoverage, honored_operators, load_cards
+
+    cards = load_cards()
+    assert cards["movingo"].variant_gated and cards["norrlandsresan"].variant_gated
+    # Build a timetable where Movingo's union region would otherwise cover a Mälartåg leg.
+    A = Stop(id="740000001", name="Stockholm C", lat=59.33, lon=18.06)
+    B = Stop(id="740000004", name="Eskilstuna", lat=59.37, lon=16.51)
+    b = TimetableBuilder()
+    b.add_stop(A)
+    b.add_stop(B)
+    b.add_trip(RouteInfo(id="m", mode=TransportMode.TRAIN, operator="Mälartåg"),
+               ["740000001", "740000004"], Trip(id="t", arrivals=[0, 600], departures=[0, 600]))
+    agency_stops = {a: ["740000001", "740000004"] for a in ("SL", "UL", "VL", "Sörmlandstrafiken",
+                    "Länstrafiken Örebro", "Östgötatrafiken", "Mälartåg")}
+    cov = PassCoverage(b.build(), cards=cards, agency_stops=agency_stops)
+    leg = _leg("Mälartåg", A, B)
+    assert not cov.covers("movingo", leg)           # never auto-freed despite union coverage
+    assert not cov.is_supported("movingo")          # marked hint-only
+    assert honored_operators(["movingo"]) == frozenset()  # not even floor-zeroed
+
+
+def test_itinerary_co2_estimate():
+    from tripps.models import Itinerary, PriceConfidence, Quote
+
+    def priced_leg(op, mode, frm, to, amount):
+        dep = datetime(2026, 7, 22, 8, 0, tzinfo=TZ)
+        return Leg(from_stop=frm, to_stop=to, mode=mode, operator=op, departure=dep,
+                   arrival=dep.replace(hour=11), service_ref="t",
+                   quote=Quote(source="x", amount_ore=amount, confidence=PriceConfidence.EXACT))
+
+    STO = Stop(id="STO", name="Stockholm", lat=59.33, lon=18.06)
+    GBG = Stop(id="GBG", name="Göteborg", lat=57.71, lon=11.97)
+    train = Itinerary(legs=[priced_leg("SJ", TransportMode.TRAIN, STO, GBG, 30000)])
+    flight = Itinerary(legs=[priced_leg("SAS", TransportMode.FLIGHT, STO, GBG, 90000)])
+    # ~400 km great-circle: train ~1 g/km is tiny, flight ~127 g/km is large.
+    assert 0 < train.co2_grams < flight.co2_grams
+    assert flight.co2_grams > 40_000  # ~400 km * 127 g ~= 50 kg
+    assert "co2_grams" in train.model_dump()

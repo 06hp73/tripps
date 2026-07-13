@@ -460,11 +460,18 @@
     }).join("");
   }
 
+  function co2Label(g) {
+    if (g == null) return "";
+    const txt = g >= 1000 ? (g / 1000).toFixed(1) + " kg" : Math.round(g) + " g";
+    return ` · <span class="meta" title="estimated CO₂e, great-circle distance">~${txt} CO₂</span>`;
+  }
+
   function renderItinerary(itin) {
     const price = itin.total_price_sek != null
       ? Math.round(itin.total_price_sek) + " SEK" : "price unavailable";
     return `<div class="itin"><div class="head"><span class="price">${price}</span> `
-      + `<span class="meta">${itin.departure.slice(11,16)}→${itin.arrival.slice(11,16)}</span></div>`
+      + `<span class="meta">${itin.departure.slice(11,16)}→${itin.arrival.slice(11,16)}</span>`
+      + `${co2Label(itin.co2_grams)}</div>`
       + `<ul class="legs">${legRows(itin)}</ul></div>`;
   }
 

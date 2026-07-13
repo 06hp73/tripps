@@ -14,12 +14,22 @@ Europe/Stockholm.
 from __future__ import annotations
 
 import enum
+import math
 from datetime import datetime
 
 from pydantic import BaseModel, Field, computed_field, field_validator
 
 SEK = 100  # öre per krona
 STOCKHOLM_TZ = "Europe/Stockholm"
+
+
+def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Great-circle distance in km. An estimate - real track/road distance is longer."""
+    r = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dphi, dlam = math.radians(lat2 - lat1), math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlam / 2) ** 2
+    return 2 * r * math.asin(math.sqrt(a))
 
 
 class TransportMode(str, enum.Enum):
@@ -37,6 +47,21 @@ class TransportMode(str, enum.Enum):
     FERRY = "ferry"
     LOCAL_TRANSIT = "local_transit"
     WALK = "walk"
+
+
+#: Estimated grams of CO2e per passenger-km, for the itinerary CO2 figure. Swedish electric
+#: rail is near-zero; coach ~30; domestic flight 127 incl. high-altitude uplift; a relocated
+#: Freerider car ~170 (single occupant); a ferry is a rough placeholder. Sources in
+#: `Itinerary.co2_grams`.
+_CO2_G_PER_PKM = {
+    TransportMode.TRAIN: 1,
+    TransportMode.BUS: 30,
+    TransportMode.FLIGHT: 127,
+    TransportMode.FREERIDER: 170,
+    TransportMode.FERRY: 120,
+    TransportMode.LOCAL_TRANSIT: 30,
+    TransportMode.WALK: 0,
+}
 
 
 #: Modes whose legs are "long-distance" for the purposes of the intercity network.
@@ -283,6 +308,24 @@ class Itinerary(BaseModel):
     def total_price_sek(self) -> float | None:
         total = self.total_price_ore
         return None if total is None else total / SEK
+
+    @computed_field
+    @property
+    def co2_grams(self) -> int:
+        """Rough well-to-wheel CO2e for the journey, grams, over great-circle leg distances.
+
+        Per passenger-km factors (klimatsmartsemester.se / UIC EcoPassenger, 2026): Swedish
+        electric rail ~1 g, long-distance coach ~30 g, domestic flight ~127 g CO2e (incl. the
+        1.7x high-altitude uplift), a relocated car ~170 g. An estimate, not a certified figure
+        - distances are great-circle, so the real number is a little higher.
+        """
+        total = 0.0
+        for leg in self.legs:
+            km = haversine_km(
+                leg.from_stop.lat, leg.from_stop.lon, leg.to_stop.lat, leg.to_stop.lon
+            )
+            total += km * _CO2_G_PER_PKM.get(leg.mode, 0)
+        return round(total)
 
     @computed_field
     @property

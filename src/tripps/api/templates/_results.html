@@ -69,6 +69,7 @@
           {{ itin.departure.strftime("%H:%M") }} → {{ itin.arrival.strftime("%H:%M") }}
           · {{ (itin.duration_seconds // 3600) }}h{{ "%02d"|format((itin.duration_seconds % 3600) // 60) }}
           · {{ itin.transfers }} transfer{{ "" if itin.transfers == 1 else "s" }}
+          · ~{{ "%.1f kg"|format(itin.co2_grams / 1000) if itin.co2_grams >= 1000 else "%d g"|format(itin.co2_grams) }} CO₂
         </div>
       </div>
 
