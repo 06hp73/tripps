@@ -77,6 +77,11 @@
   .rental-form select, .rental-form input { width: auto; flex: 1 1 8rem; margin-bottom: 0; }
   .rental-form button { padding: .5rem .9rem; }
   .warn-note { color: #b8860b; }
+  .recent { max-width: 880px; margin: .75rem auto 0; display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+  .recent-label { color: var(--muted); font-size: .82rem; }
+  .recent-chip { background: var(--card); border: 1px solid var(--line); color: var(--fg);
+                 border-radius: 999px; padding: .25rem .7rem; font-size: .82rem; cursor: pointer; }
+  .recent-chip:hover { border-color: var(--accent); color: var(--accent); }
   .full { grid-column: 1 / -1; }
   button {
     padding: .7rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent);
@@ -204,6 +209,7 @@
     </div>
   </form>
 
+  <div id="recent" class="recent"></div>
   <div id="results"></div>
 </main>
 
@@ -426,6 +432,76 @@
   document.getElementById("rental-add").addEventListener("click", addRental);
   loadRentals();
 
+  // --- permalinks + recent searches -----------------------------------
+  const recentEl = document.getElementById("recent");
+
+  function currentSearch() {
+    return {
+      origin: form.origin.value.trim(), destination: form.destination.value.trim(),
+      date: form.date.value, ret: form.return_date ? form.return_date.value : "",
+      earliest: form.earliest.value,
+      train: form.mode_train.checked, bus: form.mode_bus.checked, ferry: form.mode_ferry.checked,
+      freerider: form.mode_freerider.checked, flight: form.mode_flight.checked,
+    };
+  }
+
+  function searchToQuery(s) {
+    const p = new URLSearchParams();
+    p.set("from", s.origin); p.set("to", s.destination);
+    if (s.date) p.set("date", s.date);
+    if (s.ret) p.set("return", s.ret);
+    if (s.earliest && s.earliest !== "06:00") p.set("earliest", s.earliest);
+    p.set("modes", ["train", "bus", "ferry", "freerider", "flight"].filter(m => s[m]).join(","));
+    return p.toString();
+  }
+
+  function applyQuery() {
+    const q = new URLSearchParams(location.search);
+    if (!q.get("from") || !q.get("to")) return false;
+    form.origin.value = q.get("from"); form.destination.value = q.get("to");
+    if (q.get("date")) form.date.value = q.get("date");
+    if (q.get("return") && form.return_date) form.return_date.value = q.get("return");
+    if (q.get("earliest")) form.earliest.value = q.get("earliest");
+    if (q.has("modes")) {
+      const m = q.get("modes").split(",");
+      form.mode_train.checked = m.includes("train"); form.mode_bus.checked = m.includes("bus");
+      form.mode_ferry.checked = m.includes("ferry"); form.mode_freerider.checked = m.includes("freerider");
+      form.mode_flight.checked = m.includes("flight");
+    }
+    return true;
+  }
+
+  function syncUrl() {
+    const s = currentSearch();
+    if (!s.origin || !s.destination) return;
+    history.replaceState(null, "", "?" + searchToQuery(s));
+    saveRecent(s);
+  }
+
+  function loadRecent() {
+    try { return JSON.parse(localStorage.getItem("tripps.recent") || "[]"); } catch (_) { return []; }
+  }
+
+  function saveRecent(s) {
+    const key = j => j.origin + "|" + j.destination;
+    let list = loadRecent().filter(j => key(j) !== key(s));
+    list.unshift({ origin: s.origin, destination: s.destination, date: s.date });
+    try { localStorage.setItem("tripps.recent", JSON.stringify(list.slice(0, 6))); } catch (_) {}
+    renderRecent();
+  }
+
+  function renderRecent() {
+    const list = loadRecent();
+    if (!list.length) { recentEl.innerHTML = ""; return; }
+    recentEl.innerHTML = '<span class="recent-label">Recent</span> ' + list.map((j, i) =>
+      `<button type="button" class="recent-chip" data-i="${i}">${esc(j.origin)} → ${esc(j.destination)}</button>`).join(" ");
+    recentEl.querySelectorAll(".recent-chip").forEach(b => b.addEventListener("click", () => {
+      const j = list[+b.dataset.i];
+      form.origin.value = j.origin; form.destination.value = j.destination;
+      form.requestSubmit();
+    }));
+  }
+
   function modeParams() {
     // local_transit is always allowed (feeder legs); the checkboxes pick the travel modes.
     const modes = ["local_transit"];
@@ -502,6 +578,7 @@
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    syncUrl();
     const returnDate = form.return_date.value;
     if (returnDate) {
       status.textContent = "Pricing both directions…";
@@ -567,6 +644,10 @@
       card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDay(Number(card.dataset.day)); } });
     });
   });
+
+  // On load: show recent searches, and if the URL is a shared permalink, run it.
+  renderRecent();
+  if (applyQuery()) form.requestSubmit();
 </script>
 </body>
 </html>
