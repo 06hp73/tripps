@@ -330,14 +330,21 @@ def _boardable_trips(
         return [first]
 
     horizon = ready + query.profile_window_seconds
-    chosen: list[int] = []
+    within: list[int] = []
     for trip_idx in range(first, len(route.trips)):
         if route.trips[trip_idx].departures[pos] > horizon:
             break
-        chosen.append(trip_idx)
-        if len(chosen) >= query.max_departures_per_route:
-            break
-    return chosen
+        within.append(trip_idx)
+    cap = query.max_departures_per_route
+    if len(within) <= cap:
+        return within
+    # More departures than the cap. Taking the first `cap` in order would keep only the
+    # earliest ones and silently drop the whole evening - and a cheap 22:55 coach is routinely
+    # the bargain. Spread the sample evenly over the window instead, keeping BOTH the earliest
+    # and the latest departure (linspace over [0, n-1] including both ends).
+    n = len(within)
+    picks = sorted({round(i * (n - 1) / (cap - 1)) for i in range(cap)})
+    return [within[i] for i in picks]
 
 
 def _dominates_existing_ride(rides: list[_Ride], candidate: _Ride) -> bool:

@@ -144,7 +144,7 @@ async def test_departure_far_from_any_journey_is_unavailable(payload):
     assert quote.confidence is PriceConfidence.UNAVAILABLE
 
 
-async def test_day_response_is_cached_across_legs(payload):
+def _counting_adapter(payload):
     calls = {"n": 0}
     adapter = ToraAdapter(min_interval=0.0)
 
@@ -153,11 +153,26 @@ async def test_day_response_is_cached_across_legs(payload):
         return payload
 
     adapter._fetch_offers_sync = fake_fetch  # type: ignore[method-assign]
+    return adapter, calls
 
+
+async def test_same_hour_legs_share_one_fetch(payload):
+    # Two legs on the same O/D within the same departure hour reuse one offers response.
+    adapter, calls = _counting_adapter(payload)
     await adapter.quote_leg(_leg("Öresundståg", datetime(2026, 7, 24, 8, 12, tzinfo=TZ), datetime(2026, 7, 24, 11, 5, tzinfo=TZ)))
-    await adapter.quote_leg(_leg("Vy Bus4You", datetime(2026, 7, 24, 9, 50, tzinfo=TZ), datetime(2026, 7, 24, 13, 15, tzinfo=TZ), mode=TransportMode.BUS))
+    await adapter.quote_leg(_leg("Vy Bus4You", datetime(2026, 7, 24, 8, 45, tzinfo=TZ), datetime(2026, 7, 24, 12, 15, tzinfo=TZ), mode=TransportMode.BUS))
     await adapter.aclose()
-    assert calls["n"] == 1, "both legs share one day response"
+    assert calls["n"] == 1, "same O/D and hour should reuse one fetch"
+
+
+async def test_different_hour_legs_each_fetch_their_own_window(payload):
+    # Tora only returns a ~1 h window, so a later departure must fetch its own window rather
+    # than reuse the first hour's response (which was the day-cache bug that hid it).
+    adapter, calls = _counting_adapter(payload)
+    await adapter.quote_leg(_leg("Öresundståg", datetime(2026, 7, 24, 8, 12, tzinfo=TZ), datetime(2026, 7, 24, 11, 5, tzinfo=TZ)))
+    await adapter.quote_leg(_leg("Öresundståg", datetime(2026, 7, 24, 17, 20, tzinfo=TZ), datetime(2026, 7, 24, 20, 5, tzinfo=TZ)))
+    await adapter.aclose()
+    assert calls["n"] == 2, "a different hour must fetch its own window"
 
 
 async def test_upstream_failure_degrades_to_unavailable():
@@ -247,3 +262,19 @@ def test_primp_client_is_built_with_a_bounded_timeout(monkeypatch):
 def test_default_tora_timeout_is_bounded():
     # Comfortably under the phase-2 deadline so one slow leg cannot consume the whole search.
     assert ToraAdapter()._timeout <= 20.0
+
+
+def test_vr_snabbtag_is_priceable_via_tora():
+    # VR Snabbtåg (ex-MTRX) is in the feed but no direct adapter sells it; Tora resells it, so
+    # it must be supported rather than structurally dropped as unpriceable.
+    from tripps.pricing.tora import TORA_OPERATORS
+
+    adapter = ToraAdapter()
+    vr_leg = _leg("VR Snabbtåg", datetime(2026, 7, 24, 8, 12, tzinfo=TZ), datetime(2026, 7, 24, 11, 5, tzinfo=TZ),
+                  frm="740000001", to="740000002")
+    assert "VR Snabbtåg" in TORA_OPERATORS
+    assert adapter.supports(vr_leg)
+    # the feed name "VR Snabbtåg" folds onto Tora's shorter carrier string "VR"...
+    assert carrier_matches("VR Snabbtåg", "VR")
+    # ...but the entry does not false-match an unrelated operator
+    assert not carrier_matches("SJ", "VR Snabbtåg")

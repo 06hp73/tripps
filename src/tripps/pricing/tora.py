@@ -66,14 +66,20 @@ TORA_OPERATORS = frozenset(
         "Kombardo Expressen",
         "Tågab",
         "Norrtåg",
+        # VR Snabbtåg (ex-MTRX) runs the Stockholm-Göteborg high-speed corridor and is often the
+        # cheapest train there, but SJ's API does not sell it; Trainplanet/Tora resells it (its
+        # carrier string is "VR", which carrier_matches folds into "VR Snabbtåg"). The full name
+        # is listed here rather than the 2-char "VR" so supports() never false-matches.
+        "VR Snabbtåg",
     }
 )
 
 #: How far a Tora departure may sit from the timetabled leg and still be the same service.
 MATCH_TOLERANCE = timedelta(minutes=5)
 
-#: One offers response covers a whole day for an origin/destination; regional fares are fixed
-#: rather than yield-managed, so a longer cache is safe.
+#: A single Tora offers response only spans roughly an hour around the requested time, NOT a
+#: whole day, so the memo is keyed per departure-hour (see `_day_offers`): fares are fixed
+#: rather than yield-managed, so caching that hour's window for a while is safe.
 DAY_CACHE_TTL_SECONDS = 1800
 
 _IMPERSONATE = "chrome_145"
@@ -240,7 +246,11 @@ class ToraAdapter(HttpPriceAdapter):
     async def _day_offers(
         self, origin: str, destination: str, day: date, near: datetime
     ) -> list[ToraJourney]:
-        cache_key = (origin, destination, day.isoformat())
+        # Key by departure HOUR, not day: the endpoint returns only a ~1 h window around the
+        # requested time, so a single day-keyed memo would serve the first-probed hour's
+        # journeys to every later departure and leave them "no matching Tora journey" (i.e.
+        # unpriced and hidden). Per-hour keying gives each probed departure its own window.
+        cache_key = (origin, destination, day.isoformat(), near.hour)
         cached = self._day_cache.get(cache_key)
         if cached is not None and time.monotonic() - cached[0] < self.day_cache_ttl:
             return cached[1]

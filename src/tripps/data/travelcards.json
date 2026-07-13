@@ -103,7 +103,11 @@
   "region_agencies": [
    "SL"
   ],
-  "coverage_note": "Flat, zone-free; validity polygon = Stockholms län + Bålsta + Gnesta, all under 'SL' agency. Waxholmsbolaget is CONDITIONAL: whole network free low season 14 Sep–29 Apr, 44 central piers year-round, 30-day+ period ticket only. EXCLUSIONS: Arlanda C gate (separate Arlandapassage ~130 kr, not free); Arlanda Express (never free); Mälartåg/SJ through the county (need Movingo).",
+  "denied_stops": [
+   "740000559",
+   "740000005"
+  ],
+  "coverage_note": "Flat, zone-free; validity polygon = Stockholms län + Bålsta + Gnesta, all under 'SL' agency. Waxholmsbolaget is CONDITIONAL: whole network free low season 14 Sep–29 Apr, 44 central piers year-round, 30-day+ period ticket only. EXCLUSIONS: Arlanda C gate (separate Arlandapassage ~130 kr, not free); Arlanda Express (never free); Mälartåg/SJ through the county (need Movingo). denied_stops: pendeltåg 40 runs to Knivsta (740000559) and Uppsala C (740000005) which are in Uppsala län and need a UL fare - an operator-only card would otherwise wrongly free them.",
   "confidence": "verified-corrected"
  },
  {

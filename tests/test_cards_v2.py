@@ -319,3 +319,33 @@ async def test_pass_adapter_prices_a_jointly_covered_leg_free():
     assert quote.amount_ore == 0
     assert "jointly cover" in (quote.note or "")
     assert "Region One" in quote.note and "Region Two" in quote.note
+
+
+# --- SL operator-only over-coverage guard (denied_stops) --------------------
+
+def test_sl_card_denies_pendeltag_to_uppsala_but_keeps_valid_legs():
+    from tripps.passes import PassCoverage, load_cards
+
+    STHLM = Stop(id="740000001", name="Stockholm C", lat=59.33, lon=18.06)
+    UPPSALA = Stop(id="740000005", name="Uppsala C", lat=59.86, lon=17.64)
+    KNIVSTA = Stop(id="740000559", name="Knivsta", lat=59.72, lon=17.79)
+    SODERTALJE = Stop(id="740000615", name="Södertälje", lat=59.20, lon=17.63)
+    b = TimetableBuilder()
+    for s in (STHLM, UPPSALA, KNIVSTA, SODERTALJE):
+        b.add_stop(s)
+    b.add_trip(
+        RouteInfo(id="pt40", mode=TransportMode.TRAIN, operator="SL"),
+        ["740000001", "740000559", "740000005"], Trip(id="t", arrivals=[0, 300, 600], departures=[0, 300, 600]),
+    )
+    cov = PassCoverage(b.build())  # real registry, incl. sl-stockholm denied_stops
+
+    def sl(frm, to):
+        dep = datetime(2026, 7, 22, 8, 0, tzinfo=TZ)
+        return Leg(from_stop=frm, to_stop=to, mode=TransportMode.TRAIN, operator="SL",
+                   departure=dep, arrival=dep.replace(hour=9), service_ref="t")
+
+    assert load_cards()["sl-stockholm"].denied_stops == frozenset({"740000559", "740000005"})
+    assert not cov.covers("sl-stockholm", sl(STHLM, UPPSALA))   # to a denied stop
+    assert not cov.covers("sl-stockholm", sl(UPPSALA, STHLM))   # from a denied stop
+    assert not cov.covers("sl-stockholm", sl(STHLM, KNIVSTA))   # Knivsta is denied too
+    assert cov.covers("sl-stockholm", sl(STHLM, SODERTALJE))    # within SL validity, still free

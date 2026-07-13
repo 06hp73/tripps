@@ -93,6 +93,11 @@ class TravelCard:
     #: region set already includes any boundary station the card's OWN agency runs to, so this
     #: is only for stations served solely by a neighbour's agency under a named agreement.
     border_stops: frozenset[str] = frozenset()
+    #: Stops this card is NOT valid at even though its operator/agency serves them - the
+    #: over-coverage escape hatch. Chiefly for operator-only cards (SL) whose vehicle crosses
+    #: the ticket boundary: SL pendeltag 40 runs to Knivsta and Uppsala C, which need a UL
+    #: fare. A leg touching a denied stop is never freed by this card.
+    denied_stops: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -158,6 +163,7 @@ def load_cards() -> dict[str, TravelCard]:
             coverage_note=entry.get("coverage_note", ""),
             confidence=entry.get("confidence", "reported-secondhand"),
             border_stops=frozenset(entry.get("border_stops", [])),
+            denied_stops=frozenset(entry.get("denied_stops", [])),
         )
     return cards
 
@@ -221,6 +227,10 @@ class PassCoverage:
         operator = leg.operator or ""
         if operator in GLOBAL_EXCLUSIONS or operator not in card.honored_operators:
             return False
+        if card.denied_stops and (
+            leg.from_stop.id in card.denied_stops or leg.to_stop.id in card.denied_stops
+        ):
+            return False  # the card's vehicle serves this stop but the ticket is not valid there
         if card.coverage_model == "operator-only":
             return True
         region = self._region_stops.get(card_id) or frozenset()
@@ -293,6 +303,7 @@ class PassCoverage:
             return None
         covered_by = {
             card.id: (self._region_stops.get(card.id, frozenset()) | card.border_stops)
+            - card.denied_stops
             for card in honoring
         }
         path = set(leg.via_stop_ids)

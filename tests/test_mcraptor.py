@@ -374,3 +374,29 @@ def test_unreachable_target_returns_empty():
     )
     res = run_mcraptor(tt, zero_floors(), _query(tt, "STO", "GBG", hhmm(7)))
     assert res.labels == []
+
+
+def test_boardable_trips_spread_keeps_earliest_and_latest():
+    """When a route has more departures than the cap, the sample is spread over the whole
+    window (keeping the first and last), not truncated to the earliest - a cheap late coach
+    must stay reachable."""
+    from tripps.routing.mcraptor import _boardable_trips
+
+    trips = [[at(hhmm(6) + i * 1800), at(hhmm(9) + i * 1800)] for i in range(34)]  # 06:00..22:30
+    tt = Net().route("R", ["STO", "GBG"], trips).build()
+    route = tt.routes[0]
+    q = _query(tt, "STO", "GBG", 0)
+    picks = _boardable_trips(route, 0, 0, q, unboarded=True)
+    assert len(picks) == q.max_departures_per_route == 16
+    assert picks[0] == 0, "earliest departure kept"
+    assert picks[-1] == 33, "latest departure kept (was dropped by first-16 truncation)"
+    assert picks == sorted(picks)
+
+
+def test_boardable_trips_under_cap_returns_all():
+    from tripps.routing.mcraptor import _boardable_trips
+
+    trips = [[at(hhmm(8) + i * 1800), at(hhmm(11) + i * 1800)] for i in range(5)]
+    tt = Net().route("R", ["STO", "GBG"], trips).build()
+    q = _query(tt, "STO", "GBG", 0)
+    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=True) == [0, 1, 2, 3, 4]
