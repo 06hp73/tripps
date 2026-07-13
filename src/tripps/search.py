@@ -657,6 +657,15 @@ def _charged_rental_ids(itin: Itinerary, price_of: dict[int, int]) -> set[int]:
     return charged
 
 
+def _fold(text: str) -> str:
+    """Casefold and strip diacritics, so "malmo"/"goteborg" match "Malmö"/"Göteborg" for a
+    traveller without the å/ä/ö keys. Swedish speakers who type the letters still match too."""
+    import unicodedata
+
+    nfkd = unicodedata.normalize("NFKD", text.strip().casefold())
+    return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
 def resolve_stops(timetable: Timetable, query: str, limit: int = 8) -> list[Stop]:
     """Match a typed place name against timetable stops.
 
@@ -669,13 +678,13 @@ def resolve_stops(timetable: Timetable, query: str, limit: int = 8) -> list[Stop
     A free function as well as a Planner method, so tools that hold only a timetable (the
     Freerider watch CLI) can resolve a place without building a whole planner.
     """
-    needle = query.strip().casefold()
+    needle = _fold(query)
     if not needle:
         return []
 
     buckets: list[list[tuple[int, Stop]]] = [[], [], []]
     for index, stop in enumerate(timetable.stops):
-        name = stop.name.casefold()
+        name = _fold(stop.name)
         if name == needle:
             rank = 0
         elif name.startswith(needle):

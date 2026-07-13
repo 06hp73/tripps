@@ -537,3 +537,23 @@ async def test_summarize_reads_sensibly(db):
     assert "6h00m" in line
     assert "199 SEK" in line
     assert "bus" in line
+
+
+def test_resolve_stops_folds_diacritics():
+    """A traveller without the å/ä/ö keys can type 'malmo'/'goteborg' and still match."""
+    from tripps.models import Stop
+    from tripps.routing.timetable import RouteInfo, TimetableBuilder, Trip
+    from tripps.search import resolve_stops
+
+    b = TimetableBuilder()
+    b.add_stop(Stop(id="MMX", name="Malmö C", lat=55.6, lon=13.0))
+    b.add_stop(Stop(id="GBG", name="Göteborg C", lat=57.7, lon=12.0))
+    b.add_trip(
+        RouteInfo(id="r", mode=TransportMode.TRAIN, operator="X"),
+        ["MMX", "GBG"], Trip(id="t", arrivals=[0, 600], departures=[0, 600]),
+    )
+    tt = b.build()
+    assert resolve_stops(tt, "malmo")[0].name == "Malmö C"
+    assert resolve_stops(tt, "goteborg")[0].name == "Göteborg C"
+    assert resolve_stops(tt, "Malmö")[0].name == "Malmö C"  # native letters still match
+    assert resolve_stops(tt, "zzz") == []

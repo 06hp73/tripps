@@ -265,3 +265,16 @@ async def test_key_resolution_does_not_consume_search_budget():
         # The budget is untouched: a real price search still has its full allowance.
         assert adapter._budget.remaining(adapter.name) == 1
         await adapter.aclose()
+
+
+@respx.mock
+async def test_a_401_invalidates_the_cached_key(sj_search):
+    # A rotated subscription key (401) must be dropped so the next search re-resolves it.
+    respx.get(url__startswith=f"{DEFAULT_API}/config").mock(return_value=httpx.Response(200, json={}))
+    respx.post(url__startswith=f"{DEFAULT_API}/search").mock(return_value=httpx.Response(401))
+    adapter = SJAdapter(min_interval=0.0, key="stalekey")
+    assert adapter._key == "stalekey"
+    quote = await adapter.quote_leg(_leg(datetime(2026, 7, 24, 8, 12, tzinfo=TZ), datetime(2026, 7, 24, 11, 5, tzinfo=TZ)))
+    await adapter.aclose()
+    assert quote.confidence is PriceConfidence.UNAVAILABLE
+    assert adapter._key is None  # cleared, so ensure_key re-resolves next time

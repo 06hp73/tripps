@@ -286,7 +286,12 @@ class AppState:
     async def _poll_loop(self) -> None:
         while True:
             await asyncio.sleep(self.settings.freerider_poll_seconds)
-            await self.refresh_freerider()
+            try:
+                await self.refresh_freerider()
+            except asyncio.CancelledError:
+                raise
+            except Exception:  # noqa: BLE001 - one failed poll must never kill the loop
+                log.exception("freerider poll iteration failed; will retry next interval")
 
     def start_polling(self) -> None:
         """Start the background refresh. The *first* fetch happens in `lifespan`, before the
@@ -945,9 +950,12 @@ async def ui_search(
         response, stats = await _run_search(
             state, origin, destination, service_date, constraints
         )
-    except HTTPException as exc:
+    except (HTTPException, FileNotFoundError) as exc:
+        # A missing GTFS feed (FileNotFoundError) or an unknown place (404) should render an
+        # honest message in the results pane, not a raw 500.
+        detail = exc.detail if isinstance(exc, HTTPException) else str(exc)
         return TEMPLATES.TemplateResponse(
-            request, "_results.html", {"error": exc.detail, "itineraries": []}, status_code=200
+            request, "_results.html", {"error": detail, "itineraries": []}, status_code=200
         )
 
     return TEMPLATES.TemplateResponse(

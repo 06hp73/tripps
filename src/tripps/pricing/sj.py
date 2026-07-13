@@ -285,6 +285,8 @@ class SJAdapter(HttpPriceAdapter):
         await self._limiter.acquire()
         client = await self.http()
         resp = await client.post(url, json=body, headers=self._headers(key))
+        if resp.status_code == 401:
+            self._key = None  # subscription key rotated; force re-resolution next search
         resp.raise_for_status()
         payload = resp.json()
         if not isinstance(payload, dict):
@@ -299,6 +301,8 @@ class SJAdapter(HttpPriceAdapter):
         client = await self.http()
         key = await self.ensure_key()
         resp = await client.get(url, params=params, headers=self._headers(key))
+        if resp.status_code == 401:
+            self._key = None  # subscription key rotated; force re-resolution next search
         resp.raise_for_status()
         return resp.json()
 
