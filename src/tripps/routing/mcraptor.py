@@ -230,6 +230,7 @@ def run_mcraptor(
             stats["route_scans"] += 1
             route = tt.routes[route_idx]
             per_km = floors.per_km_ore(route.info.mode, route.info.operator)
+            base_fare = floors.boarding_ore(route.info.mode, route.info.operator)
             rides: list[_Ride] = []
 
             for pos in range(first_pos, len(route.stops)):
@@ -272,7 +273,7 @@ def run_mcraptor(
                         boarding_fare = (
                             trip.precomputed_fare_ore
                             if trip.precomputed_fare_ore is not None
-                            else floors.boarding_ore(route.info.mode, route.info.operator)
+                            else base_fare  # hoisted: constant per route, not per (label, trip)
                         )
                         price = label.price_ore + boarding_fare
                         # The journey's departure is fixed by its first boarding.

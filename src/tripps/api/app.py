@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from collections import OrderedDict
 from contextlib import asynccontextmanager
 from datetime import date, datetime
@@ -94,6 +95,7 @@ class AppState:
         )
         self.errors: list[str] = []
         self._poller: asyncio.Task | None = None
+        self._scheduler: asyncio.Task | None = None
 
     # --- timetable --------------------------------------------------------
 
@@ -293,18 +295,39 @@ class AppState:
             except Exception:  # noqa: BLE001 - one failed poll must never kill the loop
                 log.exception("freerider poll iteration failed; will retry next interval")
 
+    async def _scheduler_loop(self) -> None:
+        """Periodic self-maintenance so a deploy needs no external cron: re-probe the price
+        sources, recalibrate floors from newly logged fares, and reload them into the router."""
+        from ..calibration import load_calibrated_floors, run_calibration
+        from ..monitoring import persist_canaries, run_canaries
+
+        while True:
+            await asyncio.sleep(self.settings.scheduler_seconds)
+            try:
+                persist_canaries(self.db, await run_canaries(self.settings))
+                run_calibration(self.db)
+                if self.orchestrator is not None:
+                    self.orchestrator.floors = load_calibrated_floors(self.db)
+            except asyncio.CancelledError:
+                raise
+            except Exception:  # noqa: BLE001 - maintenance must never take the server down
+                log.exception("scheduled maintenance failed; will retry next interval")
+
     def start_polling(self) -> None:
         """Start the background refresh. The *first* fetch happens in `lifespan`, before the
         app serves anything, so the very first search does not silently see zero cars."""
         self._poller = asyncio.create_task(self._poll_loop())
+        if self.settings.scheduler_seconds > 0:
+            self._scheduler = asyncio.create_task(self._scheduler_loop())
 
     async def stop(self) -> None:
-        if self._poller is not None:
-            self._poller.cancel()
-            try:
-                await self._poller
-            except asyncio.CancelledError:
-                pass
+        for task in (self._poller, self._scheduler):
+            if task is not None:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
         await self.freerider_client.aclose()
         if self.orchestrator is not None:
             for adapter in self.orchestrator.adapters:
@@ -828,11 +851,17 @@ def _health_snapshot(state: AppState) -> dict:
     # Split the scheduled-canary rows out from the live per-request source health.
     canaries = {k.removeprefix("canary:"): v for k, v in all_health.items() if k.startswith("canary:")}
     sources = {k: v for k, v in all_health.items() if not k.startswith("canary:")}
+    feed_path = state.settings.gtfs_zip_path
+    feed_age_hours = None
+    if feed_path.exists():
+        feed_age_hours = round((time.time() - feed_path.stat().st_mtime) / 3600, 1)
     return {
         "status": "ok" if not state.errors else "degraded",
         "errors": state.errors,
         "timetable_date": state.timetable_date.isoformat() if state.timetable_date else None,
         "timetable_dates_cached": [d.isoformat() for d in state._timetables],
+        "feed_age_hours": feed_age_hours,
+        "feed_stale": feed_age_hours is not None and feed_age_hours > state.settings.feed_stale_hours,
         "stops": state.current_timetable.num_stops if state.current_timetable else 0,
         "trips": state.current_timetable.num_trips if state.current_timetable else 0,
         "freerider_offers": len(state.freerider_offers),

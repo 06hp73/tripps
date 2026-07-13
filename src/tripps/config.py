@@ -112,6 +112,13 @@ class Settings(BaseSettings):
     #: planner, not a sniper, so we stay well back from that.
     freerider_poll_seconds: int = 300
 
+    #: Background maintenance interval: re-run price-source canaries, recalibrate the routing
+    #: floors from newly logged fares, and reload them into the live router. 0 disables it.
+    scheduler_seconds: int = 6 * 3600
+
+    #: A GTFS feed older than this reads as stale on /health - it should be re-fetched daily.
+    feed_stale_hours: int = 48
+
     def ensure_dirs(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
