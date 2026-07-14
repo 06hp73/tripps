@@ -231,6 +231,11 @@ def run_mcraptor(
             route = tt.routes[route_idx]
             per_km = floors.per_km_ore(route.info.mode, route.info.operator)
             base_fare = floors.boarding_ore(route.info.mode, route.info.operator)
+            # Do this route's trips carry differing exact fares (one flight per departure)?
+            # If so, a LATER trip can be strictly cheaper, and the usual "only the earliest
+            # catchable trip matters" boarding shortcut is unsound. Hoisted per route: GTFS
+            # trips are all None and Freerider trips share one fare, so both stay False.
+            fares_vary = len({t.precomputed_fare_ore for t in route.trips}) > 1
             rides: list[_Ride] = []
 
             for pos in range(first_pos, len(route.stops)):
@@ -268,7 +273,9 @@ def run_mcraptor(
                 for label in prev_bag[stop_idx]:
                     ready = label.ready_at(query.min_transfer_seconds)
                     unboarded = label.departure == INFINITY
-                    for trip_idx in _boardable_trips(route, pos, ready, query, unboarded):
+                    for trip_idx in _boardable_trips(
+                        route, pos, ready, query, unboarded, fares_vary
+                    ):
                         trip = route.trips[trip_idx]
                         boarding_fare = (
                             trip.precomputed_fare_ore
@@ -310,7 +317,7 @@ def run_mcraptor(
 
 
 def _boardable_trips(
-    route, pos: int, ready: int, query: RaptorQuery, unboarded: bool
+    route, pos: int, ready: int, query: RaptorQuery, unboarded: bool, fares_vary: bool
 ) -> list[int]:
     """Which trips on this route are worth boarding at `pos`, given readiness at `ready`.
 
@@ -323,11 +330,20 @@ def _boardable_trips(
     frontier. Enumerating them is what turns this into a range query and what lets a cheap
     late-night coach be found alongside the fast morning one. The window and the cap keep
     that enumeration from running to the end of the service day on a busy urban route.
+
+    `fares_vary` breaks BOTH shortcuts. When each trip carries its own exact fare (one
+    flight per departure), a later trip can be strictly CHEAPER, so the mid-journey
+    "earliest only" rule would prune the cheapest journey the moment a feeder leg precedes
+    the flight, and the time-index thinning could sample away the one cheap departure.
+    Such routes enumerate every catchable trip in the window - they are synthetic and
+    small (domestic flights: at most a couple of dozen departures per airport pair per
+    day), so the full enumeration is bounded. The ride-level Pareto keeps only the
+    non-dominated ones.
     """
     first = route.earliest_trip_from(pos, ready)
     if first is None:
         return []
-    if not (unboarded and query.profile):
+    if not fares_vary and not (unboarded and query.profile):
         return [first]
 
     horizon = ready + query.profile_window_seconds
@@ -337,7 +353,7 @@ def _boardable_trips(
             break
         within.append(trip_idx)
     cap = query.max_departures_per_route
-    if len(within) <= cap:
+    if fares_vary or len(within) <= cap:
         return within
     # More departures than the cap. Taking the first `cap` in order would keep only the
     # earliest ones and silently drop the whole evening - and a cheap 22:55 coach is routinely

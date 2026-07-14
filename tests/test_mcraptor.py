@@ -386,7 +386,7 @@ def test_boardable_trips_spread_keeps_earliest_and_latest():
     tt = Net().route("R", ["STO", "GBG"], trips).build()
     route = tt.routes[0]
     q = _query(tt, "STO", "GBG", 0)
-    picks = _boardable_trips(route, 0, 0, q, unboarded=True)
+    picks = _boardable_trips(route, 0, 0, q, unboarded=True, fares_vary=False)
     assert len(picks) == q.max_departures_per_route == 16
     assert picks[0] == 0, "earliest departure kept"
     assert picks[-1] == 33, "latest departure kept (was dropped by first-16 truncation)"
@@ -399,4 +399,73 @@ def test_boardable_trips_under_cap_returns_all():
     trips = [[at(hhmm(8) + i * 1800), at(hhmm(11) + i * 1800)] for i in range(5)]
     tt = Net().route("R", ["STO", "GBG"], trips).build()
     q = _query(tt, "STO", "GBG", 0)
-    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=True) == [0, 1, 2, 3, 4]
+    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=True, fares_vary=False) == [
+        0, 1, 2, 3, 4,
+    ]
+
+
+# --- per-trip exact fares: a later trip can be strictly cheaper ------------------------------
+
+
+def test_mid_journey_cheaper_later_flight_survives():
+    """The cardinal repro: feeder train to the airport, then a flight route where the 20:00
+    departure (300 kr) is far cheaper than the 10:00 one (1500 kr). Once the feeder fixes the
+    journey's departure, the old mid-journey "earliest catchable only" shortcut boarded only
+    the 10:00 flight - the genuinely cheapest journey was never generated at all."""
+    tt = (
+        Net()
+        .route("FEED", ["STO", "ARN"], [[at(hhmm(8)), at(hhmm(9))]])
+        .route(
+            "AIR",
+            ["ARN", "GBG"],
+            [
+                [at(hhmm(10)), at(hhmm(11))],
+                [at(hhmm(20)), at(hhmm(21))],
+            ],
+            mode=TransportMode.FLIGHT,
+            operator="flight:test",
+            fares_ore=[150_000, 30_000],
+            synthetic=True,
+        )
+        .build()
+    )
+    res = run_mcraptor(tt, zero_floors(), _query(tt, "STO", "GBG", hhmm(7)))
+
+    prices = sorted(label.price_ore for label in res.labels)
+    assert 30_000 in prices, "the cheaper LATER flight must be boardable mid-journey"
+    assert res.labels[0].price_ore == 30_000, "and it is the cheapest label"
+
+
+def test_same_fare_route_keeps_the_single_boarding_shortcut_mid_journey():
+    """Freerider-shaped route: every trip carries the SAME fare, so mid-journey the earliest
+    catchable trip still dominates and the fast path must stay."""
+    from tripps.routing.mcraptor import _boardable_trips
+
+    trips = [[at(hhmm(10 + i)), at(hhmm(11 + i))] for i in range(3)]
+    tt = Net().route(
+        "CAR", ["STO", "GBG"], trips, fares_ore=[5_000, 5_000, 5_000], synthetic=True
+    ).build()
+    q = _query(tt, "STO", "GBG", 0)
+    # fares do not vary -> mid-journey shortcut intact
+    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=False, fares_vary=False) == [0]
+    # varying fares -> every catchable trip is generated, even mid-journey
+    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=False, fares_vary=True) == [
+        0, 1, 2,
+    ]
+
+
+def test_cap_never_drops_the_cheapest_varying_fare_trip():
+    """With 20 departures and cap 16, the time-index spread drops indices {2,7,12,17}. For a
+    fare-carrying route the cheapest flight could sit exactly there - fare-varying routes skip
+    the thinning entirely, so the min-fare departure always stays reachable."""
+    fares = [100_000] * 20
+    fares[12] = 5_000  # an index the linspace sample would have dropped
+    trips = [[at(hhmm(6) + i * 1800), at(hhmm(9) + i * 1800)] for i in range(20)]
+    tt = Net().route(
+        "AIR", ["ARN", "GBG"], trips,
+        mode=TransportMode.FLIGHT, operator="flight:test",
+        fares_ore=fares, synthetic=True,
+    ).build()
+    res = run_mcraptor(tt, zero_floors(), _query(tt, "ARN", "GBG", 0))
+
+    assert min(label.price_ore for label in res.labels) == 5_000
