@@ -275,8 +275,13 @@ class Database:
             if age > 60:
                 return None
             confidence = PriceConfidence.UNAVAILABLE
-        elif stored is PriceConfidence.ESTIMATED:
-            confidence = PriceConfidence.ESTIMATED  # fare tables do not go stale like quotes
+        elif stored is PriceConfidence.ESTIMATED and age <= row["ttl_seconds"]:
+            # Within TTL an estimate is served as-is. Past it, it ages to STALE like any
+            # other quote (the elif chain falls through): FlixBus's "cheapest departure that
+            # day" fallback is a live yield-managed number, and serving it frozen forever
+            # presented last month's price as today's. A static fare table merely re-quotes
+            # locally on the refetch, so nothing is lost by letting estimates age.
+            confidence = PriceConfidence.ESTIMATED
         elif age > row["ttl_seconds"]:
             confidence = PriceConfidence.STALE
         else:

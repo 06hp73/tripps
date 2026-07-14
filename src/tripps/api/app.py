@@ -16,7 +16,7 @@ import logging
 import time
 from collections import OrderedDict
 from contextlib import asynccontextmanager
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, Form, HTTPException, Query, Request
@@ -298,7 +298,9 @@ class AppState:
 
     async def _scheduler_loop(self) -> None:
         """Periodic self-maintenance so a deploy needs no external cron: re-probe the price
-        sources, recalibrate floors from newly logged fares, and reload them into the router."""
+        sources, recalibrate floors from newly logged fares, reload them into the router, and
+        evict dead quote-cache rows (each searched departure mints a row keyed on its exact
+        datetime, never queried again once the date passes - unpurged, the table only grows)."""
         from ..calibration import load_calibrated_floors, run_calibration
         from ..monitoring import persist_canaries, run_canaries
 
@@ -309,6 +311,11 @@ class AppState:
                 run_calibration(self.db)
                 if self.orchestrator is not None:
                     self.orchestrator.floors = load_calibrated_floors(self.db)
+                # Retention comfortably above every quote TTL (longest is 24 h), so a purge
+                # never removes a row another code path could still serve as CACHED/STALE.
+                purged = self.db.purge_quotes(timedelta(days=3))
+                if purged:
+                    log.info("purged %d expired quote-cache rows", purged)
             except asyncio.CancelledError:
                 raise
             except Exception:  # noqa: BLE001 - maintenance must never take the server down

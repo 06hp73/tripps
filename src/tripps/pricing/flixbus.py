@@ -83,8 +83,15 @@ def parse_search(payload: dict) -> list[FlixDeparture]:
         for uid, item in results.items():
             try:
                 price = item["price"]
-                # `total_with_platform_fee` is absent on some legacy responses.
-                with_fee = price.get("total_with_platform_fee", price["total"])
+                # `total_with_platform_fee` is absent on some legacy responses - and can be
+                # PRESENT with a JSON null, which .get(key, default) does not paper over. The
+                # `or` collapses both to the plain total, and the ore conversions run inside
+                # this guard so one malformed departure skips instead of aborting the whole
+                # parse (a raised TypeError here escaped quote_leg's httpx/ValueError net and
+                # unpriced the leg entirely).
+                with_fee = price.get("total_with_platform_fee") or price["total"]
+                total_ore = ore_from_major(price["total"])
+                total_with_fee_ore = ore_from_major(with_fee)
                 departure = datetime.fromisoformat(item["departure"]["date"])
                 arrival = datetime.fromisoformat(item["arrival"]["date"])
             except (KeyError, TypeError, ValueError):
@@ -95,8 +102,8 @@ def parse_search(payload: dict) -> list[FlixDeparture]:
                     uid=item.get("uid", uid),
                     departure=departure,
                     arrival=arrival,
-                    total_ore=ore_from_major(price["total"]),
-                    total_with_fee_ore=ore_from_major(with_fee),
+                    total_ore=total_ore,
+                    total_with_fee_ore=total_with_fee_ore,
                     status=str(item.get("status", "")),
                     transfer_type=str(item.get("transfer_type", "")),
                     seats_left=available.get("seats"),

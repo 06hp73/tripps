@@ -127,6 +127,32 @@ def test_parse_search_tolerates_missing_platform_fee():
     assert dep.total_with_fee_ore == dep.total_ore == 10_000
 
 
+def test_parse_search_tolerates_null_platform_fee_and_keeps_other_departures():
+    """A PRESENT-but-null fee is not covered by .get's default; it used to escape as a
+    TypeError from ore_from_major OUTSIDE the guard, aborting the whole day's parse (and
+    quote_leg's httpx/ValueError net does not catch TypeError, so the leg went unpriced)."""
+    good = {
+        "uid": "good",
+        "price": {"total": 200, "total_with_platform_fee": 211},
+        "departure": {"date": "2026-07-24T09:30:00+02:00"},
+        "arrival": {"date": "2026-07-24T15:45:00+02:00"},
+        "status": "available",
+    }
+    nulled = {
+        "uid": "nulled",
+        "price": {"total": 100, "total_with_platform_fee": None},
+        "departure": {"date": "2026-07-24T07:30:00+02:00"},
+        "arrival": {"date": "2026-07-24T13:45:00+02:00"},
+        "status": "available",
+    }
+    payload = {"trips": [{"results": {"good": good, "nulled": nulled}}]}
+    departures = parse_search(payload)
+    assert len(departures) == 2, "a null fee must not abort the parse"
+    by_uid = {d.uid: d for d in departures}
+    assert by_uid["nulled"].total_with_fee_ore == 10_000  # null collapses to the plain total
+    assert by_uid["good"].total_with_fee_ore == 21_100
+
+
 # --- FlixBus adapter over mocked HTTP --------------------------------------
 
 

@@ -192,6 +192,13 @@ class PricingOrchestrator:
             return Quote.unavailable(source=adapter.name, note=str(exc))
         except Exception as exc:  # noqa: BLE001 - an adapter bug must not empty the results
             log.exception("adapter %s raised on leg %s", adapter.name, leg.service_ref)
+            # Same principle as the BudgetExceeded branch: a stale cached number beats no
+            # number. Without this, a transient upstream blip unpriced the leg and (under
+            # require_priced) silently hid an itinerary that may be the genuinely cheapest.
+            if self.db is not None:
+                stale = self.db.get_quote(adapter.name, leg)
+                if stale is not None and stale.is_priced:
+                    return stale
             return Quote.unavailable(source=adapter.name, note=f"pricing failed: {exc}")
 
         if self.db is not None:
