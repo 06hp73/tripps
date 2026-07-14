@@ -322,6 +322,121 @@ async def test_pass_adapter_prices_a_jointly_covered_leg_free():
     assert "Region One" in quote.note and "Region Two" in quote.note
 
 
+# --- Skånetrafiken cross-county over-coverage guard (denied_stops) -----------
+
+# Real GTFS ids, because the registry's denied_stops are keyed on them.
+SK_MALMO = Stop(id="740000002", name="Malmö C", lat=55.609, lon=13.000)
+SK_LUND = Stop(id="740000120", name="Lund C", lat=55.708, lon=13.187)
+SK_OSBY = Stop(id="740000295", name="Osby", lat=56.380, lon=13.994)  # northern SKÅNE
+SK_BASTAD = Stop(id="740001603", name="Båstad", lat=56.432, lon=12.907)  # SKÅNE
+SK_SOLVESBORG = Stop(id="740000079", name="Sölvesborg", lat=56.050, lon=14.583)  # Blekinge
+SK_ALMHULT = Stop(id="740000045", name="Älmhult", lat=56.551, lon=14.137)  # Kronoberg
+SK_HALMSTAD = Stop(id="740000080", name="Halmstad C", lat=56.669, lon=12.865)  # Halland
+
+
+def _skane_cov():
+    from tripps.passes import load_cards
+
+    stops = (SK_MALMO, SK_LUND, SK_OSBY, SK_BASTAD, SK_SOLVESBORG, SK_ALMHULT, SK_HALMSTAD)
+    b = TimetableBuilder()
+    for s in stops:
+        b.add_stop(s)
+    b.add_trip(
+        RouteInfo(id="ore", mode=TransportMode.TRAIN, operator="Öresundståg"),
+        [s.id for s in stops],
+        Trip(id="o1", arrivals=list(range(0, 42, 6)), departures=list(range(0, 42, 6))),
+    )
+    # The agency's OWN vehicle reach includes the out-of-county stations (Pågatåg Nordost +
+    # västkusten run there) - exactly the over-coverage the denied_stops must fence off.
+    return PassCoverage(
+        b.build(),
+        cards={"skanetrafiken": load_cards()["skanetrafiken"]},
+        agency_stops={"Skånetrafiken": [s.id for s in stops]},
+    )
+
+
+def test_skane_card_never_frees_out_of_county_stations():
+    """The card's own trains reach Blekinge/Kronoberg/Halland, but the Skåne card is not
+    valid there - freeing those legs would be lying about a real fare."""
+    cov = _skane_cov()
+    assert not cov.covers("skanetrafiken", _leg("Öresundståg", SK_LUND, SK_SOLVESBORG))
+    assert not cov.covers("skanetrafiken", _leg("Öresundståg", SK_MALMO, SK_ALMHULT))
+    assert not cov.covers("skanetrafiken", _leg("Öresundståg", SK_LUND, SK_HALMSTAD))
+    assert not cov.covers("skanetrafiken", _leg("Öresundståg", SK_HALMSTAD, SK_MALMO))
+
+
+def test_skane_card_still_covers_all_of_skane_including_the_north():
+    cov = _skane_cov()
+    assert cov.covers("skanetrafiken", _leg("Öresundståg", SK_MALMO, SK_LUND))
+    assert cov.covers("skanetrafiken", _leg("Öresundståg", SK_LUND, SK_OSBY))
+    assert cov.covers("skanetrafiken", _leg("Öresundståg", SK_MALMO, SK_BASTAD))
+
+
+def test_extra_region_stops_restore_a_station_the_pta_buses_never_serve():
+    """Hallandstrafiken's own feed vehicles are buses; every train at Halmstad C runs under a
+    train operator's agency, so the county's MAIN station is absent from the agency-derived
+    region. extra_region_stops puts it back as a full region member - single-card and
+    combined coverage alike - because the card genuinely covers it."""
+    from tripps.passes import load_cards
+
+    card = load_cards()["hallandstrafiken"]
+    assert "740000080" in card.extra_region_stops
+
+    laholm = Stop(id="740000058", name="Laholm", lat=56.502, lon=13.000)
+    halmstad = Stop(id="740000080", name="Halmstad C", lat=56.669, lon=12.865)
+    b = TimetableBuilder()
+    b.add_stop(laholm)
+    b.add_stop(halmstad)
+    b.add_trip(
+        RouteInfo(id="ore", mode=TransportMode.TRAIN, operator="Öresundståg"),
+        [laholm.id, halmstad.id],
+        Trip(id="o1", arrivals=[0, 600], departures=[0, 600]),
+    )
+    cov = PassCoverage(
+        b.build(),
+        cards={"hallandstrafiken": card},
+        # The agency's own (bus) reach includes Laholm's parent but NOT the Halmstad rail one.
+        agency_stops={"Hallandstrafiken": [laholm.id]},
+    )
+    assert cov.covers("hallandstrafiken", _leg("Öresundståg", laholm, halmstad))
+
+
+# --- combined coverage must not pool border stops -----------------------------
+
+
+def test_combined_border_stops_do_not_bridge_a_gap_between_two_cards():
+    """SC lies in NEITHER card's region; both merely name it as a single-card border
+    extension. Pooling border stops as covered let the pair 'jointly' free SA->SD across a
+    hop neither card covers - the union must be region stops only."""
+    reg1 = TravelCard(
+        id="reg1", name="Region One", region="R1",
+        honored_operators=frozenset({"Kust"}), coverage_model="region-stops",
+        region_agencies=frozenset({"Ag1"}), border_stops=frozenset({"SC"}),
+    )
+    reg2 = TravelCard(
+        id="reg2", name="Region Two", region="R2",
+        honored_operators=frozenset({"Kust"}), coverage_model="region-stops",
+        region_agencies=frozenset({"Ag2"}), border_stops=frozenset({"SC"}),
+    )
+    b = TimetableBuilder()
+    for s in (SA, SB, SC, SD):
+        b.add_stop(s)
+    b.add_trip(
+        RouteInfo(id="k", mode=TransportMode.TRAIN, operator="Kust"),
+        ["SA", "SB", "SC", "SD"],
+        Trip(id="k1", arrivals=[0, 6, 12, 18], departures=[0, 6, 12, 18]),
+    )
+    cov = PassCoverage(
+        b.build(),
+        cards={"reg1": reg1, "reg2": reg2},
+        agency_stops={"Ag1": ["SA", "SB"], "Ag2": ["SD"]},
+    )
+    # The gap hop SB->SC->SD is bridged only by border stops -> NOT combined-covered.
+    assert cov.combined_cover(["reg1", "reg2"], _through(SA, SD, ["SA", "SB", "SC", "SD"])) is None
+    # The single-card directional border extension is untouched: SB (region) -> SC (border).
+    assert cov.covers("reg1", _leg("Kust", SB, SC))
+
+
 # --- SL operator-only over-coverage guard (denied_stops) --------------------
 
 def test_sl_card_denies_pendeltag_to_uppsala_but_keeps_valid_legs():

@@ -98,6 +98,13 @@ class TravelCard:
     #: the ticket boundary: SL pendeltag 40 runs to Knivsta and Uppsala C, which need a UL
     #: fare. A leg touching a denied stop is never freed by this card.
     denied_stops: frozenset[str] = frozenset()
+    #: The under-coverage escape hatch, mirror of `denied_stops`: stations the card IS valid at
+    #: that the region derivation misses because the PTA's OWN feed vehicles never call there.
+    #: Hallandstrafiken is the canonical case - its buses serve town stops while every train at
+    #: Halmstad C runs under a train operator's agency, so the county's main station is absent
+    #: from the agency-derived region. Full region members (unlike `border_stops`, which are
+    #: endpoint-only extensions): they count for single-card and combined coverage alike.
+    extra_region_stops: frozenset[str] = frozenset()
     #: A per-relation / partial product (Movingo, Norrlandsresan) whose exact validity is not a
     #: region polygon and cannot be verified from the feed. Such a card is registered and shown
     #: but NEVER auto-frees a leg - modelling its region as a multi-county union would over-cover
@@ -169,6 +176,7 @@ def load_cards() -> dict[str, TravelCard]:
             confidence=entry.get("confidence", "reported-secondhand"),
             border_stops=frozenset(entry.get("border_stops", [])),
             denied_stops=frozenset(entry.get("denied_stops", [])),
+            extra_region_stops=frozenset(entry.get("extra_region_stops", [])),
             variant_gated=bool(entry.get("variant_gated", False)),
         )
     return cards
@@ -207,6 +215,9 @@ class PassCoverage:
             stops: set[str] = set()
             for agency in card.region_agencies:
                 stops |= by_agency.get(agency, set())
+            # Curated stations the card is valid at but the PTA's own vehicles never serve
+            # (Halmstad C for Hallandstrafiken: only train agencies call at the rail parent).
+            stops |= card.extra_region_stops
             self._region_stops[card.id] = frozenset(stops)
 
     def card(self, card_id: str) -> TravelCard | None:
@@ -312,9 +323,15 @@ class PassCoverage:
         ]
         if len(honoring) < 2:
             return None
+        # Region stops ONLY - border_stops stay out of the union on purpose. A border stop is a
+        # named single-card extension ("this card is valid TO that one neighbouring station"),
+        # valid only as an endpoint adjacent to the card's own region. Pooling them as ordinary
+        # covered stops let two cards' border extensions bridge a mid-path hop neither card
+        # covers (x-trafik + dalatrafik would jointly "cover" Gävle->Örebro via a gap both
+        # merely border), silently freeing a paid stretch. Cross-region handoffs still combine
+        # where the regions genuinely meet, via real region stops.
         covered_by = {
-            card.id: (self._region_stops.get(card.id, frozenset()) | card.border_stops)
-            - card.denied_stops
+            card.id: self._region_stops.get(card.id, frozenset()) - card.denied_stops
             for card in honoring
         }
         path = set(leg.via_stop_ids)

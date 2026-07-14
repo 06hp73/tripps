@@ -121,8 +121,12 @@ def test_operator_only_card_needs_no_region_gate():
 
 
 def test_card_with_no_region_in_feed_is_unsupported(coverage):
-    # Hallandstrafiken has no home agency in this mini feed, so it cannot free anything.
-    assert not coverage.is_supported("hallandstrafiken")
+    # Värmlandstrafik has no home agency in this mini feed (and, unlike Hallandstrafiken, no
+    # curated extra_region_stops), so its region is empty and it cannot free anything.
+    assert not coverage.is_supported("varmlandstrafik")
+    assert not coverage.covers("varmlandstrafik", _leg("Öresundståg", MALMO, LUND))
+    # Hallandstrafiken keeps a non-empty region even here (curated Halmstad C), but still
+    # cannot free a leg whose endpoints lie outside it.
     assert not coverage.covers("hallandstrafiken", _leg("Öresundståg", MALMO, LUND))
 
 

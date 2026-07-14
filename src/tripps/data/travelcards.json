@@ -124,8 +124,19 @@
   "region_agencies": [
    "Skånetrafiken"
   ],
-  "coverage_note": "Zone-based. Skånetrafiken-agency legs (incl. Pågatåg) are operator-only-safe within Skåne; Öresundståg/Krösatåg free ONLY within Skåne stops, never onward to Göteborg/Västtrafik or Copenhagen. Safe only for the full-region (stor zon / hela Skåne) card variant.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740000045",
+   "740000058",
+   "740000073",
+   "740000079",
+   "740000080",
+   "740000258",
+   "740000366",
+   "740000441",
+   "740011176"
+  ],
+  "coverage_note": "Zone-based. Skånetrafiken-agency legs (incl. Pågatåg) are operator-only-safe within Skåne; Öresundståg/Krösatåg free ONLY within Skåne stops, never onward to Göteborg/Västtrafik or Copenhagen. Safe only for the full-region (stor zon / hela Skåne) card variant. denied_stops: Skånetrafiken's OWN trains cross the county line (Pågatåg Nordost + västkusten), putting out-of-county stations in the agency's stop set where the Skåne card is NOT valid - Älmhult (740000045) + Markaryd (740000258) in Kronoberg; Karlshamn (740000073), Sölvesborg (740000079), Mörrum (740000366), Olofström (740000441 + bussterminal 740011176) in Blekinge; Halmstad C (740000080) + Laholm (740000058) in Halland. Residual: out-of-county village BUS stops served by Skånetrafiken buses are not individually denied; express-bus legs ending at one could still be freed wrongly (known, low exposure).",
+  "confidence": "verified-corrected"
  },
  {
   "id": "ul-uppsala",
@@ -231,8 +242,11 @@
   "region_agencies": [
    "Hallandstrafiken"
   ],
-  "coverage_note": "Zone-based, own bus absent from feed. 'Västtrafik' here means Västtågen WITHIN Halland only — including VG's home agency is safe ONLY under strict region-stops gating on Halland-internal stops (needs station-level fencing). Pågatåg into Halland is Skånetrafiken agency, not honored.",
-  "confidence": "verified-in-docs"
+  "extra_region_stops": [
+   "740000080"
+  ],
+  "coverage_note": "Zone-based, own bus absent from feed. 'Västtrafik' here means Västtågen WITHIN Halland only — including VG's home agency is safe ONLY under strict region-stops gating on Halland-internal stops (needs station-level fencing). Pågatåg into Halland is Skånetrafiken agency, not honored. extra_region_stops: Halmstad C (740000080) — the county's main station, inside Halland and covered by the card, but absent from the agency-derived region because every train there runs under a train operator's agency while Hallandstrafiken's own feed vehicles are buses that never call at the rail parent.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "lanstrafiken-kronoberg",
