@@ -43,6 +43,11 @@ class PricingBudget(BaseSettings):
     phase2_timeout_seconds: float = 35.0
     #: Per-source politeness delay between calls, seconds.
     min_interval_seconds: float = 0.35
+    #: After ranking, probe whether an SJ through fare is beaten by two tickets split at a major
+    #: hub, and annotate the leg with the saving. Costs a few extra SJ price calls on the shown
+    #: itineraries only (bounded by the same per-source budget); the number tripps stands behind
+    #: is unchanged. Off-switch for when those extra calls are unwanted.
+    enable_split_tickets: bool = True
 
     model_config = SettingsConfigDict(env_prefix="TRIPPS_BUDGET_")
 

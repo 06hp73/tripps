@@ -156,6 +156,12 @@ class Quote(BaseModel):
     #: `amount_ore == rental.price_ore` identity survives a surcharge landing on the charged
     #: leg. It IS part of the itinerary total (see `Itinerary.total_price_ore`).
     surcharge_ore: int | None = None
+    #: An advisory (not a re-price): if buying two separate tickets split at a major hub is
+    #: firmly cheaper than this through fare, the human-readable saving is recorded here. It
+    #: does NOT change `amount_ore` or the itinerary total - the authoritative price stays the
+    #: bookable through fare - because a split is two contracts with no rebooking protection
+    #: across the break, an honest tip rather than the number we stand behind.
+    split_hint: str | None = None
 
     @field_validator("amount_ore", "surcharge_ore")
     @classmethod
@@ -208,6 +214,11 @@ class Leg(BaseModel):
     #: whether the union of held travel cards covers the *whole* path of a through-train, not
     #: just its endpoints. In-process only - excluded from serialization to keep the API lean.
     via_stop_ids: tuple[str, ...] = Field(default=(), exclude=True, repr=False)
+    #: Departure and arrival wall-clock times at each stop in `via_stop_ids`, index-aligned.
+    #: Let a caller reconstruct a sub-leg board X -> alight Y of this same physical train (its
+    #: departure at X, arrival at Y) to price a split ticket. In-process only, not serialized.
+    via_departures: tuple[datetime, ...] = Field(default=(), exclude=True, repr=False)
+    via_arrivals: tuple[datetime, ...] = Field(default=(), exclude=True, repr=False)
 
     @field_validator("arrival")
     @classmethod

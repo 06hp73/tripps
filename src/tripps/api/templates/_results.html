@@ -82,6 +82,7 @@
               <strong>{{ leg.from_stop.name }}</strong> → <strong>{{ leg.to_stop.name }}</strong>
               {% if leg.operator %}<br><span class="meta">{{ leg.operator }}{% if leg.headsign %} · {{ leg.headsign }}{% endif %}</span>{% endif %}
               {% if leg.quote and leg.quote.note %}<br><span class="meta">{{ leg.quote.note }}</span>{% endif %}
+              {% if leg.quote and leg.quote.split_hint %}<br><span class="split-tip">💡 {{ leg.quote.split_hint }}</span>{% endif %}
             </span>
             <span class="cost">
               {% if leg.mode.value == "walk" %}

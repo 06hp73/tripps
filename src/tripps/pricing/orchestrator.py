@@ -32,6 +32,7 @@ from ..config import CacheTTL, PricingBudget
 from ..db import Database
 from ..interfaces import PriceAdapter
 from ..models import (
+    SEK,
     Itinerary,
     Leg,
     PriceConfidence,
@@ -56,6 +57,8 @@ from ..routing.journey import (
 from ..surcharges import apply_arlanda_fee
 from .base import BudgetExceeded, CallBudget
 from .freerider import FreeriderAdapter
+from .sj import SOURCE as SJ_SOURCE
+from .split import sub_legs as _split_sub_legs
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +74,23 @@ _FLOOR_EXEMPT_SOURCES = frozenset({PASS_SOURCE, TICKITAL_SOURCE})
 #: Confidences firm enough to decide "the rental beats the singles". A stale or estimated
 #: single is too soft to justify pushing a traveller into a terms-risky rental.
 _FIRM_CONFIDENCES = frozenset({PriceConfidence.EXACT, PriceConfidence.CACHED})
+
+#: Don't trumpet a split saving below this - the two-contract hassle is not worth a few kronor,
+#: and a saving that small is within the noise of a re-priced yield-managed fare.
+_SPLIT_MIN_SAVING_ORE = 500
+
+
+def _splittable(leg: Leg) -> bool:
+    """An SJ leg firmly enough priced, with a known stop path, to test a split against."""
+    q = leg.quote
+    return (
+        q is not None
+        and q.source == SJ_SOURCE
+        and q.amount_ore is not None
+        and q.confidence in _FIRM_CONFIDENCES
+        and q.split_hint is None
+        and bool(leg.via_stop_ids)
+    )
 
 #: Ordering of confidences when the UI must pick "the weakest link".
 _CONFIDENCE_RANK = {
@@ -221,6 +241,98 @@ class PricingOrchestrator:
             floor_ore=floor,
             actual_ore=quote.amount_ore,
         )
+
+    # --- split ticketing (advisory) ---------------------------------------
+
+    async def _price_sub_leg(self, leg: Leg) -> Quote:
+        """Price a synthetic split sub-leg. Like `_quote_leg`, but never records a floor
+        violation or a calibration sample: a sub-leg was not routed, so its fare says nothing
+        about the routing bound, and a spurious violation would wrongly alarm the traveller."""
+        adapter = self._adapter_for(leg)
+        if adapter is None:
+            return Quote.unavailable(source="none")
+        if self.db is not None:
+            cached = self.db.get_quote(adapter.name, leg)
+            if cached is not None and cached.confidence in (
+                PriceConfidence.CACHED,
+                PriceConfidence.ESTIMATED,
+            ):
+                return cached
+        try:
+            quote = await adapter.quote_leg(leg)
+        except BudgetExceeded as exc:
+            return Quote.unavailable(source=adapter.name, note=str(exc))
+        except Exception as exc:  # noqa: BLE001 - a split probe must never empty the results
+            log.exception("split sub-leg pricing failed on %s", leg.service_ref)
+            return Quote.unavailable(source=adapter.name, note=f"pricing failed: {exc}")
+        if self.db is not None and quote.is_priced:
+            self.db.put_quote(adapter.name, leg, quote, self.ttl.for_mode(leg.mode))
+        return quote
+
+    async def _best_split_hint(self, leg: Leg) -> str | None:
+        """The cheapest firm split of this SJ leg, as advisory text, or None if none undercuts
+        the through fare by a worthwhile margin. Both halves must be firmly priced on the same
+        train, so the saving is one a traveller can actually realise."""
+        through = leg.quote.amount_ore
+        best_total: int | None = None
+        best_name = ""
+        for name, first, second in _split_sub_legs(leg):
+            q1 = await self._price_sub_leg(first)
+            if q1.amount_ore is None or q1.confidence not in _FIRM_CONFIDENCES:
+                continue
+            q2 = await self._price_sub_leg(second)
+            if q2.amount_ore is None or q2.confidence not in _FIRM_CONFIDENCES:
+                continue
+            total = q1.amount_ore + q2.amount_ore
+            if best_total is None or total < best_total:
+                best_total, best_name = total, name
+        if best_total is None or through - best_total < _SPLIT_MIN_SAVING_ORE:
+            return None
+        saving = through - best_total
+        return (
+            f"Split at {best_name}: two separate SJ tickets total {best_total / SEK:.0f} kr, "
+            f"{saving / SEK:.0f} kr less than the {through / SEK:.0f} kr through fare "
+            f"(two tickets, no rebooking or delay protection across {best_name})."
+        )
+
+    async def _apply_split_tickets(self, shown: list[Itinerary]) -> None:
+        """Annotate SJ legs in the shown itineraries where a hub split beats the through fare.
+
+        Advisory only: neither `amount_ore` nor the itinerary total moves - the price tripps
+        stands behind stays the bookable through fare. Each distinct train is probed once (many
+        itineraries reuse it) and the hint is copied onto every leg that rides it.
+
+        Runs on its OWN fresh budget, not the search's: main pricing routinely spends the SJ
+        call allowance, and sharing it would leave the split probe unable to price either half
+        and silently find nothing. A separate allowance keeps this advisory bounded on its own
+        terms while never starving the authoritative pricing that precedes it.
+        """
+        if not self.budget.enable_split_tickets:
+            return
+        split_budget = CallBudget.from_settings(self.budget)
+        for adapter in self.adapters:
+            setter = getattr(adapter, "set_budget", None)
+            if setter is not None:
+                setter(split_budget)
+        try:
+            seen: dict[tuple[str, str, str], str | None] = {}
+            for itin in shown:
+                for i, leg in enumerate(itin.legs):
+                    if not _splittable(leg):
+                        continue
+                    key = (leg.from_stop.id, leg.to_stop.id, leg.departure.isoformat())
+                    if key not in seen:
+                        seen[key] = await self._best_split_hint(leg)
+                    hint = seen[key]
+                    if hint is not None:
+                        itin.legs[i] = leg.model_copy(
+                            update={"quote": leg.quote.model_copy(update={"split_hint": hint})}
+                        )
+        finally:
+            for adapter in self.adapters:
+                setter = getattr(adapter, "set_budget", None)
+                if setter is not None:
+                    setter(None)
 
     # --- one itinerary ----------------------------------------------------
 
@@ -488,6 +600,11 @@ class PricingOrchestrator:
         # that the top-N missed, so ticking train+bus+car shows a train, a bus and a car option
         # rather than a list of whichever mode happened to win on price.
         shown = _ensure_mode_coverage(ranked, _cover_modes(constraints), max_results)
+
+        # On the handful of itineraries actually shown, flag any SJ leg a hub split undercuts.
+        # Advisory-only and budget-bounded, so it neither reorders the results nor risks the
+        # cheapest being missed - it just tells the traveller how to shave the fare further.
+        await self._apply_split_tickets(shown)
 
         status = {a.name: (await a.health()).state.value for a in self.adapters}
 
