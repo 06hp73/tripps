@@ -50,7 +50,7 @@ from ..passes import (
 from ..routing.floors import PriceFloorModel
 from ..routing.journey import (
     collapse_equivalent,
-    leg_distance_km,
+    leg_floor_km,
     pattern_key,
     spread_by_departure,
 )
@@ -219,7 +219,10 @@ class PricingOrchestrator:
             # search zeroed (a card/rental honours it) was routed with a 0 lower bound, so a
             # paid quote below the calibrated floor pruned nothing - not a violation.
             return
-        floor = self.floors.floor_ore(leg.mode, leg.operator, leg_distance_km(leg))
+        # Audited over the ridden polyline (leg_floor_km) - the same distance the router
+        # integrated the floor over. Auditing the shorter endpoint chord would blind this
+        # detector exactly on the winding routes where the invariant breaks.
+        floor = self.floors.floor_ore(leg.mode, leg.operator, leg_floor_km(leg))
         if floor > quote.amount_ore:
             ctx.violations.append(
                 f"{leg.operator or leg.mode.value}: floor {floor} > actual {quote.amount_ore}"
@@ -231,7 +234,9 @@ class PricingOrchestrator:
             return
         if not self._prices_a_real_ticket(leg) or source in _FLOOR_EXEMPT_SOURCES:
             return
-        distance = leg_distance_km(leg)
+        # Record the ridden polyline distance, so calibration fits per_km against the metric
+        # the router actually applies it over. (Fit-on-chord + apply-on-path breaks the floor.)
+        distance = leg_floor_km(leg)
         floor = self.floors.floor_ore(leg.mode, leg.operator, distance)
         self.db.record_reprice_delta(
             source=source,

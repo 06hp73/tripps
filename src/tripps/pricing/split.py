@@ -93,6 +93,7 @@ def sub_legs(leg: Leg) -> list[tuple[str, Leg, Leg]]:
                 "via_stop_ids": leg.via_stop_ids[: i + 1],
                 "via_departures": leg.via_departures[: i + 1],
                 "via_arrivals": leg.via_arrivals[: i + 1],
+                "path_km": None,  # the parent's ridden distance is wrong for a half
             }
         )
         second = leg.model_copy(
@@ -103,6 +104,7 @@ def sub_legs(leg: Leg) -> list[tuple[str, Leg, Leg]]:
                 "via_stop_ids": leg.via_stop_ids[i:],
                 "via_departures": leg.via_departures[i:],
                 "via_arrivals": leg.via_arrivals[i:],
+                "path_km": None,  # the parent's ridden distance is wrong for a half
             }
         )
         out.append((hub.name, first, second))

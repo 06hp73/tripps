@@ -219,6 +219,13 @@ class Leg(BaseModel):
     #: departure at X, arrival at Y) to price a split ticket. In-process only, not serialized.
     via_departures: tuple[datetime, ...] = Field(default=(), exclude=True, repr=False)
     via_arrivals: tuple[datetime, ...] = Field(default=(), exclude=True, repr=False)
+    #: Ridden polyline length in km: the sum of the route's per-segment distances from board to
+    #: alight - the SAME distance McRAPTOR integrated its per-km price floor over. The floor
+    #: audit and calibration must use this, never the shorter endpoint straight-line: a per-km
+    #: rate fit on the chord but applied over the curve exceeds the true fare on winding routes,
+    #: silently breaking the floor <= true_price contract. None when the leg was not built by
+    #: the router (walks, synthetic injections). In-process only, not serialized.
+    path_km: float | None = Field(default=None, exclude=True, repr=False)
 
     @field_validator("arrival")
     @classmethod

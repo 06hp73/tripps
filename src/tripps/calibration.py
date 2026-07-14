@@ -10,6 +10,11 @@ Every time phase 2 prices a leg it already logs the (floor, actual) pair to `rep
 This module closes that loop: it reads those observations and fits a tighter per-operator
 floor, then stores it so the next search's router prunes better.
 
+All distances here are RIDDEN-PATH kilometres (`Leg.path_km`: the sum of the route's
+per-segment great-circle hops) - the same polyline McRAPTOR integrates `per_km` over. Fitting
+against the shorter endpoint straight-line and applying over the path would break the floor
+contract on winding routes; `db._migrate` wipes any samples recorded under that older metric.
+
 The one hard constraint is the floor's correctness contract, unchanged from floors.py:
 
     floor(leg) <= true_price(leg),  always.

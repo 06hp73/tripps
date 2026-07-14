@@ -146,7 +146,20 @@ CREATE TABLE IF NOT EXISTS operator_floor (
     samples      INTEGER NOT NULL,
     updated_at   TEXT NOT NULL
 );
+
+-- Free-form key/value store for one-time data migrations and schema-adjacent markers.
+CREATE TABLE IF NOT EXISTS meta (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
 """
+
+#: The distance metric calibration samples and fitted floors are expressed in. "path" = the
+#: ridden per-segment polyline the router integrates over. Rows recorded under the older
+#: endpoint-chord metric are poison for a path-metric fit (chord < path inflates actual/dist,
+#: and a fit surviving only on chord rows over-floors real journeys), so a metric change wipes
+#: both tables and lets calibration re-learn from scratch.
+_FLOOR_DISTANCE_METRIC = "path"
 
 
 def leg_cache_key(source: str, leg: Leg) -> str:
@@ -204,6 +217,21 @@ class Database:
         if "all_zone" not in cols:
             self._conn.execute(
                 "ALTER TABLE travel_card ADD COLUMN all_zone INTEGER NOT NULL DEFAULT 1"
+            )
+
+        # Floor-calibration distance metric changed (endpoint chord -> ridden path). Samples
+        # and fits recorded under the old metric would keep an over-tight floor alive, so they
+        # are dropped once; defaults apply until calibration re-learns from path-metric rows.
+        row = self._conn.execute(
+            "SELECT value FROM meta WHERE key = 'floor_distance_metric'"
+        ).fetchone()
+        if row is None or row["value"] != _FLOOR_DISTANCE_METRIC:
+            self._conn.execute("DELETE FROM reprice_delta")
+            self._conn.execute("DELETE FROM operator_floor")
+            self._conn.execute(
+                "INSERT INTO meta (key, value) VALUES ('floor_distance_metric', ?) "
+                "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                (_FLOOR_DISTANCE_METRIC,),
             )
 
     def close(self) -> None:

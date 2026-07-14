@@ -89,6 +89,9 @@ def _ride_leg(tt: Timetable, edge: RideEdge, service_date: date) -> Leg:
             from_service_seconds(trip.arrivals[i], service_date)
             for i in range(edge.board_pos, edge.alight_pos + 1)
         ),
+        # The exact distance the router accumulated per-km floor over (segment_km[i] spans
+        # stops[i]..stops[i+1], so board..alight is the [board_pos, alight_pos) slice).
+        path_km=sum(route.segment_km[edge.board_pos : edge.alight_pos]),
     )
 
 
@@ -107,11 +110,26 @@ def _walk_leg(
 
 
 def leg_distance_km(leg: Leg) -> float:
+    """Endpoint straight-line distance. Display/CO2 only - never for price floors."""
     from .timetable import haversine_km
 
     return haversine_km(
         leg.from_stop.lat, leg.from_stop.lon, leg.to_stop.lat, leg.to_stop.lon
     )
+
+
+def leg_floor_km(leg: Leg) -> float:
+    """The distance the price floor must be fit, applied, and audited over.
+
+    McRAPTOR integrates `per_km` over the route's per-segment polyline, so the floor audit and
+    the calibration samples must use that same ridden distance (`Leg.path_km`). Mixing metrics
+    is the cardinal bug: a per-km rate fit on the shorter endpoint chord, applied over the
+    longer curve, exceeds the very fare it was fit from on winding routes - undetectably,
+    because the detector would be measuring the chord too. The chord is only a fallback for
+    legs the router never priced per-segment (it is <= the polyline, so a floor computed from
+    it can only be lower = safe).
+    """
+    return leg.path_km if leg.path_km is not None else leg_distance_km(leg)
 
 
 def dedupe_itineraries(itineraries: list[Itinerary]) -> list[Itinerary]:
