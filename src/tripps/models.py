@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import enum
 import math
-from datetime import datetime
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, Field, computed_field, field_validator
 
@@ -278,6 +278,10 @@ class Itinerary(BaseModel):
     @computed_field
     @property
     def duration_seconds(self) -> int:
+        # Wall-nominal by design: same-tzinfo subtraction ignores UTC offsets, so this is the
+        # clock-face difference, consistent with every displayed time. On a DST-change night it
+        # differs from true elapsed by an hour; SearchConstraints.permits enforces max_duration
+        # on the TRUE elapsed instead.
         return int((self.arrival - self.departure).total_seconds())
 
     @computed_field
@@ -378,8 +382,19 @@ class SearchConstraints(BaseModel):
     include_freerider: bool = True
 
     def permits(self, itin: Itinerary) -> bool:
-        if self.max_duration_seconds is not None and itin.duration_seconds > self.max_duration_seconds:
-            return False
+        if self.max_duration_seconds is not None:
+            # Enforce on TRUE elapsed time. The displayed `duration_seconds` is wall-nominal
+            # by design (same-tzinfo subtraction ignores UTC offsets), which under-counts by
+            # an hour across the autumn DST fall-back - a 10h30m overnight journey would
+            # sneak past a 10h cap. Aware datetimes normalized to UTC measure the real gap;
+            # naive ones (tests, fixtures) subtract identically either way.
+            dep, arr = itin.departure, itin.arrival
+            if dep.tzinfo is not None and arr.tzinfo is not None:
+                elapsed = int((arr.astimezone(UTC) - dep.astimezone(UTC)).total_seconds())
+            else:
+                elapsed = itin.duration_seconds
+            if elapsed > self.max_duration_seconds:
+                return False
         if self.max_transfers is not None and itin.transfers > self.max_transfers:
             return False
         if self.earliest_departure is not None and itin.departure < self.earliest_departure:

@@ -23,11 +23,16 @@ A floor above the truth can prune the genuinely cheapest itinerary before it is 
 the fit is provably safe on the observed data and then discounted by a margin for headroom:
 
     per_km = min over observations of actual / distance      # cheapest per-km ever seen
-    base   = min over observations of (actual - per_km*dist) # always >= 0 by construction
+    base   = 0                                               # honestly: per-km-only
 
-For any observation i, `base + per_km*dist_i <= actual_i`, because both `min`s are taken
-over a set that includes i. Scaling both down by `margin < 1` keeps that true and leaves
-room for a future fare cheaper than anything seen so far. If a genuinely lower fare still
+The calibrated floor is deliberately per-km-only. A base derived from the same data as
+`base = min(actual - per_km*dist)` is structurally ZERO - per_km's own argmin zeroes its
+term and every other term is >= 0 by the choice of per_km - so pretending to fit one would
+be a fiction. (A genuine base needs a joint fit, e.g. the supporting line of the lower
+convex hull; noted as future work - a floor that is merely loose costs CPU, never
+correctness.) For any observation i, `per_km * dist_i <= actual_i` because the min is taken
+over a set that includes i. Scaling down by `margin < 1` keeps that true and leaves room
+for a future fare cheaper than anything seen so far. If a genuinely lower fare still
 appears, the existing floor-violation detector logs it and the calibration self-corrects on
 the next run.
 """
@@ -94,16 +99,15 @@ def calibrate(
             continue
         mode = Counter(m for m, _, _ in points).most_common(1)[0][0]
         per_km = min(actual / dist for _, dist, actual in points)
-        base = min(actual - per_km * dist for _, dist, actual in points)
-        base = max(0.0, base)
-        # Scale both down for headroom; safety is preserved because margin < 1.
+        # No base term: min(actual - per_km*dist) over the SAME points is structurally zero
+        # (per_km's argmin zeroes its own term; every other is >= 0), so computing one only
+        # dressed a constant 0 up as a fit. See the module docstring for the honest story.
         per_km_ore = int(per_km * margin)
-        base_ore = int(base * margin)
         calibrated.append(
             CalibratedFloor(
                 operator=operator,
                 mode=mode,
-                base_ore=base_ore,
+                base_ore=0,
                 per_km_ore=per_km_ore,
                 samples=len(points),
             )
