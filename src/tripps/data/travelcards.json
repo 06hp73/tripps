@@ -55,8 +55,11 @@
   "region_agencies": [
    "Din Tur"
   ],
-  "coverage_note": "Norrtåg only within Västernorrland (Sundsvall–Härnösand–Örnsköldsvik, Stöde–Sundsvall). Cross-county Norrtåg needs Norrlandsresan.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740000434"
+  ],
+  "coverage_note": "Norrtåg only within Västernorrland (Sundsvall–Härnösand–Örnsköldsvik, Stöde–Sundsvall). Cross-county Norrtåg needs Norrlandsresan. denied_stops (web-verified 2026-07, dintur.se: länskort 'inom Västernorrlands län'): Hoting (Strömsunds kommun, Jämtland) — Din Tur's own line 39 reaches it but the county card does not.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "jonkopings-lanstrafik",
@@ -72,8 +75,19 @@
   "region_agencies": [
    "Jönköpings Länstrafik"
   ],
-  "coverage_note": "Zone-based within county. Cross-county Sydtaxan tickets extend SJ kust-kust to Kalmar/Kronoberg (so SJ is not strictly county-internal). HARD LIMIT: never valid on SJ Regional or Västtåg into Västra Götaland (Göteborg/Borås). 'Västtrafik' and 'SJ' need strict region-stops gating; SJ high-speed over-coverage risk.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740000080",
+   "740001290",
+   "740000313",
+   "740000312",
+   "740000021",
+   "740000116",
+   "740000625",
+   "740000250",
+   "740000348"
+  ],
+  "coverage_note": "Zone-based within county. Cross-county Sydtaxan tickets extend SJ kust-kust to Kalmar/Kronoberg (so SJ is not strictly county-internal). HARD LIMIT: never valid on SJ Regional or Västtåg into Västra Götaland (Göteborg/Borås). 'Västtrafik' and 'SJ' need strict region-stops gating; SJ high-speed over-coverage risk. denied_stops (web-verified 2026-07, jlt.se periodbiljett + resor-over-lansgrans: areas are 1 zon/2 zoner/Hela länet, cross-county = separate Sydtaxan product): Halmstad C, Sannarp, Oskarström, Torup, Kinnared, Landeryd, Hyltebruk (Halland, HNJ-line); Växjö (Kronoberg); Hultsfred (Kalmar).",
+  "confidence": "verified-corrected"
  },
  {
   "id": "kalmar-lanstrafik",
@@ -89,8 +103,20 @@
   "region_agencies": [
    "Kalmar Länstrafik"
   ],
-  "coverage_note": "Zone-based; 5+ zones = full county länsgiltighet. Öresundståg beyond the county border needs border-spanning zones. Krösatåg line 185 to Linköping crosses into Östergötland — region-stops on Kalmar stops will under-credit that endpoint.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740000009",
+   "740001336",
+   "740000338",
+   "740000365",
+   "740000496",
+   "740001016",
+   "740000344",
+   "740000230",
+   "740001537",
+   "740000140"
+  ],
+  "coverage_note": "Zone-based; 5+ zones = full county länsgiltighet. KLT's own Krösatåg lines cross three borders, putting out-of-county stations in the agency stop set where the länskort is NOT valid (web-verified 2026-07: ÖT-side pricing applies inom Östergötland per ostgotatrafiken.se biljettsamarbeten/krosatagen; KLT sells a SEPARATE 30-dagars 'för resor utanför Kalmar län – exempelvis till Karlskrona' per kalmarlanstrafik.se). denied_stops: Linköping C, Tannefors, Åtvidaberg, Rimforsa, Falerum, Basthagen, Kisa (Östergötland); Karlskrona C, Bergåsa (Blekinge); Nässjö C (Jönköping). Sydtaxan relation-priced cross-county period tickets exist as separate products, matching the plain-card model.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "sl-stockholm",
@@ -188,7 +214,16 @@
   "region_agencies": [
    "Västtrafik"
   ],
-  "coverage_note": "Zone A/B/C; ABC = whole VG + Kungsbacka. Öresundståg capped at Åsa (Varberg is out-of-area). SJ = Regional only on 3 named lines, 2nd class — but GTFS agency 'SJ' also carries high-speed X2000/SJ3000 which is NOT free (over-coverage risk). 'Vy Norge' is an INFERRED, unverified GTFS string for the Göteborg–Halden Vy Tåg line.",
+  "denied_stops": [
+   "740000133",
+   "740000361",
+   "740000192",
+   "740000077",
+   "740000194",
+   "740000140",
+   "740000364"
+  ],
+  "coverage_note": "Zone A/B/C; ABC = whole VG + Kungsbacka. Öresundståg capped at Åsa (Varberg is out-of-area). SJ = Regional only on 3 named lines, 2nd class — but GTFS agency 'SJ' also carries high-speed X2000/SJ3000 which is NOT free (over-coverage risk). 'Vy Norge' is an INFERRED, unverified GTFS string for the Göteborg–Halden Vy Tåg line. denied_stops (web-verified 2026-07: base Zon ABC = 'Västtrafiks område (VGR och Kungsbacka kommun)'; the very existence of the purchasable 'Extra Örebro V' / 'Extra Län Jönköping' / 'Extra Värmland S' period supplements proves the base card stops at the border): Örebro C, Örebro Södra, Kumla, Hallsberg, Laxå (Örebro län, Kinnekulletåget/Västtågen); Nässjö C (Jönköping, Västtågen); Årjäng (Värmland, buss 755). Line-specific exception: VT tickets valid to Säffle on SJ Göteborg–Åmål–Säffle — not generalizable, not modeled.",
   "confidence": "verified-corrected"
  },
  {
@@ -209,7 +244,7 @@
    "740000630",
    "740000111"
   ],
-  "coverage_note": "Zone-based. Mälartåg only the Gävle–Furuvik stub. SJ only to/from Sundsvall with county/Sundsvall validity; other SJ needs a paid supplement (over-coverage risk on the 'SJ' agency). Region-stops set spans Gävleborg + the Sundsvall X-tåget corridor endpoint. border_stops: the county-validity 30-day/annual ticket gives free Tåg i Bergslagen travel across the Dalarna border to Fors (740000704), Horndals Bruk (740000630) and Avesta Krylbo (740000111), verified 2026-07 at xtrafik.se/tag-i-bergslagen; Falun is already in-region (X-tåget).",
+  "coverage_note": "Zone-based. Mälartåg only the Gävle–Furuvik stub. SJ only to/from Sundsvall with county/Sundsvall validity; other SJ needs a paid supplement (over-coverage risk on the 'SJ' agency). Region-stops set spans Gävleborg + the Sundsvall X-tåget corridor endpoint. border_stops: the county-validity 30-day/annual ticket gives free Tåg i Bergslagen travel across the Dalarna border to Fors (740000704), Horndals Bruk (740000630) and Avesta Krylbo (740000111), verified 2026-07 at xtrafik.se/tag-i-bergslagen. Re-verified 2026-07 in the geography audit: Sundsvall C/Västra + Njurundabommen are genuinely covered (xtrafik.se/sj + /stadsbussarna-i-sundsvall: länsbiljett carries Sundsvall rights incl. city buses), and Falun C is covered via the SAME TiB agreement ('obegränsat resande med TiB till/från Falun, Horndalsbruk, Fors och Avesta/Krylbo') — it sits in the agency stop set so it needs no border_stops entry, but the mechanism is the agreement, not X-tåget reach.",
   "confidence": "verified-in-docs"
  },
  {
@@ -225,8 +260,11 @@
   "region_agencies": [
    "Östgötatrafiken"
   ],
-  "coverage_note": "Zone-based (Liten/Mellan/Stor/Län). Krösatåg free only within Östergötland — never onward to Kalmar/Nässjö/Hultsfred. Region-stops set must include Tranås (Jönköping county) since Östgötapendeln terminates there and is covered.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740000084"
+  ],
+  "coverage_note": "Zone-based (Liten/Mellan/Stor/Län). Krösatåg free only within Östergötland — never onward to Kalmar/Nässjö/Hultsfred. Region-stops set must include Tranås (Jönköping county) since Östgötapendeln terminates there and is covered. denied_stops (web-verified 2026-07): Eksjö (Jönköping) — ÖT's own bus 631 reaches it but the län-biljett zone is 'Hela Östergötland' only.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "hallandstrafiken",
@@ -261,8 +299,12 @@
   "region_agencies": [
    "Länstrafiken Kronoberg"
   ],
-  "coverage_note": "Zone-based. Own bus network is NOT an agency in the intercity feed. SJ Regional valid within their area only (over-coverage risk: 'SJ' agency also = high-speed). Gate all to Kronoberg stops.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740043449",
+   "740000157"
+  ],
+  "coverage_note": "Zone-based. Own bus network is NOT an agency in the intercity feed. SJ Regional valid within their area only (over-coverage risk: 'SJ' agency also = high-speed). Gate all to Kronoberg stops. denied_stops (web-verified 2026-07): Halmstad C Resecentrum + Veinge (Halland) — reachable by the agency's buses but outside the county card; note Markarydsbanan Halmstad–Markaryd has NO passenger service until ~2028 (Trafikverket), planned operator is Pågatåg, not Krösatåg — revisit at opening.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "lanstrafiken-norrbotten",
@@ -291,8 +333,19 @@
   "region_agencies": [
    "Länstrafiken Västerbotten"
   ],
-  "coverage_note": "Norrtåg within Västerbotten (Umeå–Vännäs, Umeå–Örnsköldsvik stretch, Umeå–Lycksele/Hällnäs). Boundary stations not station-verified. Cross-county needs Norrlandsresan.",
-  "confidence": "reported-secondhand"
+  "denied_stops": [
+   "740000123",
+   "740013462",
+   "740000254",
+   "740014701",
+   "740000372",
+   "740023338",
+   "740023812",
+   "740026948",
+   "740000425"
+  ],
+  "coverage_note": "Norrtåg within Västerbotten (Umeå–Vännäs, Umeå–Örnsköldsvik stretch, Umeå–Lycksele/Hällnäs). Cross-county needs Norrlandsresan (tabussen.nu lansbiljett + resor-over-lansgranser, verified 2026-07: länsbiljett 'gäller på samtliga busslinjer i Västerbottens län samt på Norrtåg'). denied_stops: the agency's long inter-county bus lines (45, 100/20 Norrlandskusten) put out-of-county stops in the region set — Östersund C + busstation (Jämtland), Hammerdal (Jämtland), Gällivare, Jokkmokk, Haparanda x4 (Norrbotten) — none covered by the länsbiljett.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "lanstrafiken-jamtland",
@@ -305,8 +358,17 @@
   "region_agencies": [
    "Länstrafiken Jämtland"
   ],
-  "coverage_note": "Own bus absent from feed — only Norrtåg maps. Norrtåg Storlien–Åre–Östersund–Bräcke within Jämtland. Cross-county needs Norrlandsresan.",
-  "confidence": "verified-in-docs"
+  "denied_stops": [
+   "740000302",
+   "740024261",
+   "740000198",
+   "740000460",
+   "740000043",
+   "740001570",
+   "740013630"
+  ],
+  "coverage_note": "Own bus absent from feed — only Norrtåg maps. Norrtåg Storlien–Åre–Östersund–Bräcke within Jämtland. Cross-county needs Norrlandsresan (ltr.se resor-over-lansgrans, verified 2026-07: länskort is county-only). denied_stops: the agency's own buses cross the border, putting out-of-county stops in the region set — Mora + Orsa (Dalarna), Ljusdal + Färila (Gävleborg), Sollefteå + Örnsköldsvik C (Västernorrland), Dorotea (Västerbotten). Hoting (Strömsunds kommun) is IN-county and stays covered.",
+  "confidence": "verified-corrected"
  },
  {
   "id": "lanstrafiken-orebro",

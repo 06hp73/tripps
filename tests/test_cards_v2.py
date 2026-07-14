@@ -508,3 +508,65 @@ def test_itinerary_co2_estimate():
     assert 0 < train.co2_grams < flight.co2_grams
     assert flight.co2_grams > 40_000  # ~400 km * 127 g ~= 50 kg
     assert "co2_grams" in train.model_dump()
+
+
+# --- web-verified cross-county curation (2026-07 geography audit) -------------
+
+def test_curated_cards_never_free_verified_invalid_stations():
+    """Each PTA's own vehicles cross its county line, putting stations in the agency stop set
+    where the county card is NOT valid (web-verified per PTA). covers() must refuse them all,
+    while an in-county leg on the same card stays covered."""
+    from tripps.passes import load_cards
+
+    # card -> (home agency, honored operator to test with,
+    #          one in-county station id kept covered, [out-of-county denied ids])
+    cases = {
+        "kalmar-lanstrafik": ("Kalmar Länstrafik", "Krösatåg", "740000075",
+                              ["740000009", "740000230", "740000140"]),
+        "jonkopings-lanstrafik": ("Jönköpings Länstrafik", "Krösatåg", "740000140",
+                                  ["740000080", "740000250", "740000348"]),
+        "vasttrafik": ("Västtrafik", "Västtrafik", "740000002",
+                       ["740000133", "740000077", "740000140"]),
+        "ostgotatrafiken": ("Östgötatrafiken", "Östgötatrafiken", "740000009",
+                            ["740000084"]),
+        "din-tur": ("Din Tur", "Din Tur", "740000130",
+                    ["740000434"]),
+        "lanstrafiken-jamtland": ("Länstrafiken Jämtland", "Norrtåg", "740000123",
+                                  ["740001570", "740000302"]),
+        "lanstrafiken-vasterbotten": ("Länstrafiken Västerbotten", "Norrtåg", "740000175",
+                                      ["740000123", "740000254"]),
+        "lanstrafiken-kronoberg": ("Länstrafiken Kronoberg", "Öresundståg", "740000250",
+                                   ["740043449"]),
+    }
+    cards = load_cards()
+    for cid, (agency, operator, home_id, denied_ids) in cases.items():
+        stops = {sid: Stop(id=sid, name=sid, lat=60.0, lon=15.0)
+                 for sid in [home_id, *denied_ids, "HOME2"]}
+        b = TimetableBuilder()
+        for s in stops.values():
+            b.add_stop(s)
+        b.add_trip(
+            RouteInfo(id=f"r-{cid}", mode=TransportMode.TRAIN, operator=operator),
+            list(stops), Trip(id="t", arrivals=list(range(0, 6 * len(stops), 6)),
+                              departures=list(range(0, 6 * len(stops), 6))),
+        )
+        cov = PassCoverage(
+            b.build(), cards={cid: cards[cid]},
+            agency_stops={agency: list(stops)},  # the agency's reach includes them ALL
+        )
+        home, home2 = stops[home_id], stops["HOME2"]
+        assert cov.covers(cid, _leg(operator, home, home2)), f"{cid}: in-county must stay covered"
+        for did in denied_ids:
+            assert not cov.covers(cid, _leg(operator, home, stops[did])), (
+                f"{cid}: {did} is web-verified INVALID and must not be freed"
+            )
+
+
+def test_x_trafik_verified_valid_extensions_stay_covered():
+    """The audit confirmed x-trafik's Sundsvall + Falun coverage is genuine (cooperation
+    agreements) - the curation must NOT have denied them."""
+    from tripps.passes import load_cards
+
+    card = load_cards()["x-trafik"]
+    for sid in ("740000130", "740020045", "740001622", "740000030"):
+        assert sid not in card.denied_stops
