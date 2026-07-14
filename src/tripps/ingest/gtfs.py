@@ -28,7 +28,7 @@ import pickle
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from ..models import Stop, TransportMode
@@ -38,7 +38,19 @@ from ..timeutil import parse_gtfs_time
 log = logging.getLogger(__name__)
 
 #: Bump when the parse output changes shape, so stale pickles are ignored after an upgrade.
-_TIMETABLE_CACHE_VERSION = 1
+_TIMETABLE_CACHE_VERSION = 2
+
+#: Trips from the previous service day that run past midnight are re-expressed relative to this
+#: day's midnight; their id is suffixed so the tail is distinguishable from the same train's own
+#: same-day run (both can exist in one materialized timetable).
+_OVERNIGHT_SUFFIX = "#ovn"
+
+#: One nominal service day in seconds. The whole router treats a service day as a flat 24 h
+#: (`from_service_seconds`/`to_service_seconds` do naive-midnight arithmetic and just stamp the
+#: zone), so an overnight tail is re-timed by exactly this to stay consistent with every same-day
+#: post-midnight trip. A DST-adjusted shift would put overnight trips on a different clock than
+#: the rest of the feed - worse, not better.
+_DAY_SECONDS = 86400
 
 # --- route type vocabulary -------------------------------------------------
 # Extended GTFS route types, per the Google/Trafiklab extension. Ranges rather than
@@ -235,8 +247,17 @@ def load_timetable(
     zip_path: Path | str,
     service_date: date,
     config: GtfsConfig | None = None,
+    *,
+    merge_overnight: bool = False,
 ) -> tuple[Timetable, GtfsStats]:
-    """Parse a GTFS zip into a `Timetable` for one service date."""
+    """Parse a GTFS zip into a `Timetable` for one service date.
+
+    With `merge_overnight`, trips of the *previous* service day that run past midnight are also
+    materialized, truncated to their post-midnight tail and re-timed relative to this day's
+    midnight. Without it, an early-morning search misses a night train that departed yesterday
+    evening and is still running after 00:00 - it belongs to yesterday's service id, so a naive
+    single-day load never sees it.
+    """
     config = config or GtfsConfig()
     stats = GtfsStats()
     builder = TimetableBuilder()
@@ -271,14 +292,25 @@ def load_timetable(
                 stats.agencies.add(operator)
 
         services = active_service_ids(zf, service_date)
+        prev_date = service_date - timedelta(days=1)
+        services_prev: set[str] = (
+            active_service_ids(zf, prev_date) if merge_overnight else set()
+        )
 
-        kept_trips: dict[str, tuple[str, str | None]] = {}
+        # (route_id, headsign, runs_today, ran_previous_day). A trip id may run on both days -
+        # they are distinct vehicles, and yesterday's run crossing midnight is exactly the tail
+        # we want in addition to today's own run.
+        kept_trips: dict[str, tuple[str, str | None, bool, bool]] = {}
         for route_id, service_id, trip_id, headsign in _iter_columns(
             zf, "trips.txt", ["route_id", "service_id", "trip_id", "trip_headsign"]
         ):
-            if route_id not in kept_routes or service_id not in services:
+            if route_id not in kept_routes:
                 continue
-            kept_trips[trip_id] = (route_id, headsign or None)
+            today = service_id in services
+            prev = service_id in services_prev
+            if not (today or prev):
+                continue
+            kept_trips[trip_id] = (route_id, headsign or None, today, prev)
 
         stops_by_id, alias = _load_stops(zf, config)
 
@@ -317,8 +349,12 @@ def load_timetable(
                             continue  # a stop_time without times is a non-timepoint; skip it
                         trip_times[trip_id].append((sequence, stop_id, arrival, departure))
 
-        used_stops: set[str] = set()
-        for entries in trip_times.values():
+        # Materialize concrete trips: each kept trip contributes its same-day run and/or, when
+        # merging overnight, the post-midnight tail of the previous service day's run. Build the
+        # emission list first so `used_stops` reflects exactly what is actually added (a tail
+        # that keeps < 2 post-midnight stops contributes no stops).
+        emissions: list[tuple[RouteInfo, list[str], Trip]] = []
+        for trip_id, entries in trip_times.items():
             if len(entries) < 2:
                 stats.dropped_trips += 1
                 continue
@@ -328,30 +364,48 @@ def load_timetable(
             if len(deduped) < 2:
                 stats.dropped_trips += 1
                 continue
-            used_stops.update(e[1] for e in deduped)
+            route_id, headsign, today, prev = kept_trips[trip_id]
+            info, _mode = kept_routes[route_id]
+            if today:
+                emissions.append(
+                    (
+                        info,
+                        [e[1] for e in deduped],
+                        Trip(
+                            id=trip_id,
+                            arrivals=[e[2] for e in deduped],
+                            departures=[e[3] for e in deduped],
+                            headsign=headsign,
+                        ),
+                    )
+                )
+            if prev:
+                # Keep only stops the train reaches after this day's midnight, re-timed to it.
+                tail = [
+                    e for e in deduped if e[2] >= _DAY_SECONDS and e[3] >= _DAY_SECONDS
+                ]
+                if len(tail) >= 2:
+                    emissions.append(
+                        (
+                            info,
+                            [e[1] for e in tail],
+                            Trip(
+                                id=f"{trip_id}{_OVERNIGHT_SUFFIX}",
+                                arrivals=[e[2] - _DAY_SECONDS for e in tail],
+                                departures=[e[3] - _DAY_SECONDS for e in tail],
+                                headsign=headsign,
+                            ),
+                        )
+                    )
 
+        used_stops: set[str] = {sid for _, stop_ids, _ in emissions for sid in stop_ids}
         for stop_id in used_stops:
             builder.add_stop(stops_by_id[stop_id])
 
-        for trip_id, entries in trip_times.items():
-            if len(entries) < 2:
-                continue
-            entries.sort(key=lambda e: e[0])
-            deduped = _dedupe_consecutive(entries)
-            if len(deduped) < 2:
-                continue
-            route_id, headsign = kept_trips[trip_id]
-            info, _mode = kept_routes[route_id]
-            stop_ids = [e[1] for e in deduped]
-            trip = Trip(
-                id=trip_id,
-                arrivals=[e[2] for e in deduped],
-                departures=[e[3] for e in deduped],
-                headsign=headsign,
-            )
+        for info, stop_ids, trip in emissions:
             if not _monotonic(trip):
                 stats.dropped_trips += 1
-                stats.problems.append(f"trip {trip_id}: non-monotonic stop times")
+                stats.problems.append(f"trip {trip.id}: non-monotonic stop times")
                 continue
             builder.add_trip(info, stop_ids, trip)
             stats.trips += 1
@@ -460,6 +514,7 @@ def load_timetable_cached(
     config: GtfsConfig | None = None,
     *,
     cache_dir: Path | None = None,
+    merge_overnight: bool = False,
 ) -> Timetable:
     """`load_timetable`, but memoized to disk as a pickle keyed by (feed mtime, date).
 
@@ -467,15 +522,17 @@ def load_timetable_cached(
     under a second. So a date is parsed once and thereafter loaded, which is what makes a
     "cheapest day over the next week" search (one timetable per day) and cold-date searches
     across restarts fast. The feed's mtime is in the key, so a fresh download invalidates the
-    cache automatically.
+    cache automatically. `merge_overnight` is part of the key so the two variants never share
+    a cache entry.
     """
     zip_path = Path(zip_path)
     if cache_dir is None:
-        return load_timetable(zip_path, service_date, config)[0]
+        return load_timetable(zip_path, service_date, config, merge_overnight=merge_overnight)[0]
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     mtime = int(zip_path.stat().st_mtime)
-    key = f"tt-v{_TIMETABLE_CACHE_VERSION}-{mtime}-{service_date.isoformat()}.pkl"
+    ovn = "-ovn" if merge_overnight else ""
+    key = f"tt-v{_TIMETABLE_CACHE_VERSION}-{mtime}-{service_date.isoformat()}{ovn}.pkl"
     path = cache_dir / key
     if path.exists():
         try:
@@ -484,7 +541,9 @@ def load_timetable_cached(
         except Exception as exc:  # noqa: BLE001 - a corrupt cache must not be fatal
             log.warning("timetable cache %s unreadable, reparsing: %s", path, exc)
 
-    timetable, _stats = load_timetable(zip_path, service_date, config)
+    timetable, _stats = load_timetable(
+        zip_path, service_date, config, merge_overnight=merge_overnight
+    )
     tmp = path.with_suffix(".tmp")
     try:
         with tmp.open("wb") as fh:

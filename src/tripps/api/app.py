@@ -169,7 +169,8 @@ class AppState:
         # Disk-cached: a date is parsed once (~15 s) and thereafter unpickled (<1 s), which is
         # what makes date-range ("cheapest day") searches and cold-date searches usable.
         timetable = load_timetable_cached(
-            zip_path, service_date, GtfsConfig(), cache_dir=self.settings.data_dir / "tt-cache"
+            zip_path, service_date, GtfsConfig(),
+            cache_dir=self.settings.data_dir / "tt-cache", merge_overnight=True,
         )
         log.info(
             "timetable for %s: %d stops, %d trips",

@@ -182,7 +182,8 @@ def _cli_planner_factory(settings, db, *, flights: bool, max_results: int):
             print(f"loading timetable for {service_date}...", file=sys.stderr)
             seen.add(service_date)
         timetable = load_timetable_cached(
-            settings.gtfs_zip_path, service_date, GtfsConfig(), cache_dir=cache_dir
+            settings.gtfs_zip_path, service_date, GtfsConfig(),
+            cache_dir=cache_dir, merge_overnight=True,
         )
         return Planner(
             timetable,
