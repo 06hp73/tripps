@@ -137,3 +137,18 @@ def test_load_with_no_calibration_returns_defaults(db):
 def test_empty_observations_writes_nothing(db):
     assert run_calibration(db) == []
     assert db.get_operator_floors() == []
+
+
+def test_put_operator_floors_is_a_true_replace(db):
+    """An operator absent from a later batch (samples purged / below MIN_SAMPLES) must fall
+    back to the conservative defaults, not keep a stale fit forever - a lingering over-tight
+    floor is exactly what the calibration loop exists to prevent."""
+    row = {"mode": "train", "base_ore": 0, "samples": 9, "updated_at": "2026-07-14T00:00:00+00:00"}
+    db.put_operator_floors([
+        {**row, "operator": "OldOp", "per_km_ore": 40},
+        {**row, "operator": "KeptOp", "per_km_ore": 50},
+    ])
+    db.put_operator_floors([{**row, "operator": "KeptOp", "per_km_ore": 55}])
+
+    floors = {r["operator"]: r["per_km_ore"] for r in db.get_operator_floors()}
+    assert floors == {"KeptOp": 55}, "OldOp's stale fit must be gone"

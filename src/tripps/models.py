@@ -198,7 +198,14 @@ class Quote(BaseModel):
 
 
 class Leg(BaseModel):
-    """One continuous ride (or walk) between two stops."""
+    """One continuous ride (or walk) between two stops.
+
+    Times are aware Europe/Stockholm datetimes on the GTFS *nominal* timeline (see
+    `timeutil`). Caveat for API consumers: during the one skipped hour of the spring-forward
+    night, a serialized timestamp can carry a nonexistent wall label with the pre-gap offset;
+    cross-leg UTC instant math on that hour is unreliable. Wall-clock display is always
+    consistent.
+    """
 
     from_stop: Stop
     to_stop: Stop

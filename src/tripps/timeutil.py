@@ -58,7 +58,19 @@ def to_service_seconds(moment: datetime, service_date: date) -> int:
 
 
 def from_service_seconds(seconds: int, service_date: date) -> datetime:
-    """Inverse of `to_service_seconds`, returning an aware Europe/Stockholm datetime."""
+    """Inverse of `to_service_seconds`, returning an aware Europe/Stockholm datetime.
+
+    KNOWN, ACCEPTED EDGE (spring-forward night only): a nominal offset landing in the
+    skipped 02:00-03:00 hour yields a wall label that does not exist, carrying the pre-gap
+    offset (PEP 495 fold=0). All internal comparison, validation, and duration arithmetic is
+    same-tzinfo and therefore naive-wall (correct against the GTFS nominal timeline), but a
+    serialized ISO string from inside the gap denotes a UTC instant that can invert against a
+    neighbouring leg's - an external client must not do cross-leg instant math on that one
+    hour a year. Normalizing the label here instead would break the naive-wall harmony every
+    internal check relies on (a 03:50 -> 03:10 gap-straddling leg would suddenly fail the
+    arrival >= departure wall check), trading a documented cosmetic artifact for real
+    crashes; see the module docstring for why nominal-local is the design.
+    """
     midnight = datetime.combine(service_date, time.min)
     return (midnight + timedelta(seconds=int(seconds))).replace(tzinfo=TZ)
 

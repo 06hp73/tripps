@@ -300,6 +300,10 @@ class Database:
         )
 
     def put_quote(self, source: str, leg: Leg, quote: Quote, ttl_seconds: int) -> None:
+        """Persist the ADAPTER's answer only. Deliberately not stored: `surcharge_ore`,
+        `coupon_rental_id`, and `split_hint` are derived per search AFTER pricing (Arlanda
+        fee, tickital coupon, split probe) and are re-derived on every cache hit - persisting
+        them would double-apply a surcharge or replay another search's coupon identity."""
         key = leg_cache_key(source, leg)
         fetched_at = (quote.fetched_at or datetime.now(UTC)).isoformat()
         with self._write() as conn:
@@ -644,16 +648,19 @@ class Database:
     # --- calibrated floors ------------------------------------------------
 
     def put_operator_floors(self, floors: list[dict]) -> None:
-        """Replace the calibrated-floor table with a fresh batch."""
+        """Replace the calibrated-floor table with a fresh batch.
+
+        A true replace, not an upsert: an operator absent from this batch (its samples were
+        purged, or it dropped below MIN_SAMPLES) must fall back to the conservative defaults
+        rather than keep an old fit forever - a stale fit is exactly the kind of quietly
+        over-tight floor the calibration loop exists to prevent.
+        """
         with self._write() as conn:
+            conn.execute("DELETE FROM operator_floor")
             conn.executemany(
                 """
                 INSERT INTO operator_floor (operator, mode, base_ore, per_km_ore, samples, updated_at)
                 VALUES (:operator, :mode, :base_ore, :per_km_ore, :samples, :updated_at)
-                ON CONFLICT(operator) DO UPDATE SET
-                    mode=excluded.mode, base_ore=excluded.base_ore,
-                    per_km_ore=excluded.per_km_ore, samples=excluded.samples,
-                    updated_at=excluded.updated_at
                 """,
                 floors,
             )

@@ -283,7 +283,14 @@ class ToraAdapter(HttpPriceAdapter):
         ]
         if not candidates:
             return None
-        return min(candidates, key=lambda j: abs(j.departure - leg.departure))
+        # Arrival tie-break, same as the SJ and FlixBus matchers: two same-carrier trains can
+        # leave within the tolerance window, and picking by departure alone could return the
+        # other train's (differently priced) fare. Today's Tora carriers make that collision
+        # unlikely, but the operator set grows and an EXACT quote must never be a guess.
+        return min(
+            candidates,
+            key=lambda j: (abs(j.departure - leg.departure), abs(j.arrival - leg.arrival)),
+        )
 
     async def quote_leg(self, leg: Leg) -> Quote:
         if not self.supports(leg):

@@ -8,7 +8,7 @@ monkeypatching the sync `primp` fetch, since `primp` cannot be intercepted by `r
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -278,3 +278,25 @@ def test_vr_snabbtag_is_priceable_via_tora():
     assert carrier_matches("VR Snabbtåg", "VR")
     # ...but the entry does not false-match an unrelated operator
     assert not carrier_matches("SJ", "VR Snabbtåg")
+
+
+def test_match_breaks_departure_ties_by_arrival():
+    """Two same-carrier trains inside the tolerance window: the one whose ARRIVAL also
+    matches the timetabled leg is the leg, same defense as the SJ/FlixBus matchers - an
+    EXACT quote must never be the other train's fare."""
+    from tripps.pricing.tora import ToraJourney
+
+    dep = datetime(2026, 7, 22, 8, 0, tzinfo=TZ)
+    fast = ToraJourney(
+        departure=dep + timedelta(minutes=2), arrival=dep + timedelta(hours=2),
+        changes=0, carriers=("Öresundståg",), cheapest_ore=9900,
+    )
+    slow = ToraJourney(
+        departure=dep - timedelta(minutes=2), arrival=dep + timedelta(hours=3),
+        changes=0, carriers=("Öresundståg",), cheapest_ore=15900,
+    )
+    adapter = ToraAdapter()
+    leg = _leg("Öresundståg", dep, dep + timedelta(hours=3, minutes=2))
+    # Both depart 2 min off; the slow train's arrival matches the leg's - it must win.
+    match = adapter._match([fast, slow], leg)
+    assert match is slow
