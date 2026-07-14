@@ -52,20 +52,24 @@ def test_max_duration_on_naive_datetimes_uses_wall_difference():
     assert not SearchConstraints(max_duration_seconds=7199).permits(itin)
 
 
-# --- calibration base honesty ----------------------------------------------------------------
+# --- calibration hull fit ---------------------------------------------------------------------
 
 
-def test_calibrated_base_is_explicitly_zero():
-    """min(actual - per_km*dist) over the fitting points is structurally 0 (per_km's own
-    argmin zeroes its term), so the floor is per-km-only and says so."""
+def test_hull_fit_recovers_a_genuine_base_component():
+    """Fares on the exact line 496 kr + 0.04 kr/km: the old min-ratio-then-residual fit was
+    structurally base=0 (its per_km absorbed the intercept as slope), giving a floor of only
+    ~375 kr at 100 km. The hull fit learns the true line - base 372 kr after margin - a far
+    tighter floor at every observed distance, still under every fare."""
     obs = [
         {"operator": "OP", "mode": "train", "distance_km": 100 + i * 25,
-         "actual_ore": 50_000 + i * 100}  # a genuine 500 kr intercept the fit CANNOT see
+         "actual_ore": 50_000 + i * 100}  # = 49_600 + 4 * dist
         for i in range(10)
     ]
     [floor] = calibrate(obs, min_samples=8)
-    assert floor.base_ore == 0
-    assert floor.per_km_ore > 0
-    # The invariant still holds on every observation with the per-km-only floor.
+    assert floor.base_ore == int(49_600 * 0.75)  # 37_200: the genuine intercept, learned
+    assert floor.per_km_ore == int(4 * 0.75)
     for o in obs:
-        assert floor.per_km_ore * o["distance_km"] <= o["actual_ore"]
+        assert floor.base_ore + floor.per_km_ore * o["distance_km"] <= o["actual_ore"]
+    # And it strictly beats the old per-km-only bound on the shortest observed leg.
+    old_per_km_only = int(min(o["actual_ore"] / o["distance_km"] for o in obs) * 0.75)
+    assert floor.base_ore + floor.per_km_ore * 100 > old_per_km_only * 100

@@ -152,3 +152,58 @@ def test_put_operator_floors_is_a_true_replace(db):
 
     floors = {r["operator"]: r["per_km_ore"] for r in db.get_operator_floors()}
     assert floors == {"KeptOp": 55}, "OldOp's stale fit must be gone"
+
+
+# --- hull fit adversarial cases ---------------------------------------------
+
+
+def test_hull_fit_never_exceeds_any_fare_with_a_cheap_short_promo():
+    """A short-distance promo outlier must cap the base: the hull line through it keeps the
+    invariant, where a naive intercept fit would sail over it."""
+    obs = [_obs("OP", "train", 100 + i * 40, 40_000 + i * 500) for i in range(9)]
+    obs.append(_obs("OP", "train", 60, 4_900))  # 49 kr promo on a short hop
+    [floor] = calibrate(obs, min_samples=8, margin=1.0)  # margin 1: the fit itself must hold
+    for o in obs:
+        assert floor.base_ore + floor.per_km_ore * o["distance_km"] <= o["actual_ore"] + 1
+
+
+def test_hull_fit_single_distance_degenerates_to_per_km_only():
+    """All observations at one distance cannot separate base from slope; the through-origin
+    line is the only safe shape."""
+    obs = [_obs("OP", "bus", 250.0, 20_000 + i * 300) for i in range(8)]
+    [floor] = calibrate(obs, min_samples=8, margin=1.0)
+    assert floor.base_ore == 0
+    assert floor.per_km_ore == int(20_000 / 250.0)
+
+
+def test_hull_fit_is_at_least_as_tight_as_the_old_per_km_only_fit():
+    """On any data, the chosen line's total floor mass >= the through-origin candidate's,
+    because that candidate is always in the pool."""
+    obs = [_obs("OP", "train", 80 + i * 37, 15_000 + (i * 977) % 9_000) for i in range(12)]
+    [floor] = calibrate(obs, min_samples=8, margin=1.0)
+    per_km_only = min(o["actual_ore"] / o["distance_km"] for o in obs)
+    new_mass = sum(floor.base_ore + floor.per_km_ore * o["distance_km"] for o in obs)
+    old_mass = sum(int(per_km_only) * o["distance_km"] for o in obs)
+    assert new_mass >= old_mass - len(obs)  # integer truncation slack only
+
+
+def test_hull_fit_fuzz_invariant_holds_on_random_clouds():
+    """200 seeded random fare clouds: the fitted line (margin=1, no headroom) must sit on or
+    under EVERY observation - the cardinal floor invariant, checked exhaustively."""
+    import random
+
+    rng = random.Random(20260714)
+    for _ in range(200):
+        n = rng.randint(8, 25)
+        obs = [
+            _obs(
+                "OP", "train",
+                round(rng.uniform(10, 600), 1),
+                rng.randint(1_500, 120_000),
+            )
+            for _ in range(n)
+        ]
+        [floor] = calibrate(obs, min_samples=8, margin=1.0)
+        for o in obs:
+            predicted = floor.base_ore + floor.per_km_ore * o["distance_km"]
+            assert predicted <= o["actual_ore"] + 1, (floor, o)

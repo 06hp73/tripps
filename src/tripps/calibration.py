@@ -20,21 +20,23 @@ The one hard constraint is the floor's correctness contract, unchanged from floo
     floor(leg) <= true_price(leg),  always.
 
 A floor above the truth can prune the genuinely cheapest itinerary before it is priced. So
-the fit is provably safe on the observed data and then discounted by a margin for headroom:
+the fit is provably safe on the observed data and then discounted by a margin for headroom.
 
-    per_km = min over observations of actual / distance      # cheapest per-km ever seen
-    base   = 0                                               # honestly: per-km-only
-
-The calibrated floor is deliberately per-km-only. A base derived from the same data as
-`base = min(actual - per_km*dist)` is structurally ZERO - per_km's own argmin zeroes its
-term and every other term is >= 0 by the choice of per_km - so pretending to fit one would
-be a fiction. (A genuine base needs a joint fit, e.g. the supporting line of the lower
-convex hull; noted as future work - a floor that is merely loose costs CPU, never
-correctness.) For any observation i, `per_km * dist_i <= actual_i` because the min is taken
-over a set that includes i. Scaling down by `margin < 1` keeps that true and leaves room
-for a future fare cheaper than anything seen so far. If a genuinely lower fare still
-appears, the existing floor-violation detector logs it and the calibration self-corrects on
-the next run.
+The fitted floor is a LINE `base + per_km * dist` chosen among provably-safe candidates:
+the through-origin line with `per_km = min(actual/dist)` (always safe: the min is over a
+set including every point), plus each edge of the lower convex hull of the (dist, actual)
+cloud extended to a full line (a hull edge's line supports the hull, so every observation
+lies on or above it). Deriving a base the naive way - `min(actual - per_km*dist)` with
+per_km already the min ratio - is structurally ZERO (the argmin zeroes its own term), which
+is why a joint fit over hull edges is needed to learn a genuine boarding component at all.
+Every candidate is re-verified point-by-point (belt over the geometric proof), the one with
+the greatest total floor mass over the observations wins, and both coefficients are scaled
+by `margin < 1` for headroom against fares cheaper than anything yet seen. If a genuinely
+lower fare still appears, the floor-violation detector logs it and the next calibration
+self-corrects. Note the extrapolation caveat: below the shortest observed distance a
+positive base keeps the floor at `base` while a real short-hop fare could undercut it -
+the same unobserved-region risk the per-km slope always had, covered by the same margin
+and detector.
 """
 
 from __future__ import annotations
@@ -79,6 +81,61 @@ class CalibratedFloor:
         }
 
 
+def _lower_hull(points: list[tuple[float, int]]) -> list[tuple[float, int]]:
+    """Lower convex hull of (distance, fare) points, left to right (monotone chain).
+
+    Duplicate distances collapse to their cheapest fare first - only the lower envelope can
+    constrain a floor.
+    """
+    dedup: list[tuple[float, int]] = []
+    for d, a in sorted(points):
+        if dedup and dedup[-1][0] == d:
+            if a < dedup[-1][1]:
+                dedup[-1] = (d, a)
+        else:
+            dedup.append((d, a))
+    hull: list[tuple[float, int]] = []
+    for p in dedup:
+        while len(hull) >= 2:
+            (x1, y1), (x2, y2) = hull[-2], hull[-1]
+            # Pop while the middle point sits on or above the chord: keep the hull convex-down.
+            if (x2 - x1) * (p[1] - y1) - (y2 - y1) * (p[0] - x1) <= 0:
+                hull.pop()
+            else:
+                break
+        hull.append(p)
+    return hull
+
+
+def _fit_floor_line(points: list[tuple[str, float, int]]) -> tuple[float, float]:
+    """The safest-tight (base, per_km) line under every observation.
+
+    Candidates: the through-origin min-ratio line (always valid), plus every lower-hull edge
+    with non-negative slope and intercept (a hull edge's line supports the whole cloud).
+    Each is re-verified against every point, and the one with the greatest total floor mass
+    over the observations wins - the tightest bound on the traffic actually seen.
+    """
+    per_km_only = min(actual / dist for _, dist, actual in points)
+    candidates: list[tuple[float, float]] = [(0.0, per_km_only)]
+    hull = _lower_hull([(dist, actual) for _, dist, actual in points])
+    for (x1, y1), (x2, y2) in zip(hull, hull[1:], strict=False):
+        slope = (y2 - y1) / (x2 - x1)
+        intercept = y1 - slope * x1
+        if slope >= 0 and intercept > 0:
+            candidates.append((intercept, slope))
+    # Epsilon absorbs float round-off at a candidate's own defining points ((a/d)*d can
+    # exceed a by one ulp); 1e-6 öre is twelve orders below any fare, and the margin scaling
+    # plus int() truncation keep the final integer floor strictly on the safe side.
+    safe = [
+        (b, s)
+        for b, s in candidates
+        if all(b + s * dist <= actual + 1e-6 for _, dist, actual in points)
+    ]
+    if not safe:  # pure paranoia: the through-origin line is valid up to that same round-off
+        return (0.0, per_km_only)
+    return max(safe, key=lambda c: sum(c[0] + c[1] * dist for _, dist, _ in points))
+
+
 def calibrate(
     observations, *, min_samples: int = MIN_SAMPLES, margin: float = SAFETY_MARGIN
 ) -> list[CalibratedFloor]:
@@ -98,17 +155,13 @@ def calibrate(
         if len(points) < min_samples:
             continue
         mode = Counter(m for m, _, _ in points).most_common(1)[0][0]
-        per_km = min(actual / dist for _, dist, actual in points)
-        # No base term: min(actual - per_km*dist) over the SAME points is structurally zero
-        # (per_km's argmin zeroes its own term; every other is >= 0), so computing one only
-        # dressed a constant 0 up as a fit. See the module docstring for the honest story.
-        per_km_ore = int(per_km * margin)
+        base, per_km = _fit_floor_line(points)
         calibrated.append(
             CalibratedFloor(
                 operator=operator,
                 mode=mode,
-                base_ore=0,
-                per_km_ore=per_km_ore,
+                base_ore=int(base * margin),
+                per_km_ore=int(per_km * margin),
                 samples=len(points),
             )
         )
