@@ -148,3 +148,48 @@ def test_overnight_tail_uses_nominal_day_across_dst(tmp_path):
     assert "T_NIGHT#ovn" in ids
     _, deps, _ = ids["T_NIGHT#ovn"]
     assert deps[0] == 24 * 3600 + 35 * 60 - _DAY_SECONDS
+
+
+def test_midnight_dwell_stop_is_board_only_in_the_tail(tmp_path):
+    """A stop the night train REACHES before midnight but LEAVES after (arr 23:50, dep 00:10)
+    is a genuine post-midnight boarding on the arrival date. The old AND-filter dropped it
+    from the tail entirely. It must appear board-only: its true arrival belongs to yesterday,
+    so alighting 'today' there would be fiction."""
+    stop_times = (
+        "trip_id,arrival_time,departure_time,stop_id,stop_sequence\n"
+        "T_NIGHT,22:00:00,22:00:00,MMX,1\n"
+        "T_NIGHT,23:50:00,24:10:00,NRK,2\n"  # the midnight dwell
+        "T_NIGHT,26:00:00,26:00:00,STO,3\n"
+        "T_DAY,08:00:00,08:00:00,MMX,1\n"
+        "T_DAY,10:00:00,10:00:00,NRK,2\n"
+        "T_DAY,12:00:00,12:00:00,STO,3\n"
+    )
+    trips = (
+        "route_id,service_id,trip_id,trip_headsign\n"
+        "R_NIGHT,NIGHTSVC,T_NIGHT,Stockholm\n"
+        "R_DAY,DAILY,T_DAY,Stockholm\n"
+    )
+    cal_dates = f"service_id,date,exception_type\nNIGHTSVC,{NIGHT_DAY.strftime('%Y%m%d')},1\n"
+    path = tmp_path / "dwell.zip"
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("agency.txt", _AGENCY)
+        zf.writestr("stops.txt", _STOPS)
+        zf.writestr("routes.txt", _ROUTES)
+        zf.writestr("calendar.txt", _CALENDAR)
+        zf.writestr("calendar_dates.txt", cal_dates)
+        zf.writestr("trips.txt", trips)
+        zf.writestr("stop_times.txt", stop_times)
+
+    tt, _ = load_timetable(path, NEXT_DAY, merge_overnight=True)
+    tail = None
+    for route in tt.routes:
+        for trip in route.trips:
+            if trip.id == "T_NIGHT#ovn":
+                tail = (route, trip)
+    assert tail is not None, "the dwell tail must exist at all"
+    route, trip = tail
+    assert [tt.stops[i].id for i in route.stops] == ["NRK", "STO"]
+    assert trip.departures[0] == 10 * 60  # boards NRK at 00:10 on the arrival date
+    assert trip.arrivals[0] == 0  # clamped: the true arrival belongs to yesterday
+    assert trip.no_alight == (True, False), "dwell stop is board-only"
+    assert trip.no_board is None

@@ -38,7 +38,7 @@ from ..timeutil import parse_gtfs_time
 log = logging.getLogger(__name__)
 
 #: Bump when the parse output changes shape, so stale pickles are ignored after an upgrade.
-_TIMETABLE_CACHE_VERSION = 2
+_TIMETABLE_CACHE_VERSION = 3
 
 #: Trips from the previous service day that run past midnight are re-expressed relative to this
 #: day's midnight; their id is suffixed so the tail is distinguishable from the same train's own
@@ -318,7 +318,11 @@ def load_timetable(
         # single most expensive part of loading the feed, so the loop is inlined and hand-
         # tuned: reject on trip_id before touching any other column, since ~99.9% of rows
         # belong to local-transit trips we dropped and building a tuple for them is pure waste.
-        trip_times: dict[str, list[tuple[int, str, int, int]]] = defaultdict(list)
+        # Entries: (sequence, stop_id, arrival, departure, no_board, no_alight) - the last two
+        # from pickup_type/drop_off_type, where any nonzero value (1 forbidden, 2/3 arrange
+        # ahead) counts as forbidden for a cheapest-trip planner: offering a boarding the
+        # operator does not freely sell is a wrong journey, not a bargain.
+        trip_times: dict[str, list[tuple[int, str, int, int, bool, bool]]] = defaultdict(list)
         if "stop_times.txt" in zf.namelist():
             with zf.open("stop_times.txt") as raw:
                 text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
@@ -331,6 +335,9 @@ def load_timetable(
                     ci_dep = col["departure_time"]
                     ci_stop = col["stop_id"]
                     ci_seq = col["stop_sequence"]
+                    # Optional columns; a feed without them allows everything everywhere.
+                    ci_pick = col.get("pickup_type")
+                    ci_drop = col.get("drop_off_type")
                     width = len(header)
                     for row in reader:
                         if len(row) < width:
@@ -347,7 +354,15 @@ def load_timetable(
                             sequence = int(row[ci_seq])
                         except (KeyError, ValueError):
                             continue  # a stop_time without times is a non-timepoint; skip it
-                        trip_times[trip_id].append((sequence, stop_id, arrival, departure))
+                        no_board = (
+                            ci_pick is not None and row[ci_pick] not in ("", "0")
+                        )
+                        no_alight = (
+                            ci_drop is not None and row[ci_drop] not in ("", "0")
+                        )
+                        trip_times[trip_id].append(
+                            (sequence, stop_id, arrival, departure, no_board, no_alight)
+                        )
 
         # Materialize concrete trips: each kept trip contributes its same-day run and/or, when
         # merging overnight, the post-midnight tail of the previous service day's run. Build the
@@ -367,6 +382,8 @@ def load_timetable(
             route_id, headsign, today, prev = kept_trips[trip_id]
             info, _mode = kept_routes[route_id]
             if today:
+                nb = tuple(e[4] for e in deduped)
+                na = tuple(e[5] for e in deduped)
                 emissions.append(
                     (
                         info,
@@ -376,24 +393,38 @@ def load_timetable(
                             arrivals=[e[2] for e in deduped],
                             departures=[e[3] for e in deduped],
                             headsign=headsign,
+                            # None for the (overwhelmingly common) unrestricted trip keeps
+                            # the pickle compact and the router's fast path branch-free.
+                            no_board=nb if any(nb) else None,
+                            no_alight=na if any(na) else None,
                         ),
                     )
                 )
             if prev:
-                # Keep only stops the train reaches after this day's midnight, re-timed to it.
-                tail = [
-                    e for e in deduped if e[2] >= _DAY_SECONDS and e[3] >= _DAY_SECONDS
-                ]
+                # Keep every stop still boardable after this day's midnight: departure past
+                # midnight suffices (arrival >= departure never holds, so arrival-past-
+                # midnight implies it). A stop that ARRIVES before midnight but DEPARTS
+                # after - a midnight dwell - is a genuine post-midnight boarding, re-timed
+                # with its arrival clamped to 00:00 and marked board-only: its true arrival
+                # belongs to yesterday, so offering an alight "today" would be fiction.
+                tail = [e for e in deduped if e[3] >= _DAY_SECONDS]
                 if len(tail) >= 2:
+                    nb = tuple(e[4] for e in tail)
+                    na = tuple(
+                        e[5] or e[2] < _DAY_SECONDS  # straddle stop: board-only
+                        for e in tail
+                    )
                     emissions.append(
                         (
                             info,
                             [e[1] for e in tail],
                             Trip(
                                 id=f"{trip_id}{_OVERNIGHT_SUFFIX}",
-                                arrivals=[e[2] - _DAY_SECONDS for e in tail],
+                                arrivals=[max(0, e[2] - _DAY_SECONDS) for e in tail],
                                 departures=[e[3] - _DAY_SECONDS for e in tail],
                                 headsign=headsign,
+                                no_board=nb if any(nb) else None,
+                                no_alight=na if any(na) else None,
                             ),
                         )
                     )
@@ -555,18 +586,21 @@ def load_timetable_cached(
 
 
 def _dedupe_consecutive(
-    entries: list[tuple[int, str, int, int]],
-) -> list[tuple[int, str, int, int]]:
+    entries: list[tuple[int, str, int, int, bool, bool]],
+) -> list[tuple[int, str, int, int, bool, bool]]:
     """Collapse repeated stations caused by parent-station aliasing.
 
     Keeps the first arrival and the last departure of the run, which is the correct
-    behaviour for a train that calls at two platforms of the same station.
+    behaviour for a train that calls at two platforms of the same station. The boarding
+    flags follow the events they describe: alighting happens at the kept (first) arrival,
+    so its no_alight stays; boarding happens at the kept (last) departure, so that row's
+    no_board wins.
     """
-    out: list[tuple[int, str, int, int]] = []
+    out: list[tuple[int, str, int, int, bool, bool]] = []
     for entry in entries:
         if out and out[-1][1] == entry[1]:
-            seq, stop_id, arrival, _dep = out[-1]
-            out[-1] = (seq, stop_id, arrival, entry[3])
+            seq, stop_id, arrival, _dep, _no_board, no_alight = out[-1]
+            out[-1] = (seq, stop_id, arrival, entry[3], entry[4], no_alight)
         else:
             out.append(entry)
     return out

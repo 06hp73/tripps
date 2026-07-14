@@ -59,6 +59,12 @@ class Trip:
     `precomputed_fare_ore` is set for injected routes whose price is already known
     exactly (a flight offer, a Freerider car); for GTFS routes it stays None and the
     price floor model supplies a bound instead.
+
+    `no_board[i]` / `no_alight[i]` carry GTFS pickup_type/drop_off_type restrictions:
+    True means the operator does not let passengers board / alight there (set-down-only
+    stops, arrange-ahead halts). None - the default, and the shape every synthetic route
+    uses - means unrestricted everywhere, so existing constructors stay valid and the
+    common case costs no memory.
     """
 
     id: str
@@ -66,10 +72,15 @@ class Trip:
     departures: list[int]
     headsign: str | None = None
     precomputed_fare_ore: int | None = None
+    no_board: tuple[bool, ...] | None = None
+    no_alight: tuple[bool, ...] | None = None
 
     def __post_init__(self) -> None:
         if len(self.arrivals) != len(self.departures):
             raise ValueError(f"trip {self.id}: arrivals/departures length mismatch")
+        for name, flags in (("no_board", self.no_board), ("no_alight", self.no_alight)):
+            if flags is not None and len(flags) != len(self.arrivals):
+                raise ValueError(f"trip {self.id}: {name} length mismatch")
 
 
 @dataclass(slots=True)

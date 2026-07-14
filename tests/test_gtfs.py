@@ -312,3 +312,61 @@ def test_missing_optional_files_are_tolerated(tmp_path: Path):
     tt, stats = load_timetable(path, date(2026, 7, 8))
     assert tt.num_trips == 1
     assert stats.problems == []
+
+
+# --- pickup/drop_off restrictions -------------------------------------------
+
+
+def _flag_feed(tmp_path: Path) -> Path:
+    """A train calling at 4 stations: NRK is set-down-only (pickup 1), MMX is board-only
+    (drop_off 1). STO has two platform rows that collapse; the run's boarding flag must come
+    from the LAST platform row (its departure event) and alight flag from the FIRST."""
+    path = tmp_path / "flags.zip"
+    stop_times = (
+        "trip_id,arrival_time,departure_time,stop_id,stop_sequence,pickup_type,drop_off_type\n"
+        "T1,08:00:00,08:00:00,STO_1,1,1,1\n"  # arriving platform row: its drop_off flag is kept
+        "T1,08:02:00,08:03:00,STO_2,2,0,0\n"  # departing platform row: its pickup flag wins
+        "T1,09:10:00,09:12:00,NRK,3,1,0\n"  # set-down only
+        "T1,10:10:00,10:12:00,MMX,4,0,1\n"  # board only
+        "T1,11:00:00,11:00:00,GBG,5,0,0\n"
+    )
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("agency.txt", AGENCY)
+        zf.writestr("stops.txt", STOPS)
+        zf.writestr("routes.txt", ROUTES)
+        zf.writestr("calendar.txt", CALENDAR)
+        zf.writestr("trips.txt", "route_id,service_id,trip_id,trip_headsign\nR_FAST,WEEKDAY,T1,Goteborg\n")
+        zf.writestr("stop_times.txt", stop_times)
+    return path
+
+
+def test_pickup_and_dropoff_types_reach_the_trip(tmp_path: Path):
+    tt, _ = load_timetable(_flag_feed(tmp_path), date(2026, 7, 8))
+    [trip] = [t for r in tt.routes for t in r.trips]
+    # Stops collapse to [STO, NRK, MMX, GBG].
+    assert trip.no_board == (False, True, False, False), "NRK set-down-only; STO merged from last platform row"
+    assert trip.no_alight == (True, False, True, False), "STO first-row drop_off=1 kept; MMX board-only"
+
+
+def test_absent_flag_columns_mean_unrestricted(feed):
+    tt, _ = load_timetable(feed, date(2026, 7, 8))
+    assert all(t.no_board is None and t.no_alight is None for r in tt.routes for t in r.trips)
+
+
+def test_router_honours_boarding_restrictions(tmp_path: Path):
+    from tripps.routing.floors import zero_floors
+    from tripps.routing.mcraptor import RaptorQuery, run_mcraptor
+
+    tt, _ = load_timetable(_flag_feed(tmp_path), date(2026, 7, 8))
+
+    def go(frm, to):
+        return run_mcraptor(
+            tt, zero_floors(),
+            RaptorQuery(origins=[(tt.index_of(frm), 6 * 3600)], targets={tt.index_of(to)}),
+        ).labels
+
+    assert go("NRK", "GBG") == [], "boarding at a set-down-only stop must be impossible"
+    assert go("STO", "MMX") == [], "alighting at a board-only stop must be impossible"
+    assert go("MMX", "GBG"), "boarding at the board-only stop is exactly what it offers"
+    assert go("STO", "NRK"), "alighting at the set-down-only stop is exactly what it offers"
+    assert go("STO", "GBG"), "riding through restricted stops is unaffected"

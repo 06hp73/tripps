@@ -249,6 +249,8 @@ def run_mcraptor(
                 # Alight: every on-board label offers an arrival at this stop.
                 for ride in rides:
                     trip = route.trips[ride.trip_idx]
+                    if trip.no_alight is not None and trip.no_alight[pos]:
+                        continue  # set-down forbidden here (GTFS drop_off_type != 0)
                     arrival = trip.arrivals[pos]
                     if arrival > query.latest_arrival:
                         continue
@@ -343,15 +345,26 @@ def _boardable_trips(
     first = route.earliest_trip_from(pos, ready)
     if first is None:
         return []
+
+    def boardable(idx: int) -> bool:
+        nb = route.trips[idx].no_board
+        return nb is None or not nb[pos]
+
     if not fares_vary and not (unboarded and query.profile):
-        return [first]
+        # The earliest catchable trip may be set-down-only here (pickup_type != 0); the
+        # earliest trip that actually SELLS a boarding at this stop is the dominating one.
+        for trip_idx in range(first, len(route.trips)):
+            if boardable(trip_idx):
+                return [trip_idx]
+        return []
 
     horizon = ready + query.profile_window_seconds
     within: list[int] = []
     for trip_idx in range(first, len(route.trips)):
         if route.trips[trip_idx].departures[pos] > horizon:
             break
-        within.append(trip_idx)
+        if boardable(trip_idx):
+            within.append(trip_idx)
     cap = query.max_departures_per_route
     if fares_vary or len(within) <= cap:
         return within
