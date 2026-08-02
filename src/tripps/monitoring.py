@@ -186,3 +186,13 @@ def persist_canaries(db, results: list[CanaryResult]) -> None:
     """Record the latest probe outcomes so /health and the UI can show them."""
     for r in results:
         db.set_health(f"canary:{r.name}", r.state.value, f"{r.detail} ({r.latency_ms}ms)")
+
+
+def is_stale(age_hours: float | None, stale_after_hours: float) -> bool:
+    """True when a stored probe is too old to be read as the state of the source now.
+
+    One definition, deliberately shared: what the status page greys out is exactly what the
+    server re-probes. If the UI called something stale that the refresh path considered
+    fresh, the page would keep showing a dead reading no run would ever replace.
+    """
+    return age_hours is None or age_hours > stale_after_hours

@@ -16,7 +16,7 @@ import logging
 import time
 from collections import OrderedDict
 from contextlib import asynccontextmanager
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, Form, HTTPException, Query, Request
@@ -296,6 +296,35 @@ class AppState:
             except Exception:  # noqa: BLE001 - one failed poll must never kill the loop
                 log.exception("freerider poll iteration failed; will retry next interval")
 
+    async def canary_catch_up(self) -> bool:
+        """Re-probe the price sources if the stored results are older than the threshold.
+
+        `_scheduler_loop` sleeps before its first pass, so a server starting with rows from an
+        earlier run would serve them untouched for a whole interval - the status page reporting
+        a three-week-old "degraded" as the state of the source right now. Returns whether a
+        probe ran.
+
+        Deliberately bounded to one catch-up per process and never wired to a request: a
+        public page view must not be able to fan out to five undocumented endpoints.
+        """
+        from ..monitoring import is_stale, persist_canaries, run_canaries
+
+        try:
+            age = self.db.oldest_canary_age_hours()
+            if not is_stale(age, self.settings.canary_stale_hours):
+                return False
+            log.info(
+                "canary results are %s; re-probing at startup",
+                "absent" if age is None else f"{age:.0f} h old",
+            )
+            persist_canaries(self.db, await run_canaries(self.settings))
+            return True
+        except asyncio.CancelledError:
+            raise
+        except Exception:  # noqa: BLE001 - a failed catch-up must not kill the scheduler
+            log.exception("startup canary catch-up failed; the scheduled pass will retry")
+            return False
+
     async def _scheduler_loop(self) -> None:
         """Periodic self-maintenance so a deploy needs no external cron: re-probe the price
         sources, recalibrate floors from newly logged fares, reload them into the router, and
@@ -303,6 +332,8 @@ class AppState:
         datetime, never queried again once the date passes - unpurged, the table only grows)."""
         from ..calibration import load_calibrated_floors, run_calibration
         from ..monitoring import persist_canaries, run_canaries
+
+        await self.canary_catch_up()
 
         while True:
             await asyncio.sleep(self.settings.scheduler_seconds)
@@ -853,9 +884,48 @@ async def api_watch_delete(request: Request, watch_id: int) -> JSONResponse:
     return JSONResponse({"deactivated": watch_id})
 
 
+def _age_label(age_hours: float | None) -> str:
+    """Human reading of a probe's age. `None` means the row carries no timestamp at all."""
+    if age_hours is None:
+        return "age unknown"
+    if age_hours < 1:
+        return f"{max(int(age_hours * 60), 1)} min ago"
+    if age_hours < 48:
+        return f"{age_hours:.0f} h ago"
+    return f"{age_hours / 24:.0f} d ago"
+
+
+def _health_entry(row: dict[str, str], stale_after_hours: float) -> dict:
+    """One health row plus its age, so a reader can tell a live result from a dead one.
+
+    A state on its own is a claim about *now*; the row it came from may predate the last
+    restart by weeks. Everything past `stale_after_hours` is flagged rather than shown as
+    the current state of the source.
+    """
+    from ..monitoring import is_stale
+
+    checked_at = row.get("checked_at")
+    age_hours: float | None = None
+    if checked_at:
+        age_hours = round(
+            (datetime.now(UTC) - datetime.fromisoformat(checked_at)).total_seconds() / 3600, 1
+        )
+    return {
+        "state": row["state"],
+        "detail": row.get("detail") or "",
+        "checked_at": checked_at,
+        "age_hours": age_hours,
+        "age_label": _age_label(age_hours),
+        "stale": is_stale(age_hours, stale_after_hours),
+    }
+
+
 def _health_snapshot(state: AppState) -> dict:
     """The health facts, shared by the JSON `/health` and the HTML `/status` page."""
-    all_health = state.db.get_health()
+    stale_after = state.settings.canary_stale_hours
+    all_health = {
+        k: _health_entry(v, stale_after) for k, v in state.db.get_health_rows().items()
+    }
     # Split the scheduled-canary rows out from the live per-request source health.
     canaries = {k.removeprefix("canary:"): v for k, v in all_health.items() if k.startswith("canary:")}
     sources = {k: v for k, v in all_health.items() if not k.startswith("canary:")}
@@ -875,6 +945,8 @@ def _health_snapshot(state: AppState) -> dict:
         "freerider_offers": len(state.freerider_offers),
         "sources": sources,
         "canaries": canaries,
+        "canary_age_hours": state.db.oldest_canary_age_hours(),
+        "canary_stale_hours": stale_after,
         "flight_scraper": "available" if _fast_flights_available() else "not installed",
         # A floor above a real fare means the router may have pruned the cheapest trip.
         "price_floor_violations": len(state.db.floor_violations()),
@@ -908,6 +980,10 @@ async def status_page(request: Request) -> HTMLResponse:
             "obs_counts": dict(sorted(obs_counts.items(), key=lambda kv: -kv[1])),
             "obs_total": len(obs),
             "floors": [dict(f) for f in floors],
+            # 0 disables scheduled maintenance, in which case the page must not promise a cadence.
+            "scheduler_hours": round(state.settings.scheduler_seconds / 3600)
+            if state.settings.scheduler_seconds > 0
+            else 0,
         },
     )
 

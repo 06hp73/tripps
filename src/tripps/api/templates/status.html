@@ -30,6 +30,10 @@
     .dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--off); }
     .ok .dot { background: var(--ok); } .down .dot { background: var(--down); }
     .degraded .dot, .warn .dot { background: var(--warn); } .disabled .dot { background: var(--off); }
+    /* A probe too old to describe the source now: greyed out, so it cannot be misread as live. */
+    .stale { color: var(--muted); border-style: dashed; }
+    .stale .dot { background: var(--off); }
+    .age { color: var(--muted); font-size: .78rem; }
     table { width: 100%; border-collapse: collapse; font-size: .88rem; }
     th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line); }
     th { color: var(--muted); font-weight: 600; }
@@ -74,14 +78,28 @@
   <h2>Price sources <button id="canary" type="button" style="float:right">Run canary</button></h2>
   <div class="card">
     <div><b>Live (per-request)</b><br>
-      {% for name, st in snap.sources.items() %}
-        <span class="pill {{ st }}"><span class="dot"></span>{{ name }} · {{ st }}</span>
+      {% for name, e in snap.sources.items() %}
+        <span class="pill {{ 'stale' if e.stale else e.state }}" title="{{ e.detail }}">
+          <span class="dot"></span>{{ name }} · {{ e.state }}
+          <span class="age">{{ e.age_label }}</span>
+        </span>
       {% else %}<span class="muted">no live health recorded yet</span>{% endfor %}
     </div>
     <div style="margin-top:.8rem"><b>Canaries (scheduled probes)</b><br>
-      {% for name, st in snap.canaries.items() %}
-        <span class="pill {{ st }}"><span class="dot"></span>{{ name }} · {{ st }}</span>
+      {% for name, e in snap.canaries.items() %}
+        <span class="pill {{ 'stale' if e.stale else e.state }}" title="{{ e.detail }}">
+          <span class="dot"></span>{{ name }} · {{ e.state }}
+          <span class="age">{{ e.age_label }}</span>
+        </span>
       {% else %}<span class="muted">no canary run recorded — click “Run canary”</span>{% endfor %}
+      {% if snap.canaries and snap.canaries.values()|selectattr('stale')|list %}
+        <p class="muted" style="margin:.5rem 0 0">
+          Grey means the probe is older than {{ snap.canary_stale_hours }} h — it describes the
+          source as it was then, not as it is now. The server re-probes stale results at startup
+          {% if scheduler_hours %}and every {{ scheduler_hours }} h{% endif %};
+          “Run canary” probes immediately.
+        </p>
+      {% endif %}
     </div>
   </div>
 

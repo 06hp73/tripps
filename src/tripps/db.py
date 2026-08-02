@@ -440,6 +440,37 @@ class Database:
             rows = self._conn.execute("SELECT name, state FROM adapter_health").fetchall()
         return {r["name"]: r["state"] for r in rows}
 
+    def get_health_rows(self) -> dict[str, dict[str, str]]:
+        """Health with its timestamp, for callers that must tell a fresh probe from an old one.
+
+        `get_health` returns only the state, which reads the same whether it was written a
+        minute or a month ago - and a month-old "ok" is not a claim the source is up.
+        """
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT name, state, detail, checked_at FROM adapter_health"
+            ).fetchall()
+        return {
+            r["name"]: {"state": r["state"], "detail": r["detail"], "checked_at": r["checked_at"]}
+            for r in rows
+        }
+
+    def oldest_canary_age_hours(self) -> float | None:
+        """Hours since the *oldest* canary row, or None if none was ever recorded.
+
+        Deliberately the oldest, not the newest. A full run writes all five rows together, so
+        the two agree in the common case - but when they disagree it is because one source was
+        left behind, and that is precisely when a refresh is owed. Keyed on the newest, a
+        single fresh row would vouch for a source last probed three weeks ago.
+        """
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT MIN(checked_at) AS oldest FROM adapter_health WHERE name LIKE 'canary:%'"
+            ).fetchone()
+        if row is None or row["oldest"] is None:
+            return None
+        return (datetime.now(UTC) - datetime.fromisoformat(row["oldest"])).total_seconds() / 3600
+
     def record_reprice_delta(
         self,
         *,

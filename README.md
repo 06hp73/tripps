@@ -151,6 +151,13 @@ way the planner does and asserts a price still comes back, exiting non-zero if a
 down — run it from cron so a rotated key or reshaped JSON surfaces before users hit it. Its
 results also feed `/health` (the `canaries` block) and the live `/api/canary` endpoint.
 
+Every health entry carries its own `checked_at`, `age_label` and `stale` flag, because a
+stored `ok` is a claim about the moment it was written, not about now — a server restarted
+after three idle weeks would otherwise present three-week-old results as the state of the
+sources. Anything older than `TRIPPS_CANARY_STALE_HOURS` (default 24) is greyed out on
+`/status` and re-probed once at startup, before the scheduler's first pass. The refresh is
+never wired to a request: a page view must not fan out to five undocumented endpoints.
+
 `tripps validate` goes a step further than the canary: it runs a fixed set of canonical
 corridors (Stockholm→Göteborg, Malmö→Umeå, a cross-border UL route, an airport-coach route, …)
 through the *real* planner and checks invariants — every routable corridor returns an

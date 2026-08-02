@@ -124,6 +124,12 @@ class Settings(BaseSettings):
     #: A GTFS feed older than this reads as stale on /health - it should be re-fetched daily.
     feed_stale_hours: int = 48
 
+    #: A canary result older than this no longer describes the live source, so /health and the
+    #: status page mark it stale rather than presenting it as current. It is also the catch-up
+    #: threshold: a server starting with rows older than this re-probes before the first
+    #: scheduled maintenance pass, instead of serving a dead reading for `scheduler_seconds`.
+    canary_stale_hours: int = 24
+
     def ensure_dirs(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)
 

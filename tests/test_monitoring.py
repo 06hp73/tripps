@@ -6,14 +6,21 @@ these tests pin the framework that must never itself raise.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from tripps.db import Database
 from tripps.interfaces import HealthState
-from tripps.monitoring import CanaryResult, _probe_date, _run, persist_canaries, run_canaries
+from tripps.monitoring import (
+    CanaryResult,
+    _probe_date,
+    _run,
+    is_stale,
+    persist_canaries,
+    run_canaries,
+)
 
 
 @pytest.fixture
@@ -80,6 +87,97 @@ def test_persist_records_each_canary_under_a_prefixed_key(db):
     health = db.get_health()
     assert health["canary:flixbus"] == "ok"
     assert health["canary:sj"] == "down"
+
+
+def test_stale_covers_missing_and_old_but_not_fresh():
+    """A state with no timestamp is not evidence about now, so it counts as stale."""
+    assert is_stale(None, 24)
+    assert is_stale(24.1, 24)
+    assert not is_stale(23.9, 24)
+    assert not is_stale(0.0, 24)
+
+
+def test_canary_age_is_none_until_a_probe_is_recorded(db):
+    assert db.oldest_canary_age_hours() is None
+
+
+def test_canary_age_tracks_the_oldest_probe_not_the_newest(db):
+    """A source left behind by a partial run must still trigger a refresh.
+
+    Keyed on the newest row, one just-probed source would vouch for the whole set and the
+    stale one would never be re-probed - the exact failure the catch-up exists to prevent.
+    """
+    db.set_health("canary:flixbus", "degraded", "no bookable priced departures")
+    with db._write() as conn:
+        conn.execute(
+            "UPDATE adapter_health SET checked_at=? WHERE name='canary:flixbus'",
+            ((datetime.now(UTC) - timedelta(days=19)).isoformat(),),
+        )
+    persist_canaries(db, [CanaryResult("sj", HealthState.OK, "15 departures", 900)])
+
+    age = db.oldest_canary_age_hours()
+    assert age is not None and age > 24
+    assert is_stale(age, 24)
+
+
+def test_canary_age_is_fresh_once_every_source_is_reprobed(db):
+    persist_canaries(
+        db,
+        [
+            CanaryResult("flixbus", HealthState.OK, "8 departures", 660),
+            CanaryResult("sj", HealthState.OK, "15 departures", 900),
+        ],
+    )
+    age = db.oldest_canary_age_hours()
+    assert age is not None and age < 1
+    assert not is_stale(age, 24)
+
+
+def test_only_canary_rows_count_toward_the_age(db):
+    """Live per-request health is written on every search; it must not mask stale canaries."""
+    db.set_health("canary:flixbus", "ok", "8 departures")
+    with db._write() as conn:
+        conn.execute(
+            "UPDATE adapter_health SET checked_at=? WHERE name='canary:flixbus'",
+            ((datetime.now(UTC) - timedelta(days=19)).isoformat(),),
+        )
+    db.set_health("freerider-inventory", "ok", "29 offers")
+
+    age = db.oldest_canary_age_hours()
+    assert age is not None and age > 24
+
+
+def test_health_rows_carry_the_timestamp_get_health_drops(db):
+    persist_canaries(db, [CanaryResult("flixbus", HealthState.DEGRADED, "no fares", 500)])
+    row = db.get_health_rows()["canary:flixbus"]
+    assert row["state"] == "degraded"
+    assert "no fares" in row["detail"]
+    assert row["checked_at"]
+
+
+def test_health_entry_flags_an_old_probe_and_keeps_a_fresh_one(db):
+    """What /health and the status page report about a stored row: state plus how old it is."""
+    from tripps.api.app import _health_entry
+
+    persist_canaries(db, [CanaryResult("sj", HealthState.OK, "15 departures", 900)])
+    fresh = _health_entry(db.get_health_rows()["canary:sj"], 24)
+    assert fresh["state"] == "ok"
+    assert not fresh["stale"]
+    assert "ago" in fresh["age_label"]
+
+    old = dict(db.get_health_rows()["canary:sj"])
+    old["checked_at"] = (datetime.now(UTC) - timedelta(days=19)).isoformat()
+    entry = _health_entry(old, 24)
+    assert entry["stale"]
+    assert entry["age_label"] == "19 d ago"
+
+
+def test_health_entry_without_a_timestamp_is_stale():
+    from tripps.api.app import _health_entry
+
+    entry = _health_entry({"state": "ok", "detail": "", "checked_at": None}, 24)
+    assert entry["stale"]
+    assert entry["age_label"] == "age unknown"
 
 
 async def test_run_canaries_returns_one_result_per_source(monkeypatch):
