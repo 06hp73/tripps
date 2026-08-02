@@ -342,6 +342,58 @@ class PassCoverage:
         return contributing if len(contributing) >= 2 else None
 
 
+    def covered_run(self, held_ids, leg: Leg) -> tuple[int, list[TravelCard]] | None:
+        """How far into this leg the held cards reach, as (index, contributing cards).
+
+        A period ticket does not stop being valid because the train carries on past its
+        border: a Hallandstrafiken holder riding Halmstad->Göteborg travels free to the edge
+        of Halland and buys a ticket only for what is left. Today that leg is charged in full
+        (195 SEK) when the real cost to the holder is the remainder (Åsa->Göteborg, 90 SEK).
+
+        Returns the index in `via_stop_ids` of the furthest stop reachable on the cards alone,
+        counting from whichever end the cards start at, or None when they cover nothing, cover
+        everything (`covers` already handles that), or the leg carries no stop path. Fails
+        closed in every uncertain case: without the path there is no way to know which stops
+        the train calls at, and a guess here would zero a stretch the traveller must pay for.
+        """
+        if leg.mode is TransportMode.WALK or not leg.via_stop_ids:
+            return None
+        operator = leg.operator or ""
+        if operator in GLOBAL_EXCLUSIONS:
+            return None
+        honoring = [
+            card
+            for card_id in held_ids or ()
+            if (card := self._cards.get(card_id)) is not None
+            and operator in card.honored_operators
+            and card.coverage_model == "region-stops"
+            and not card.variant_gated
+        ]
+        if not honoring:
+            return None
+        # Region stops only, minus each card's denied stops - the same union `combined_cover`
+        # trusts. Border stops stay out for the reason given there.
+        covered_by = {
+            card.id: self._region_stops.get(card.id, frozenset()) - card.denied_stops
+            for card in honoring
+        }
+        covered = set().union(*covered_by.values())
+
+        stops = leg.via_stop_ids
+        forward = 0
+        while forward + 1 < len(stops) and stops[forward + 1] in covered:
+            forward += 1
+        if stops[0] not in covered:
+            forward = 0
+        if forward == 0 or forward == len(stops) - 1:
+            # Nothing covered from the boarding end, or the whole path is - the latter is
+            # `covers`/`combined_cover`'s business, not a partial ticket.
+            return None
+        reached = set(stops[: forward + 1])
+        contributing = [card for card in honoring if covered_by[card.id] & reached]
+        return (forward, contributing) if contributing else None
+
+
 #: Marks a quote produced by a tickital rental (the coupon-charged leg and its zeroed
 #: siblings), so the orchestrator can raise the period-cost + terms-of-service warning.
 TICKITAL_FARE_CLASS = "tickital rental"
@@ -413,6 +465,12 @@ class PassAdapter(PriceAdapter):
             if self._coverage.partially_covers(card_id, leg):
                 return self._coverage.card(card_id)
         return None
+
+    def covered_run(self, leg: Leg) -> tuple[int, list[TravelCard]] | None:
+        """How far the held cards carry the traveller into this leg. See `PassCoverage`."""
+        if not self._held or self._coverage is None:
+            return None
+        return self._coverage.covered_run(self._held, leg)
 
     def supports(self, leg: Leg) -> bool:
         return self._card_for(leg) is not None or self._combined_for(leg) is not None

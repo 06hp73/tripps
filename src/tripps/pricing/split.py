@@ -67,6 +67,52 @@ def _pick_indices(indices: list[int], n_stops: int) -> list[int]:
     return sorted(sorted(indices, key=lambda i: abs(i - mid))[:MAX_SPLITS_PER_LEG])
 
 
+def leg_segment(leg: Leg, start: int, end: int, resolve=None) -> Leg:
+    """The same physical ride, from calling point `start` to `end` of its own stop path.
+
+    Used wherever a leg has to be priced as less than the whole ride: a hub split, or the
+    stretch left over once a travel card has carried the traveller to its border. `path_km`
+    is dropped because the parent's ridden distance is not this segment's, and a floor
+    integrated over the wrong distance is exactly how the price bound stops being a bound.
+    """
+    return leg.model_copy(
+        update={
+            "from_stop": leg.from_stop if start == 0 else _stop_at(leg, start, resolve),
+            "to_stop": (
+                leg.to_stop
+                if end == len(leg.via_stop_ids) - 1
+                else _stop_at(leg, end, resolve)
+            ),
+            "departure": leg.via_departures[start],
+            "arrival": leg.via_arrivals[end],
+            "quote": None,
+            "via_stop_ids": leg.via_stop_ids[start : end + 1],
+            "via_departures": leg.via_departures[start : end + 1],
+            "via_arrivals": leg.via_arrivals[start : end + 1],
+            "path_km": None,
+        }
+    )
+
+
+def _stop_at(leg: Leg, index: int, resolve=None) -> _Stop:
+    """A Stop for an interior calling point of this leg.
+
+    A leg carries its path as bare ids, so a faithful name comes from the timetable when the
+    caller can supply one (`resolve`), else from the curated hub table. Falling back to the id
+    as the name keeps this total rather than raising - a station id in a note is unlovely but
+    honest, where inventing a name would not be.
+    """
+    stop_id = leg.via_stop_ids[index]
+    if resolve is not None:
+        found = resolve(stop_id)
+        if found is not None:
+            return found
+    known = SPLIT_STATIONS.get(stop_id)
+    if known is not None:
+        return known
+    return _Stop(id=stop_id, name=stop_id, lat=0.0, lon=0.0, modes=frozenset({leg.mode}))
+
+
 def sub_legs(leg: Leg) -> list[tuple[str, Leg, Leg]]:
     """For each candidate hub on this train, the (hub_name, board->hub, hub->alight) sub-legs.
 

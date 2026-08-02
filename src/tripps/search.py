@@ -114,6 +114,10 @@ class Planner:
     def resolve_stops(self, query: str, limit: int = 8) -> list[Stop]:
         return resolve_stops(self.timetable, query, limit)
 
+    def _stop_by_id(self, stop_id: str) -> Stop | None:
+        index = self.timetable.stop_index.get(stop_id)
+        return None if index is None else self.timetable.stops[index]
+
     def _stop_group(self, anchor: Stop, radius_km: float = STOP_MATCH_RADIUS_KM) -> list[Stop]:
         """All stops that serve the same place, so a search is not tied to one platform.
 
@@ -437,6 +441,9 @@ class Planner:
             # calibration samples describe the bound that actually shaped this search.
             floors=floors,
             budget=budget,
+            # Lets a card-boundary note name the station a ticket starts at; only the planner
+            # holds the timetable that maps a path's stop ids back to real stations.
+            stop_resolver=self._stop_by_id,
         )
         stats.priced = len(priced.itineraries)
         stats.upstream_calls = priced.calls_made

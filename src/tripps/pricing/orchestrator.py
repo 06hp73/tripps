@@ -60,6 +60,7 @@ from ..surcharges import apply_arlanda_fee
 from .base import BudgetExceeded, CallBudget
 from .freerider import FreeriderAdapter
 from .sj import SOURCE as SJ_SOURCE
+from .split import leg_segment
 from .split import sub_legs as _split_sub_legs
 
 log = logging.getLogger(__name__)
@@ -76,6 +77,10 @@ _FLOOR_EXEMPT_SOURCES = frozenset({PASS_SOURCE, TICKITAL_SOURCE})
 #: Confidences firm enough to decide "the rental beats the singles". A stale or estimated
 #: single is too soft to justify pushing a traveller into a terms-risky rental.
 _FIRM_CONFIDENCES = frozenset({PriceConfidence.EXACT, PriceConfidence.CACHED})
+
+#: Marks a quote that is the fare for the stretch beyond a held card's area, so the
+#: "your card may reduce this" hint knows it already did and stays quiet.
+CARD_REMAINDER_FARE_CLASS = "beyond your card's area"
 
 #: Don't trumpet a split saving below this - the two-contract hassle is not worth a few kronor,
 #: and a saving that small is within the noise of a re-priced yield-managed fare.
@@ -129,6 +134,9 @@ class _Context:
     #: both be judged against this one - otherwise every student fare looks like a violation
     #: of a bound that was never applied to it.
     floors: PriceFloorModel | None = None
+    #: Turns a stop id from a leg's path into a real Stop, so a card-boundary note can name
+    #: the station the ticket starts at. Supplied by the planner, which holds the timetable.
+    stop_resolver: object | None = None
     violations: list[str] = field(default_factory=list)
     #: Operators whose routing floor the search zeroed (held cards + active rentals). A leg on
     #: one of these was routed with a 0 floor, so a paid quote below the calibrated floor
@@ -175,7 +183,15 @@ class PricingOrchestrator:
     # --- one leg ----------------------------------------------------------
 
     async def _quote_leg(self, leg: Leg, ctx: _Context) -> Quote:
-        """Cache -> budget -> upstream. Never raises."""
+        """Cache -> budget -> upstream, then the held cards' bite. Never raises.
+
+        The card-boundary reduction is applied to what is RETURNED, never to what is stored:
+        the cache is keyed on the leg and the traveller, not on which period tickets happen to
+        be registered, so caching a card holder's remainder fare there would hand it to
+        everyone. For the same reason the floor audit and the calibration sample use the full
+        fare - that is the number the operator charges, and the one a routing bound is fitted
+        against.
+        """
         adapter = self._adapter_for(leg)
         if adapter is None:
             return Quote.unavailable(
@@ -191,7 +207,7 @@ class PricingOrchestrator:
                 PriceConfidence.ESTIMATED,
             ):
                 self._check_floor(leg, cached, ctx)
-                return cached
+                return await self._apply_card_boundary(leg, cached, ctx)
 
         try:
             quote = await adapter.quote_leg(leg, ctx.passenger)
@@ -218,7 +234,57 @@ class PricingOrchestrator:
             self.db.put_quote(adapter.name, leg, quote, ttl, ctx.passenger)
             self._record_delta(leg, quote, adapter.name, ctx.passenger, ctx.floors)
         self._check_floor(leg, quote, ctx)
-        return quote
+        return await self._apply_card_boundary(leg, quote, ctx)
+
+    async def _apply_card_boundary(self, leg: Leg, quote: Quote, ctx: _Context) -> Quote:
+        """Charge only the stretch a held card does not reach.
+
+        A period ticket stays valid until its border, so a card holder riding past it buys a
+        ticket for the remainder, not for the whole leg: Halmstad->Göteborg is 195 SEK, but a
+        Hallandstrafiken holder pays the Åsa->Göteborg fare of 90. Priced, not derived - the
+        remainder is a different origin/destination pair with its own fare, never a fraction
+        of the through fare.
+
+        This runs during pricing rather than as an annotation afterwards because it changes
+        which journey is cheapest: at 195 the Halmstad coach wins, at 90 the train does.
+        """
+        passcard = next((a for a in self.adapters if isinstance(a, PassAdapter)), None)
+        if passcard is None or not quote.is_priced or quote.amount_ore is None:
+            return quote
+        run = passcard.covered_run(leg)
+        if run is None:
+            return quote
+        boundary, cards = run
+
+        segment = leg_segment(leg, boundary, len(leg.via_stop_ids) - 1, ctx.stop_resolver)
+        adapter = self._adapter_for(segment)
+        if adapter is None:
+            return quote
+        try:
+            remainder = await adapter.quote_leg(segment, ctx.passenger)
+        except BudgetExceeded:
+            return quote  # out of calls for this source; the full fare stands, honestly
+        except Exception:  # noqa: BLE001 - a probe must never empty the results
+            log.exception("card-boundary pricing failed on %s", leg.service_ref)
+            return quote
+        if not remainder.is_priced or remainder.amount_ore is None:
+            return quote
+        if remainder.amount_ore >= quote.amount_ore:
+            # No saving: the remainder is priced as dearly as the whole ride (short-hop
+            # minimums do this). Charging the through fare keeps the simpler ticket.
+            return quote
+
+        names = " + ".join(card.name for card in cards)
+        covered_to = segment.from_stop.name
+        return remainder.model_copy(
+            update={
+                "note": (
+                    f"{leg.from_stop.name} → {covered_to} is covered by your {names} "
+                    f"period ticket; only {covered_to} → {leg.to_stop.name} is charged."
+                ),
+                "fare_class": CARD_REMAINDER_FARE_CLASS,
+            }
+        )
 
     def _prices_a_real_ticket(self, leg: Leg) -> bool:
         """Freerider and walking have no ticket, so their floor carries no fare information.
@@ -524,6 +590,9 @@ class PricingOrchestrator:
                 passcard is not None
                 and quote.is_priced
                 and quote.source not in (PASS_SOURCE, TICKITAL_SOURCE)
+                # Not when the card already took its bite: this leg is the remainder fare,
+                # and telling the holder it "is shown at full fare" would be false.
+                and quote.fare_class != CARD_REMAINDER_FARE_CLASS
             ):
                 partial = passcard.partial_card(leg)
                 if partial is not None:
@@ -562,6 +631,7 @@ class PricingOrchestrator:
         zeroed_operators: frozenset[str] | None = None,
         floors: PriceFloorModel | None = None,
         budget: PricingBudget | None = None,
+        stop_resolver=None,
     ) -> PricingResult:
         """Price the most promising candidates, then rank by true total price.
 
@@ -606,6 +676,7 @@ class PricingOrchestrator:
             call_budget=CallBudget.from_settings(budget),
             passenger=constraints.passenger,
             floors=floors or self.floors,
+            stop_resolver=stop_resolver,
             zeroed_operators=zeroed_operators or frozenset(),
         )
         for adapter in self.adapters:

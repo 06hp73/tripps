@@ -310,6 +310,25 @@ all-zone card variant, never auto-frees SJ (its agency mixes SJ Regional with hi
 and prefers to charge over wrongly zeroing a leg. A covered leg is shown, not hidden, at 0
 SEK with an "Included with your Skånetrafiken period ticket" note.
 
+**Riding past your card's border.** A period ticket does not stop being valid because the
+train carries on. A Hallandstrafiken holder going Halmstad→Göteborg travels free to the edge
+of Halland and buys a ticket only for the remainder, so the leg costs the Åsa→Göteborg fare of
+**90 SEK**, not the 195 the whole ride costs. tripps prices that remainder as its own
+origin/destination pair — a fare in its own right, never a fraction of the through fare — and
+does it *during* pricing rather than as a footnote, because it changes the answer: at 195 the
+Halmstad coach (160) is the cheapest way to Göteborg, at 90 the train is. The leg carries
+"Halmstad Centralstation → Åsa station is covered by your Hallandstrafiken period ticket; only
+Åsa station → Göteborg Centralstation is charged."
+
+The reduction is applied to what is *shown*, never to what is *stored*. The quote cache is
+keyed on the leg and the traveller, not on which cards happen to be registered, so a holder's
+remainder fare in that cache would be served to everyone; the cache, the floor audit and the
+calibration sample all keep the operator's real full fare. Where the border sits comes from
+the same feed-derived regions as everything else — Åsa is the last Halland stop, Kungsbacka
+belongs to Västtrafik — and both price the tail at 90 SEK, so the conservative reading costs
+the traveller nothing. If no fare exists for the remainder, or it is no cheaper than the
+through fare (short-hop minimums do that), the single ticket stands.
+
 Each card's region is the set of stops served by its home agency, extracted once from the
 *full* GTFS feed (all route types, `data/tt-cache/agency-stops-*.json`) — county PTAs whose
 only routes are local buses are absent from the intercity routing network, so their regions
