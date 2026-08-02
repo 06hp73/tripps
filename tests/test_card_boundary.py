@@ -59,6 +59,16 @@ HALLAND = TravelCard(
 )
 AGENCY_STOPS = {"Hallandstrafiken": ["740000080", "740000110", "740001604"]}
 
+#: A second card covering only the far end, for the covered-both-ends case.
+GOTHENBURG = TravelCard(
+    id="vasttrafik",
+    name="Västtrafik",
+    region="Västra Götaland",
+    honored_operators=frozenset({"Öresundståg"}),
+    coverage_model="region-stops",
+    region_agencies=frozenset({"Västtrafik"}),
+)
+
 
 def _leg(from_index: int = 0, to_index: int = 4) -> Leg:
     ids = [sid for sid, _ in PATH][from_index : to_index + 1]
@@ -122,35 +132,71 @@ FARES = {
 # --- how far the cards reach ------------------------------------------------
 
 
-def test_covered_run_stops_at_the_card_border():
-    boundary, cards = _coverage().covered_run(["hallandstrafiken"], _leg())
-    assert [sid for sid, _ in PATH][boundary] == "740001604"  # Åsa, the last Halland stop
+def _ids(indices):
+    return [[sid for sid, _ in PATH][i] for i in indices]
+
+
+def test_the_paid_span_starts_at_the_card_border_when_riding_out_of_it():
+    start, end, cards = _coverage().paid_span(["hallandstrafiken"], _leg())
+    assert _ids((start, end)) == ["740001604", "740000002"]  # Åsa -> Göteborg
     assert [c.id for c in cards] == ["hallandstrafiken"]
 
 
-def test_no_run_when_the_card_covers_the_whole_leg():
+def test_the_paid_span_ends_at_the_card_border_when_riding_into_it():
+    """The mirror case: Göteborg -> Halmstad pays as far as Åsa and rides free from there.
+
+    Real reports of this were Kalmar->Lund and Alvesta->Hässleholm on a Skånetrafiken card -
+    journeys whose covered part is at the END, which a forward-only walk from the boarding
+    stop misses entirely.
+    """
+    northbound = _leg()
+    reversed_ids = tuple(reversed(northbound.via_stop_ids))
+    inbound = northbound.model_copy(
+        update={
+            "from_stop": STOPS[reversed_ids[0]],
+            "to_stop": STOPS[reversed_ids[-1]],
+            "via_stop_ids": reversed_ids,
+        }
+    )
+    start, end, _ = _coverage().paid_span(["hallandstrafiken"], inbound)
+    assert [inbound.via_stop_ids[i] for i in (start, end)] == ["740000002", "740001604"]
+
+
+def test_the_paid_span_is_the_gap_between_two_cards():
+    """Covered at both ends, paid in the middle - one ticket across the hole."""
+    coverage = PassCoverage(
+        None,
+        cards={HALLAND.id: HALLAND, GOTHENBURG.id: GOTHENBURG},
+        agency_stops={**AGENCY_STOPS, "Västtrafik": ["740000002"]},
+    )
+    start, end, cards = coverage.paid_span(["hallandstrafiken", "vasttrafik"], _leg())
+    assert _ids((start, end)) == ["740001604", "740000002"]  # Åsa -> Göteborg, over Kungsbacka
+    assert {c.id for c in cards} == {"hallandstrafiken", "vasttrafik"}
+
+
+def test_no_span_when_the_card_covers_the_whole_leg():
     """That is `covers`'s business - this is only about the part that is left to pay."""
-    assert _coverage().covered_run(["hallandstrafiken"], _leg(0, 2)) is None
+    assert _coverage().paid_span(["hallandstrafiken"], _leg(0, 2)) is None
 
 
-def test_no_run_when_the_journey_starts_outside_the_card():
+def test_no_span_when_the_card_reaches_none_of_the_journey():
     """Kungsbacka -> Göteborg is entirely Västtrafik's; a Halland card reaches none of it."""
-    assert _coverage().covered_run(["hallandstrafiken"], _leg(3, 4)) is None
+    assert _coverage().paid_span(["hallandstrafiken"], _leg(3, 4)) is None
 
 
-def test_no_run_without_a_stop_path():
+def test_no_span_without_a_stop_path():
     """Fails closed: with no path there is no way to know where the train calls."""
     bare = _leg().model_copy(update={"via_stop_ids": (), "via_departures": (), "via_arrivals": ()})
-    assert _coverage().covered_run(["hallandstrafiken"], bare) is None
+    assert _coverage().paid_span(["hallandstrafiken"], bare) is None
 
 
-def test_no_run_for_an_operator_the_card_does_not_honour():
+def test_no_span_for_an_operator_the_card_does_not_honour():
     other = _leg().model_copy(update={"operator": "SJ"})
-    assert _coverage().covered_run(["hallandstrafiken"], other) is None
+    assert _coverage().paid_span(["hallandstrafiken"], other) is None
 
 
-def test_no_run_without_a_held_card():
-    assert _coverage().covered_run([], _leg()) is None
+def test_no_span_without_a_held_card():
+    assert _coverage().paid_span([], _leg()) is None
 
 
 # --- what the traveller is charged ------------------------------------------
@@ -178,8 +224,8 @@ async def test_the_holder_is_charged_only_the_remainder():
     assert quote.amount_ore == 9_000
     assert quote.fare_class == CARD_REMAINDER_FARE_CLASS
     assert quote.note == (
-        "Halmstad C → Åsa is covered by your Hallandstrafiken period ticket; "
-        "only Åsa → Göteborg C is charged."
+        "Only Åsa → Göteborg C is charged; the rest of this leg is covered by your "
+        "Hallandstrafiken period ticket."
     )
     assert ("740001604", "740000002") in paid.asked
 

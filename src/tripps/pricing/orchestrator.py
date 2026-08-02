@@ -245,18 +245,22 @@ class PricingOrchestrator:
         remainder is a different origin/destination pair with its own fare, never a fraction
         of the through fare.
 
+        The uncovered stretch sits wherever the card's region does not: at the end when riding
+        out of it, at the FRONT when riding into it (Kalmar->Lund on a Skånetrafiken card), or
+        in the middle between two cards that do not quite meet.
+
         This runs during pricing rather than as an annotation afterwards because it changes
         which journey is cheapest: at 195 the Halmstad coach wins, at 90 the train does.
         """
         passcard = next((a for a in self.adapters if isinstance(a, PassAdapter)), None)
         if passcard is None or not quote.is_priced or quote.amount_ore is None:
             return quote
-        run = passcard.covered_run(leg)
-        if run is None:
+        span = passcard.paid_span(leg)
+        if span is None:
             return quote
-        boundary, cards = run
+        start, end, cards = span
 
-        segment = leg_segment(leg, boundary, len(leg.via_stop_ids) - 1, ctx.stop_resolver)
+        segment = leg_segment(leg, start, end, ctx.stop_resolver)
         adapter = self._adapter_for(segment)
         if adapter is None:
             return quote
@@ -275,12 +279,13 @@ class PricingOrchestrator:
             return quote
 
         names = " + ".join(card.name for card in cards)
-        covered_to = segment.from_stop.name
         return remainder.model_copy(
             update={
+                # One sentence for all three shapes, because "the rest" is exactly true
+                # whether the covered part is before, after, or on both sides of the charge.
                 "note": (
-                    f"{leg.from_stop.name} → {covered_to} is covered by your {names} "
-                    f"period ticket; only {covered_to} → {leg.to_stop.name} is charged."
+                    f"Only {segment.from_stop.name} → {segment.to_stop.name} is charged; "
+                    f"the rest of this leg is covered by your {names} period ticket."
                 ),
                 "fare_class": CARD_REMAINDER_FARE_CLASS,
             }

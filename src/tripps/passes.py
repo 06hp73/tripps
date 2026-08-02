@@ -342,19 +342,25 @@ class PassCoverage:
         return contributing if len(contributing) >= 2 else None
 
 
-    def covered_run(self, held_ids, leg: Leg) -> tuple[int, list[TravelCard]] | None:
-        """How far into this leg the held cards reach, as (index, contributing cards).
+    def paid_span(self, held_ids, leg: Leg) -> tuple[int, int, list[TravelCard]] | None:
+        """The stretch of this leg the held cards do NOT cover, as (start, end, cards).
 
         A period ticket does not stop being valid because the train carries on past its
-        border: a Hallandstrafiken holder riding Halmstad->Göteborg travels free to the edge
-        of Halland and buys a ticket only for what is left. Today that leg is charged in full
-        (195 SEK) when the real cost to the holder is the remainder (Åsa->Göteborg, 90 SEK).
+        border, so a holder buys a ticket for what is left rather than for the whole ride:
+        Halmstad->Göteborg is 195 SEK, but a Hallandstrafiken holder pays the Åsa->Göteborg
+        fare of 90. The uncovered stretch can sit at either end - riding *into* the card's
+        region (Kalmar->Lund on a Skånetrafiken card) leaves the paid part at the front - or
+        in the middle, between two cards that do not quite meet.
 
-        Returns the index in `via_stop_ids` of the furthest stop reachable on the cards alone,
-        counting from whichever end the cards start at, or None when they cover nothing, cover
-        everything (`covers` already handles that), or the leg carries no stop path. Fails
-        closed in every uncertain case: without the path there is no way to know which stops
-        the train calls at, and a guess here would zero a stretch the traveller must pay for.
+        Indices are into `via_stop_ids`, and they name the stations the paid ticket runs
+        between: a ticket must start where the traveller may board, so the boundary stop
+        itself is an endpoint of the paid segment, not the first stop past it.
+
+        Fails closed in every uncertain case, returning None: no stop path (the calling
+        pattern is unknown, and guessing would zero a stretch that must be paid for), no card
+        honouring the operator, nothing covered, everything covered (`covers` and
+        `combined_cover` own that), or an uncovered stretch that is not contiguous - two gaps
+        need two tickets, which is not what this prices.
         """
         if leg.mode is TransportMode.WALK or not leg.via_stop_ids:
             return None
@@ -380,18 +386,20 @@ class PassCoverage:
         covered = set().union(*covered_by.values())
 
         stops = leg.via_stop_ids
-        forward = 0
-        while forward + 1 < len(stops) and stops[forward + 1] in covered:
-            forward += 1
-        if stops[0] not in covered:
-            forward = 0
-        if forward == 0 or forward == len(stops) - 1:
-            # Nothing covered from the boarding end, or the whole path is - the latter is
-            # `covers`/`combined_cover`'s business, not a partial ticket.
+        uncovered = [i for i, stop_id in enumerate(stops) if stop_id not in covered]
+        if not uncovered or len(uncovered) == len(stops):
             return None
-        reached = set(stops[: forward + 1])
+        if uncovered != list(range(uncovered[0], uncovered[-1] + 1)):
+            return None  # two separate gaps would need two tickets
+
+        start = uncovered[0] - 1 if uncovered[0] > 0 else 0
+        end = uncovered[-1] + 1 if uncovered[-1] < len(stops) - 1 else len(stops) - 1
+        if start == 0 and end == len(stops) - 1:
+            return None  # the whole ride is chargeable; there is nothing for the card to do
+
+        reached = {stop_id for stop_id in stops if stop_id in covered}
         contributing = [card for card in honoring if covered_by[card.id] & reached]
-        return (forward, contributing) if contributing else None
+        return (start, end, contributing) if contributing else None
 
 
 #: Marks a quote produced by a tickital rental (the coupon-charged leg and its zeroed
@@ -466,11 +474,11 @@ class PassAdapter(PriceAdapter):
                 return self._coverage.card(card_id)
         return None
 
-    def covered_run(self, leg: Leg) -> tuple[int, list[TravelCard]] | None:
-        """How far the held cards carry the traveller into this leg. See `PassCoverage`."""
+    def paid_span(self, leg: Leg) -> tuple[int, int, list[TravelCard]] | None:
+        """The stretch of this leg the held cards do not cover. See `PassCoverage`."""
         if not self._held or self._coverage is None:
             return None
-        return self._coverage.covered_run(self._held, leg)
+        return self._coverage.paid_span(self._held, leg)
 
     def supports(self, leg: Leg) -> bool:
         return self._card_for(leg) is not None or self._combined_for(leg) is not None
