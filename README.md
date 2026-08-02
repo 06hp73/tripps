@@ -124,6 +124,44 @@ The planner would rather say nothing than say something false.
   every category and says so, per leg and once per journey. Ranking on an unbookable fare
   would be a lie in the one number this program exists to get right.
 
+## Refining a search
+
+A search hides itineraries it could not fully price, and most of the time that is not a
+missing fare — it is the per-source call allowance running out mid-search. Measured on
+Uppsala→Göteborg (2026-08-10, cold cache each run):
+
+| calls/source | hidden | upstream calls | wall clock |
+|---|---|---|---|
+| 12 (default) | 17 | 55 | 8.9s |
+| 24 | 5 | 74 | 14.5s |
+| 48 | 5 | 74 | 14.0s |
+
+Past 24 nothing changes: the budget stops being what binds, and the residual 5 have no
+purchasable fare at any allowance. So the fix is offered, not applied — `tripps search
+--refine`, `GET /api/search?refine=1`, or the "Look again at the N hidden option(s)" button in
+the warning box.
+
+Refining re-runs the same query with `refine_call_multiplier`× the allowance. It is cheap the
+second time because the first pass's fares are already in the quote cache and cost no budget,
+which leaves the whole new allowance for the legs that were starved:
+
+```
+step 1 (budget 12, cold)     17 hidden   55 calls
+step 2 (budget 24, warm)      5 hidden   28 calls   <- the refine
+one shot (budget 24, cold)    5 hidden   74 calls
+```
+
+On Lund→Stockholm the two-step even beat the single larger budget (4 hidden vs 6), for the
+same reason: cached quotes are free, so a second pass reaches legs one bigger budget still
+could not.
+
+**Why it is never automatic.** Across every route and budget measured, the cheapest fare did
+not move — 503, 465, 540 SEK regardless. Refining buys completeness, not a cheaper journey, so
+spending a second round of calls against undocumented endpoints on every search (including the
+ones nobody reads) is a bad trade. A floor-based auto-trigger was tried and rejected: the
+routing floors are deliberately pessimistic, so every hidden itinerary's bound sits below the
+cheapest shown price (21/21, 6/6, 1/1 on three routes) and the trigger fires always.
+
 ## Split ticketing
 
 SJ prices every origin/destination pair independently and allocates cheap seats per segment,
@@ -221,6 +259,7 @@ uv pip install -e ".[dev,flights]"
 .venv/bin/tripps search "Kiruna" "Stockholm Centralstation" --date 2026-07-13
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --date 2026-07-13 --return 2026-07-16
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --modes train,bus   # only these modes
+.venv/bin/tripps search "Stockholm C" "Göteborg C" --refine            # fewer options hidden
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --passenger student # discounted fares
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --passenger child --age 8
 .venv/bin/tripps fares  "Stockholm C" "Göteborg C" --start 2026-07-13 --days 7

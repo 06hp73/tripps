@@ -111,6 +111,9 @@ class PricingResult:
     source_status: dict[str, str] = field(default_factory=dict)
     calls_made: int = 0
     floor_violations: int = 0
+    #: Itineraries dropped for having a leg this pass could not price. Carried as a number,
+    #: not only as warning prose, so a caller can offer a refine without parsing English.
+    hidden_options: int = 0
 
 
 @dataclass(slots=True)
@@ -331,7 +334,9 @@ class PricingOrchestrator:
             f"(two tickets, no rebooking or delay protection across {best_name})."
         )
 
-    async def _apply_split_tickets(self, shown: list[Itinerary]) -> None:
+    async def _apply_split_tickets(
+        self, shown: list[Itinerary], budget: PricingBudget | None = None
+    ) -> None:
         """Annotate SJ legs in the shown itineraries where a hub split beats the through fare.
 
         Advisory only: neither `amount_ore` nor the itinerary total moves - the price tripps
@@ -343,9 +348,10 @@ class PricingOrchestrator:
         and silently find nothing. A separate allowance keeps this advisory bounded on its own
         terms while never starving the authoritative pricing that precedes it.
         """
-        if not self.budget.enable_split_tickets:
+        budget = budget or self.budget
+        if not budget.enable_split_tickets:
             return
-        split_budget = CallBudget.from_settings(self.budget)
+        split_budget = CallBudget.from_settings(budget)
         for adapter in self.adapters:
             setter = getattr(adapter, "set_budget", None)
             if setter is not None:
@@ -555,6 +561,7 @@ class PricingOrchestrator:
         require_priced: bool = True,
         zeroed_operators: frozenset[str] | None = None,
         floors: PriceFloorModel | None = None,
+        budget: PricingBudget | None = None,
     ) -> PricingResult:
         """Price the most promising candidates, then rank by true total price.
 
@@ -566,6 +573,9 @@ class PricingOrchestrator:
         "we can't price this, here's the booking link".
         """
         constraints = constraints or SearchConstraints()
+        # Per call, not per orchestrator: a refine pass runs the same adapters on a larger
+        # allowance, and the orchestrator is shared by every search in the process.
+        budget = budget or self.budget
         feasible = [itin for itin in candidates if constraints.permits(itin)]
         if not feasible:
             return PricingResult(itineraries=[], warnings=["No itinerary met the constraints."])
@@ -589,11 +599,11 @@ class PricingOrchestrator:
         # The range query returns one itinerary per departure, so the same journey shape
         # appears many times. Sample each shape across the day before spending calls: the
         # cheapest departure is often the last one, never the first.
-        feasible = spread_by_departure(feasible, self.budget.max_departures_per_pattern)
-        to_price, deferred = _select_to_price(feasible, self.budget.max_candidates_to_price)
+        feasible = spread_by_departure(feasible, budget.max_departures_per_pattern)
+        to_price, deferred = _select_to_price(feasible, budget.max_candidates_to_price)
 
         ctx = _Context(
-            call_budget=CallBudget.from_settings(self.budget),
+            call_budget=CallBudget.from_settings(budget),
             passenger=constraints.passenger,
             floors=floors or self.floors,
             zeroed_operators=zeroed_operators or frozenset(),
@@ -605,7 +615,7 @@ class PricingOrchestrator:
         warnings: list[str] = list(pre_warnings)
 
         try:
-            async with asyncio.timeout(self.budget.phase2_timeout_seconds):
+            async with asyncio.timeout(budget.phase2_timeout_seconds):
                 priced = await asyncio.gather(
                     *(self._price_itinerary(itin, ctx) for itin in to_price)
                 )
@@ -618,7 +628,7 @@ class PricingOrchestrator:
         if deferred:
             warnings.append(
                 f"{len(deferred)} slower or pricier itineraries were not priced "
-                f"(cap: {self.budget.max_candidates_to_price})."
+                f"(cap: {budget.max_candidates_to_price})."
             )
 
         if ctx.violations:
@@ -637,12 +647,14 @@ class PricingOrchestrator:
 
         ranked = sorted(collapse_equivalent(priced), key=_price_sort_key)
 
+        hidden_options = 0
         if require_priced:
             fully = [itin for itin in ranked if itin.fully_priced]
             if fully:
                 dropped = len(ranked) - len(fully)
                 ranked = fully
                 if dropped:
+                    hidden_options = dropped
                     warnings.append(
                         f"{dropped} option(s) with at least one unpriced leg were hidden."
                     )
@@ -661,7 +673,7 @@ class PricingOrchestrator:
         # On the handful of itineraries actually shown, flag any SJ leg a hub split undercuts.
         # Advisory-only and budget-bounded, so it neither reorders the results nor risks the
         # cheapest being missed - it just tells the traveller how to shave the fare further.
-        await self._apply_split_tickets(shown)
+        await self._apply_split_tickets(shown, budget)
 
         status = {a.name: (await a.health()).state.value for a in self.adapters}
 
@@ -671,6 +683,7 @@ class PricingOrchestrator:
             source_status=status,
             calls_made=ctx.call_budget.spent(),
             floor_violations=len(ctx.violations),
+            hidden_options=hidden_options,
         )
 
 

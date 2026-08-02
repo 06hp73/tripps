@@ -644,6 +644,26 @@
     }
   });
 
+  // --- refine (on demand) ----------------------------------------------
+  // Re-runs the same search with a larger call allowance. Never automatic: it is a second
+  // round of calls against undocumented endpoints, and it buys completeness, not a cheaper
+  // fare. Cheap when asked for, because the first pass's fares are already cached.
+  results.addEventListener("click", async (event) => {
+    const button = event.target.closest("#refine");
+    if (!button) return;
+    button.disabled = true;
+    button.textContent = "Pricing the options the first pass could not…";
+    const body = new FormData(form);
+    body.set("refine", "1");
+    try {
+      const response = await fetch("/search", { method: "POST", body });
+      results.innerHTML = await response.text();
+    } catch (err) {
+      button.disabled = false;
+      button.textContent = "Refine failed — try again";
+    }
+  });
+
   // --- split-ticket scan (on demand) -----------------------------------
   // Delegated, because the results are replaced wholesale on every search. One scan is
   // hundreds of SJ calls for a single train, so it only ever runs on a click.

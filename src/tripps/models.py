@@ -535,3 +535,6 @@ class SearchResponse(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     #: Per-adapter health so the UI can say "SJ prices unavailable" rather than lie.
     source_status: dict[str, str] = Field(default_factory=dict)
+    #: Options dropped for having a leg this pass could not price. A refine pass, which runs
+    #: on a larger call allowance over the now-warm quote cache, usually recovers most of them.
+    hidden_options: int = 0

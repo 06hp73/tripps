@@ -490,7 +490,9 @@ def _rentals(db) -> list[TickitalRental]:
     return [TickitalRental.from_row(r) for r in db.list_tickital_rentals()]
 
 
-async def _run_search(state: AppState, origin, destination, service_date, constraints):
+async def _run_search(
+    state: AppState, origin, destination, service_date, constraints, refine: bool = False
+):
     planner = state.planner_for(service_date)
     try:
         return await planner.search(
@@ -501,6 +503,7 @@ async def _run_search(state: AppState, origin, destination, service_date, constr
             offers=state.freerider_offers,
             held_cards=state.db.list_cards(),
             tickital_rentals=_rentals(state.db),
+            refine=refine,
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
@@ -522,6 +525,7 @@ async def api_search(
     modes: list[str] | None = Query(None),
     passenger: str | None = None,
     age: int | None = None,
+    refine: bool = False,
 ) -> JSONResponse:
     state = _state(request)
     service_date = _parse_date(date_)
@@ -529,7 +533,9 @@ async def api_search(
         max_hours, max_transfers, include_freerider, modes, earliest, service_date,
         passenger, age,
     )
-    response, stats = await _run_search(state, origin, destination, service_date, constraints)
+    response, stats = await _run_search(
+        state, origin, destination, service_date, constraints, refine
+    )
     payload = response.model_dump(mode="json")
     payload["stats"] = {
         "candidates": stats.candidates,
@@ -1171,6 +1177,7 @@ async def ui_search(
     mode_flight: bool = Form(False),
     passenger: str | None = Form(None),
     age: int | None = Form(None),
+    refine: bool = Form(False),
 ) -> HTMLResponse:
     state = _state(request)
     service_date = _parse_date(date_)
@@ -1193,7 +1200,7 @@ async def ui_search(
     )
     try:
         response, stats = await _run_search(
-            state, origin, destination, service_date, constraints
+            state, origin, destination, service_date, constraints, refine
         )
     except (HTTPException, FileNotFoundError) as exc:
         # A missing GTFS feed (FileNotFoundError) or an unknown place (404) should render an
@@ -1212,5 +1219,7 @@ async def ui_search(
             "stats": stats,
             "summarize": summarize,
             "error": None,
+            "refined": refine,
+            "hidden_options": response.hidden_options,
         },
     )

@@ -49,7 +49,29 @@ class PricingBudget(BaseSettings):
     #: is unchanged. Off-switch for when those extra calls are unwanted.
     enable_split_tickets: bool = True
 
+    #: What a *refine* pass multiplies the per-source call allowance by. A first search hides
+    #: itineraries whose legs it ran out of calls to price; asked to look again, it re-prices
+    #: the same candidates with this much more allowance. Measured on Uppsala->Göteborg
+    #: (2026-08-10): 17 hidden at the base allowance, 5 at double, and nothing improves beyond
+    #: that - past 2x the budget stops being what binds.
+    refine_call_multiplier: int = 2
+    #: Wall-clock ceiling for a refine pass. Higher than `phase2_timeout_seconds` because it
+    #: prices strictly more legs; the fares the first pass already fetched come from the quote
+    #: cache, so the extra time is spent on the legs that were starved, not on repeats.
+    refine_timeout_seconds: float = 90.0
+
     model_config = SettingsConfigDict(env_prefix="TRIPPS_BUDGET_")
+
+    def refined(self) -> PricingBudget:
+        """This budget, with the allowances a refine pass runs on."""
+        return self.model_copy(
+            update={
+                "max_calls_per_source_per_search": (
+                    self.max_calls_per_source_per_search * self.refine_call_multiplier
+                ),
+                "phase2_timeout_seconds": self.refine_timeout_seconds,
+            }
+        )
 
 
 class CacheTTL(BaseSettings):

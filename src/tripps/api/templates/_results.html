@@ -31,6 +31,11 @@
   a.book:hover { text-decoration: underline; }
   .statline { color: var(--muted); font-size: .8rem; margin-top: 1.5rem; }
   .empty { color: var(--muted); }
+  .refine-btn { font: inherit; font-size: .85rem; background: var(--warn); color: #0b0d12;
+                border: 0; border-radius: 7px; padding: .35rem .8rem; cursor: pointer;
+                margin-top: .6rem; }
+  .refine-btn[disabled] { opacity: .6; cursor: default; }
+  .refine-note { display: block; color: var(--muted); font-size: .78rem; margin-top: .35rem; }
 </style>
 
 {% if error %}
@@ -48,6 +53,25 @@
     <div class="warnbox">
       <strong>Before you book</strong>
       <ul>{% for w in response.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+      {# Offered, never automatic: a refine is a second round of calls against undocumented
+         endpoints, and it buys completeness rather than a cheaper fare. #}
+      {% if hidden_options and not refined %}
+        {# "Look again", not "show them": most hidden options were starved of calls and do
+           come back, but some have no purchasable fare at all and no allowance revives them. #}
+        <button type="button" id="refine" class="refine-btn">
+          Look again at the {{ hidden_options }} hidden option(s)
+        </button>
+        <span class="refine-note">re-prices with a larger call allowance; the fares already
+          fetched come from cache, so this is quicker than the first search</span>
+      {% elif refined %}
+        <span class="refine-note">
+          Refined with a larger call allowance.
+          {%- if hidden_options %}
+            The {{ hidden_options }} still hidden could not be priced at any allowance: those
+            legs have no purchasable fare, which is not something more calls can fix.
+          {%- endif %}
+        </span>
+      {% endif %}
     </div>
   {% endif %}
 

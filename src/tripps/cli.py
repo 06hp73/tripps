@@ -329,7 +329,7 @@ async def _search(args: argparse.Namespace) -> int:
             result = await round_trip(
                 factory, args.origin, args.destination, service_date, return_date,
                 constraints=constraints, offers=offers, held_cards=db.list_cards(),
-                tickital_rentals=_cli_rentals(db),
+                tickital_rentals=_cli_rentals(db), refine=args.refine,
             )
             print(f"\nOutbound  {args.origin} -> {args.destination}  {service_date}\n")
             _print_response(result.outbound)
@@ -346,6 +346,7 @@ async def _search(args: argparse.Namespace) -> int:
             response, run_stats = await factory(service_date).search(
                 args.origin, args.destination, service_date, constraints=constraints, offers=offers,
                 held_cards=db.list_cards(), tickital_rentals=_cli_rentals(db),
+                refine=args.refine,
             )
             print(f"\n{response.origin.name} -> {response.destination.name} on {response.date}\n")
             _print_response(response)
@@ -905,6 +906,10 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("--modes", help="comma list: train,bus,ferry,freerider,flight (overrides the two flags)")
     se.add_argument("--no-freerider", action="store_true")
     se.add_argument("--flights", action="store_true", help="also scrape domestic flight prices")
+    se.add_argument(
+        "--refine", action="store_true",
+        help="spend a larger call allowance so fewer options are hidden for want of a price",
+    )
     _add_passenger_args(se)
 
     fa = sub.add_parser("fares", help="cheapest day to travel over the next N days")

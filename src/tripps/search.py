@@ -71,6 +71,9 @@ class SearchOptions:
     airports_per_endpoint: int = 2
     #: Hide itineraries with an unpriced leg (unless that would leave no results at all).
     require_priced: bool = True
+    #: Results shown by a refine pass. Larger than `max_results` on purpose: the point of
+    #: refining is to see the options the first pass hid, which a five-row list would bury.
+    refine_max_results: int = 15
 
 
 @dataclass(slots=True)
@@ -283,9 +286,24 @@ class Planner:
         tickital_rentals: list[TickitalRental] | None = None,
         now: datetime | None = None,
         departure_after: datetime | None = None,
+        refine: bool = False,
     ) -> tuple[SearchResponse, PlannerStats]:
+        """Route, price and rank. With `refine`, look again at what the first pass could not.
+
+        A first search hides itineraries whose legs it ran out of per-source calls to price.
+        Refining re-runs the same query on a larger allowance, showing a longer list. It is
+        cheap the second time round: routing is deterministic, so the same candidates come
+        back, and every fare the first pass fetched is served from the quote cache without
+        spending any of the new allowance - which is what lets the extra calls go to the legs
+        that were starved. Measured on Uppsala->Göteborg (2026-08-10): 17 hidden options fell
+        to 5 for 28 calls, where the same allowance from cold cost 74.
+        """
         constraints = constraints or SearchConstraints()
         stats = PlannerStats()
+        budget = self.orchestrator.budget.refined() if refine else self.orchestrator.budget
+        max_results = (
+            self.options.refine_max_results if refine else self.options.max_results
+        )
 
         origins = self.resolve_stops(origin_query)
         destinations = self.resolve_stops(destination_query)
@@ -410,7 +428,7 @@ class Planner:
         priced = await self.orchestrator.price(
             candidates,
             constraints,
-            max_results=self.options.max_results,
+            max_results=max_results,
             require_priced=self.options.require_priced,
             # Operators whose floor was zeroed above: a paid quote below their calibrated floor
             # pruned nothing (the router used 0), so it must not read as a floor violation.
@@ -418,6 +436,7 @@ class Planner:
             # The very model the router just used, so the violation detector and the
             # calibration samples describe the bound that actually shaped this search.
             floors=floors,
+            budget=budget,
         )
         stats.priced = len(priced.itineraries)
         stats.upstream_calls = priced.calls_made
@@ -437,6 +456,7 @@ class Planner:
                 itineraries=priced.itineraries,
                 warnings=warnings,
                 source_status=priced.source_status,
+                hidden_options=priced.hidden_options,
             ),
             stats,
         )
@@ -564,21 +584,24 @@ async def round_trip(
     offers: list[FreeriderOffer] | None = None,
     held_cards: list[str] | None = None,
     tickital_rentals: list[TickitalRental] | None = None,
+    refine: bool = False,
 ) -> RoundTrip:
     """Search there and back, each on its own date's timetable, and combine the totals.
 
     The two legs are genuinely separate searches - a return journey runs a different calendar
     and prices independently - so this drives the planner twice and pairs the cheapest of each.
+    `refine` applies to both: a round trip whose return half still hid half its options would
+    be a confusing half-measure.
     """
     out_planner = make_planner(outbound_date)
     out_resp, _ = await out_planner.search(
         origin, destination, outbound_date, constraints=constraints, offers=offers,
-        held_cards=held_cards, tickital_rentals=tickital_rentals,
+        held_cards=held_cards, tickital_rentals=tickital_rentals, refine=refine,
     )
     in_planner = make_planner(return_date)
     in_resp, _ = await in_planner.search(
         destination, origin, return_date, constraints=constraints, offers=offers,
-        held_cards=held_cards, tickital_rentals=tickital_rentals,
+        held_cards=held_cards, tickital_rentals=tickital_rentals, refine=refine,
     )
     return RoundTrip(
         outbound=out_resp, inbound=in_resp, tickital_rentals=list(tickital_rentals or [])
