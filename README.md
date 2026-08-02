@@ -124,6 +124,56 @@ The planner would rather say nothing than say something false.
   every category and says so, per leg and once per journey. Ranking on an unbookable fare
   would be a lie in the one number this program exists to get right.
 
+## Split ticketing
+
+SJ prices every origin/destination pair independently and allocates cheap seats per segment,
+so the through fare is its own bucket rather than the sum of anything. Two tools, for two
+different questions.
+
+**During a search** (`split.py`), one break at one of twelve curated hubs is tested on the
+itineraries actually shown, and reported as an advisory `split_hint`. Cheap, and it never
+moves the price tripps stands behind.
+
+**On demand** (`tripps splits`, or the "scan split tickets" button on any SJ leg), one train
+is scanned exhaustively:
+
+```bash
+tripps splits "Stockholm Centralstation" "Malmö Centralstation" --date 2026-08-10
+tripps splits "Stockholm Centralstation" "Malmö Centralstation" --date 2026-08-10 --departure 07:19
+```
+
+```
+07:19 Stockholm Centralstation -> 11:53 Malmö Centralstation (SJ 20740523007636)
+  through fare: 1735 SEK
+  cheapest chain: 1570 SEK in 4 ticket(s)
+    07:19 Stockholm Centralstation  -> 09:32 Tranås station             885 SEK
+    09:32 Tranås station            -> 09:56 Nässjö Centralstation      185 SEK
+    09:57 Nässjö Centralstation     -> 10:30 Alvesta station            305 SEK
+    10:31 Alvesta station           -> 11:53 Malmö Centralstation       195 SEK
+  => 165 SEK cheaper than the through fare.
+```
+
+The optimisation is exact, not greedy: with a fare for every pair of calling points, the
+cheapest chain is a shortest path through a DAG, so it finds the best combination over *any*
+number of breaks. On that train it beat the best single break (1600 via Alvesta) by breaking
+four times, including at Tranås — a station no curated hub list contained.
+
+Why it is a separate command rather than part of every search. The saving lives on
+**expensive** departures: measured across Stockholm→Malmö on 2026-08-10, the 1735 SEK peak
+trains split down by 115–165 SEK while the 955 SEK cheapest departure of the day cannot be
+beaten at all. A cheapest-first search never shows those trains, so the finding is only worth
+its cost once the traveller has chosen a departure. One scan is ~3 upstream calls per pair of
+calling points — 108 calls for a 9-stop train — which is precisely the fan-out a normal
+search must never do.
+
+A chain of tickets is several contracts with no rebooking or delay protection across a break,
+so it must beat the through fare by `MIN_SAVING_ORE` before it is called cheaper, and a single
+ticket wins a tie. When SJ sells no through fare at all, a complete chain is reported as what
+it is: the only way to buy that train. What the scan did *not* cover is always stated, and the
+two reasons are kept apart — stops skipped to stay under `--max-points` (raise it and they are
+scanned) versus stops where the operator lets nobody board or alight (raising it changes
+nothing).
+
 ## Passenger categories
 
 `--passenger student` (also `youth`, `senior`, `child`, or `TRIPPS_PASSENGER`) prices the

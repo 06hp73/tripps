@@ -31,6 +31,8 @@ from .models import (
     TransportMode,
 )
 from .passes import PassAdapter, TickitalAdapter, TickitalRental
+from .pricing.deepsplit import DEFAULT_MAX_POINTS as DEEP_SPLIT_MAX_POINTS
+from .pricing.deepsplit import DEFAULT_SCAN_CALLS as DEEP_SPLIT_CALLS
 from .pricing.flights import FlightAdapter
 from .pricing.flixbus import FlixBusAdapter
 from .pricing.freerider import FreeriderAdapter
@@ -360,6 +362,139 @@ async def _search(args: argparse.Namespace) -> int:
             await adapter.aclose()
         db.close()
     return 0
+
+
+async def _splits(args: argparse.Namespace) -> int:
+    """Scan one SJ train for the cheapest chain of tickets covering it.
+
+    Deliberately its own command rather than part of `search`: it spends hundreds of upstream
+    calls on a train the traveller has already chosen, which is exactly the fan-out a normal
+    search must never do.
+    """
+    from .pricing.deepsplit import (
+        DEFAULT_SCAN_CALLS,
+        direct_runs,
+        scan_train,
+    )
+    from .pricing.sj import SOURCE as SJ_SOURCE
+    from .search import resolve_stops
+
+    settings = get_settings()
+    settings.ensure_dirs()
+    if not settings.gtfs_zip_path.exists():
+        print(f"error: no GTFS feed at {settings.gtfs_zip_path}; run `tripps fetch-gtfs`", file=sys.stderr)
+        return 2
+
+    service_date = date.fromisoformat(args.date) if args.date else now_local().date()
+    print(f"loading timetable for {service_date}...", file=sys.stderr)
+    timetable = load_timetable_cached(
+        settings.gtfs_zip_path, service_date, GtfsConfig(),
+        cache_dir=settings.data_dir / "tt-cache", merge_overnight=True,
+    )
+
+    origins = resolve_stops(timetable, args.origin, limit=4)
+    destinations = resolve_stops(timetable, args.destination, limit=4)
+    if not origins or not destinations:
+        print(f"error: could not resolve {args.origin!r} or {args.destination!r}", file=sys.stderr)
+        return 1
+
+    runs = direct_runs(
+        timetable,
+        {s.id for s in origins},
+        {s.id for s in destinations},
+        service_date,
+    )
+    if not runs:
+        print(
+            f"no direct SJ train from {origins[0].name} to {destinations[0].name} "
+            f"on {service_date}.",
+            file=sys.stderr,
+        )
+        return 1
+
+    if args.departure:
+        runs = [r for r in runs if r.departure.strftime("%H:%M") == args.departure]
+        if not runs:
+            print(f"no direct SJ train departing at {args.departure}.", file=sys.stderr)
+            return 1
+    elif len(runs) > 1 and not args.all:
+        print(f"\n{len(runs)} direct SJ trains on {service_date}:\n")
+        for run in runs:
+            print(f"  {run.label()}")
+        print("\npick one with --departure HH:MM, or scan them all with --all.")
+        return 0
+
+    db = Database(settings.db_path)
+    adapters = _build_adapters(settings, db)
+    sj = next(a for a in adapters if a.name == SJ_SOURCE)
+    passenger = _cli_passenger(args)
+    exit_code = 0
+    try:
+        for run in runs:
+            print(f"\nscanning {run.label()} for {passenger.label}...", file=sys.stderr)
+            result = await scan_train(
+                sj,
+                run,
+                passenger=passenger,
+                max_points=args.max_points,
+                max_calls=args.max_calls or DEFAULT_SCAN_CALLS,
+                progress=(
+                    (lambda a, b, ore: print(f"  {a} -> {b}: {ore / 100:.0f} SEK", file=sys.stderr))
+                    if args.verbose
+                    else None
+                ),
+            )
+            _print_scan(result)
+    finally:
+        for adapter in adapters:
+            await adapter.aclose()
+        db.close()
+    return exit_code
+
+
+def _print_scan(result) -> None:
+    from .models import SEK
+
+    run = result.run
+    print(f"\n{run.label()}")
+    through = (
+        f"{result.through_ore / SEK:.0f} SEK"
+        if result.through_ore is not None
+        else "not sold as one ticket"
+    )
+    print(f"  through fare: {through}")
+
+    if not result.tickets:
+        print("  no chain of tickets covers this train.")
+    else:
+        chain = result.chain_ore
+        print(f"  cheapest chain: {chain / SEK:.0f} SEK in {len(result.tickets)} ticket(s)")
+        for ticket in result.tickets:
+            print(
+                f"    {ticket.from_point.departure:%H:%M} {ticket.from_point.stop.name:<28}"
+                f" -> {ticket.to_point.arrival:%H:%M} {ticket.to_point.stop.name:<28}"
+                f" {ticket.price_ore / SEK:>7.0f} SEK"
+            )
+        if result.chain_wins:
+            saving = result.saving_ore
+            if saving is None:
+                print("  => these tickets are the only way to buy this train.")
+            else:
+                print(
+                    f"  => {saving / SEK:.0f} SEK cheaper than the through fare. "
+                    "Two contracts: no rebooking or delay protection across a break."
+                )
+        elif result.through_ore is not None:
+            print("  => the single through ticket is the better buy.")
+
+    print(
+        f"  scanned {result.scanned_points}/{result.total_points} calling points, "
+        f"{result.pairs_priced} sellable pairs, {result.pairs_unsellable} unsellable, "
+        f"{result.calls_made} upstream calls",
+        file=sys.stderr,
+    )
+    for note in result.notes:
+        print(f"  note: {note}", file=sys.stderr)
 
 
 async def _fares(args: argparse.Namespace) -> int:
@@ -784,6 +919,24 @@ def main(argv: list[str] | None = None) -> int:
     _add_passenger_args(fa)
     fa.add_argument("--flights", action="store_true")
 
+    sp = sub.add_parser(
+        "splits", help="scan one SJ train for the cheapest chain of tickets covering it"
+    )
+    sp.add_argument("origin")
+    sp.add_argument("destination")
+    sp.add_argument("--date", help="YYYY-MM-DD, defaults to today")
+    sp.add_argument("--departure", help="HH:MM of the train to scan; omit to list them")
+    sp.add_argument("--all", action="store_true", help="scan every direct train that day")
+    sp.add_argument(
+        "--max-points", type=int, default=DEEP_SPLIT_MAX_POINTS,
+        help="calling points to scan; pairs (and calls) grow with its square",
+    )
+    sp.add_argument(
+        "--max-calls", type=int, default=None,
+        help=f"upstream call ceiling for one scan (default {DEEP_SPLIT_CALLS})",
+    )
+    _add_passenger_args(sp)
+
     sv = sub.add_parser("serve", help="run the web UI and JSON API")
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)
@@ -854,6 +1007,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(_search(args))
     if args.command == "fares":
         return asyncio.run(_fares(args))
+    if args.command == "splits":
+        return asyncio.run(_splits(args))
     if args.command == "serve":
         return _serve(args)
     if args.command == "canary":

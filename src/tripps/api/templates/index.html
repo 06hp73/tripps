@@ -112,6 +112,10 @@
   a.book:hover { text-decoration: underline; }
   .incl { color: var(--free); font-size: .82rem; }
   .split-tip { color: var(--accent); font-size: .82rem; font-weight: 600; }
+  .split-scan { font-size: .82rem; color: var(--muted); }
+  .split-scan-box { margin-top: .35rem; padding: .5rem .7rem; border: 1px solid var(--line);
+                    border-radius: 8px; background: var(--card); }
+  .split-scan-box ul { margin: .35rem 0; padding-left: 1.1rem; }
   .rt-head { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.25rem 0 .5rem; }
   .rt-total { font-size: 1.3rem; font-weight: 700; margin: 1rem 0; }
   .note { color: var(--muted); font-size: .85rem; }
@@ -637,6 +641,49 @@
     } finally {
       button.disabled = false;
       status.textContent = "";
+    }
+  });
+
+  // --- split-ticket scan (on demand) -----------------------------------
+  // Delegated, because the results are replaced wholesale on every search. One scan is
+  // hundreds of SJ calls for a single train, so it only ever runs on a click.
+  results.addEventListener("click", async (event) => {
+    const button = event.target.closest(".scan-splits");
+    if (!button) return;
+    const panel = button.parentElement.querySelector(".split-scan");
+    button.disabled = true;
+    panel.hidden = false;
+    panel.textContent = " scanning every fare break on this train…";
+    const p = new URLSearchParams({
+      origin: button.dataset.origin, destination: button.dataset.destination,
+      date: button.dataset.date, departure: button.dataset.departure,
+    });
+    if (form.passenger.value !== "adult") p.set("passenger", form.passenger.value);
+    if (form.age.value) p.set("age", form.age.value);
+    try {
+      const res = await fetch("/api/splits?" + p.toString());
+      const data = await res.json();
+      if (!res.ok) { panel.textContent = " " + esc(data.detail || res.status); return; }
+      const scan = data.scan;
+      if (!scan || !scan.tickets.length) { panel.textContent = " no chain of tickets covers this train."; return; }
+      const rows = scan.tickets.map(t =>
+        `<li>${esc(t.from)} → ${esc(t.to)} · ${Math.round(t.price_sek)} SEK</li>`).join("");
+      const verdict = scan.chain_wins
+        ? (scan.saving_sek != null
+            ? `<b>${Math.round(scan.saving_sek)} SEK cheaper</b> than the ${Math.round(scan.through_sek)} SEK through fare`
+            : "<b>the only way to buy this train</b> — SJ sells no single ticket for it")
+        : "the single through ticket is the better buy";
+      panel.innerHTML =
+        `<div class="split-scan-box"><b>${Math.round(scan.chain_sek)} SEK</b> in ${scan.tickets.length} ticket(s) — ${verdict}` +
+        `<ul>${rows}</ul><span class="meta">${esc(scan.caveat)}</span>` +
+        `<br><span class="meta">scanned ${scan.scanned_points}/${scan.total_points} calling points, ` +
+        `${scan.upstream_calls} upstream calls</span>` +
+        (scan.notes || []).map(n => `<br><span class="meta">${esc(n)}</span>`).join("") +
+        `</div>`;
+    } catch (err) {
+      panel.textContent = " scan failed: " + esc(err);
+    } finally {
+      button.disabled = false;
     }
   });
 

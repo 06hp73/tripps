@@ -83,6 +83,15 @@
               {% if leg.operator %}<br><span class="meta">{{ leg.operator }}{% if leg.headsign %} · {{ leg.headsign }}{% endif %}</span>{% endif %}
               {% if leg.quote and leg.quote.note %}<br><span class="meta">{{ leg.quote.note }}</span>{% endif %}
               {% if leg.quote and leg.quote.split_hint %}<br><span class="split-tip">💡 {{ leg.quote.split_hint }}</span>{% endif %}
+              {% if leg.quote and leg.quote.source == "sj" %}
+                {# On demand only: a scan spends hundreds of SJ calls on this one train. #}
+                <br><button type="button" class="link-btn scan-splits"
+                        data-origin="{{ leg.from_stop.name }}"
+                        data-destination="{{ leg.to_stop.name }}"
+                        data-date="{{ leg.departure.strftime('%Y-%m-%d') }}"
+                        data-departure="{{ leg.departure.strftime('%H:%M') }}">scan split tickets</button>
+                <span class="split-scan" hidden></span>
+              {% endif %}
             </span>
             <span class="cost">
               {% if leg.mode.value == "walk" %}

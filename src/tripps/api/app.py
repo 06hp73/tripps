@@ -36,7 +36,7 @@ from ..ingest.freerider import (
     schema_drift,
 )
 from ..ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable_cached
-from ..models import Passenger, PassengerCategory, SearchConstraints, TransportMode
+from ..models import SEK, Passenger, PassengerCategory, SearchConstraints, TransportMode
 from ..passes import (
     PassAdapter,
     PassCoverage,
@@ -44,6 +44,7 @@ from ..passes import (
     TickitalRental,
     load_cards,
 )
+from ..pricing.deepsplit import DEFAULT_MAX_POINTS as DEEP_SPLIT_MAX_POINTS
 from ..pricing.flights import FlightAdapter
 from ..pricing.flixbus import FlixBusAdapter
 from ..pricing.freerider import FreeriderAdapter
@@ -644,6 +645,108 @@ async def api_fares(
                 key=lambda d: d["price_sek"],
                 default=None,
             ),
+        }
+    )
+
+
+@app.get("/api/splits")
+async def api_splits(
+    request: Request,
+    origin: str = Query(..., min_length=2),
+    destination: str = Query(..., min_length=2),
+    date_: str | None = Query(None, alias="date"),
+    departure: str | None = Query(None, description="HH:MM of the train; omit to list them"),
+    max_points: int = Query(DEEP_SPLIT_MAX_POINTS, ge=2, le=40),
+    passenger: str | None = None,
+    age: int | None = None,
+) -> JSONResponse:
+    """The cheapest chain of SJ tickets covering one train, breaking anywhere it calls.
+
+    Explicitly not part of `/api/search`: a scan spends hundreds of upstream calls on a train
+    the caller has already picked. Without `departure` it only lists the day's direct trains,
+    which costs nothing upstream - so a UI can offer the choice before spending anything.
+    """
+    from ..pricing.deepsplit import direct_runs, scan_train
+    from ..pricing.sj import SOURCE as SJ_SOURCE
+    from ..search import resolve_stops
+
+    state = _state(request)
+    service_date = _parse_date(date_)
+    timetable = state._timetable_for(service_date)
+    origins = resolve_stops(timetable, origin, limit=4)
+    destinations = resolve_stops(timetable, destination, limit=4)
+    if not origins or not destinations:
+        raise HTTPException(404, f"could not resolve {origin!r} or {destination!r}")
+
+    runs = direct_runs(
+        timetable, {s.id for s in origins}, {s.id for s in destinations}, service_date
+    )
+    if not runs:
+        raise HTTPException(
+            404, f"no direct SJ train from {origins[0].name} to {destinations[0].name}"
+        )
+
+    trains = [
+        {
+            "departure": run.departure.isoformat(),
+            "arrival": run.arrival.isoformat(),
+            "trip_id": run.trip_id,
+            "origin": run.origin.name,
+            "destination": run.destination.name,
+            "calling_points": len(run.points),
+        }
+        for run in runs
+    ]
+    if not departure:
+        return JSONResponse({"date": service_date.isoformat(), "trains": trains, "scan": None})
+
+    chosen = next((r for r in runs if r.departure.strftime("%H:%M") == departure), None)
+    if chosen is None:
+        raise HTTPException(404, f"no direct SJ train departing at {departure}")
+
+    orchestrator = state._ensure_orchestrator()
+    sj = next((a for a in orchestrator.adapters if a.name == SJ_SOURCE), None)
+    if sj is None:
+        raise HTTPException(503, "the SJ price source is not configured")
+
+    result = await scan_train(
+        sj,
+        chosen,
+        passenger=_passenger(passenger, age),
+        max_points=max_points,
+    )
+    return JSONResponse(
+        {
+            "date": service_date.isoformat(),
+            "trains": trains,
+            "scan": {
+                "train": chosen.label(),
+                "through_sek": result.through_ore / SEK if result.through_ore else None,
+                "chain_sek": result.chain_ore / SEK if result.chain_ore else None,
+                "saving_sek": result.saving_ore / SEK if result.saving_ore else None,
+                "chain_wins": result.chain_wins,
+                "tickets": [
+                    {
+                        "from": t.from_point.stop.name,
+                        "to": t.to_point.stop.name,
+                        "departure": t.from_point.departure.isoformat(),
+                        "arrival": t.to_point.arrival.isoformat(),
+                        "price_sek": t.price_ore / SEK,
+                    }
+                    for t in result.tickets
+                ],
+                "scanned_points": result.scanned_points,
+                "total_points": result.total_points,
+                "pairs_priced": result.pairs_priced,
+                "upstream_calls": result.calls_made,
+                "notes": result.notes,
+                # Said on every scan, not only when it is inconvenient: a chain is several
+                # contracts, and nothing protects the traveller across a break.
+                "caveat": (
+                    "Separate tickets: no rebooking or delay protection across a break, "
+                    "and you keep your seat only if each ticket's reservation allows it."
+                ),
+            },
         }
     )
 
