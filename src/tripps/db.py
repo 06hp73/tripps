@@ -16,7 +16,7 @@ from contextlib import contextmanager
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
-from .models import Leg, PriceConfidence, Quote
+from .models import ADULT, Leg, Passenger, PriceConfidence, Quote
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS quote_cache (
@@ -80,7 +80,11 @@ CREATE TABLE IF NOT EXISTS reprice_delta (
     operator    TEXT,
     distance_km REAL,
     floor_ore   INTEGER NOT NULL,
-    actual_ore  INTEGER NOT NULL
+    actual_ore  INTEGER NOT NULL,
+    -- Which traveller this fare was quoted for. A student fare is ~20% under the adult one,
+    -- so mixing categories in one fit would drag the floor below every adult fare (harmless
+    -- but slack) or, worse, above a discounted one (a pruned cheapest journey).
+    passenger   TEXT NOT NULL DEFAULT 'adult'
 );
 
 -- A user's standing interest in a Freerider route. The poller matches live inventory against
@@ -139,12 +143,16 @@ CREATE INDEX IF NOT EXISTS idx_rental_window ON tickital_rental(valid_from, vali
 -- These feed back into the router's price lower bound: tighter (but still safe) floors mean
 -- a smaller Pareto frontier and fewer upstream price calls per search.
 CREATE TABLE IF NOT EXISTS operator_floor (
-    operator     TEXT PRIMARY KEY,
+    operator     TEXT NOT NULL,
+    -- Part of the key, not an attribute: one operator has a different safe floor per
+    -- passenger category, and a student fit must never overwrite the adult one.
+    passenger    TEXT NOT NULL DEFAULT 'adult',
     mode         TEXT NOT NULL,
     base_ore     INTEGER NOT NULL,
     per_km_ore   INTEGER NOT NULL,
     samples      INTEGER NOT NULL,
-    updated_at   TEXT NOT NULL
+    updated_at   TEXT NOT NULL,
+    PRIMARY KEY (operator, passenger)
 );
 
 -- Free-form key/value store for one-time data migrations and schema-adjacent markers.
@@ -162,24 +170,30 @@ CREATE TABLE IF NOT EXISTS meta (
 _FLOOR_DISTANCE_METRIC = "path"
 
 
-def leg_cache_key(source: str, leg: Leg) -> str:
-    """Stable identity for "this exact departure, priced by this source".
+def leg_cache_key(source: str, leg: Leg, passenger: Passenger = ADULT) -> str:
+    """Stable identity for "this exact departure, priced by this source, for this traveller".
 
     service_ref is included because two operators can run the same o/d at the same
     minute, and the price belongs to the trip, not the timeslot.
+
+    The passenger is part of the identity for the same reason: the same seat on the same
+    train is 515 SEK for an adult and 411 for a student. Without it the first search to run
+    would poison the other - a student handed the adult fare, or worse, an adult quoted a
+    discount they cannot buy. Adult keys are written unsuffixed, so every fare cached before
+    categories existed stays valid instead of being silently orphaned.
     """
-    raw = "|".join(
-        [
-            source,
-            leg.mode.value,
-            leg.operator or "",
-            leg.from_stop.id,
-            leg.to_stop.id,
-            leg.departure.isoformat(),
-            leg.service_ref or "",
-        ]
-    )
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    parts = [
+        source,
+        leg.mode.value,
+        leg.operator or "",
+        leg.from_stop.id,
+        leg.to_stop.id,
+        leg.departure.isoformat(),
+        leg.service_ref or "",
+    ]
+    if not passenger.is_adult:
+        parts.append(passenger.cache_token)
+    return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
 
 
 class Database:
@@ -219,6 +233,51 @@ class Database:
                 "ALTER TABLE travel_card ADD COLUMN all_zone INTEGER NOT NULL DEFAULT 1"
             )
 
+        # Passenger categories arrived after these tables existed. Every row already there was
+        # recorded for an adult, which is exactly what the column defaults to, so the data stays
+        # valid and calibration keeps its history.
+        cols = {
+            row["name"]
+            for row in self._conn.execute("PRAGMA table_info(reprice_delta)").fetchall()
+        }
+        if "passenger" not in cols:
+            self._conn.execute(
+                "ALTER TABLE reprice_delta ADD COLUMN passenger TEXT NOT NULL DEFAULT 'adult'"
+            )
+
+        # operator_floor needs its PRIMARY KEY widened to (operator, passenger), and SQLite
+        # cannot alter a primary key in place - so the table is rebuilt and its adult rows
+        # carried over rather than dropped (they are still the correct adult floors).
+        floor_cols = {
+            row["name"]
+            for row in self._conn.execute("PRAGMA table_info(operator_floor)").fetchall()
+        }
+        if floor_cols and "passenger" not in floor_cols:
+            self._conn.execute("ALTER TABLE operator_floor RENAME TO operator_floor_old")
+            self._conn.execute(
+                """
+                CREATE TABLE operator_floor (
+                    operator     TEXT NOT NULL,
+                    passenger    TEXT NOT NULL DEFAULT 'adult',
+                    mode         TEXT NOT NULL,
+                    base_ore     INTEGER NOT NULL,
+                    per_km_ore   INTEGER NOT NULL,
+                    samples      INTEGER NOT NULL,
+                    updated_at   TEXT NOT NULL,
+                    PRIMARY KEY (operator, passenger)
+                )
+                """
+            )
+            self._conn.execute(
+                """
+                INSERT INTO operator_floor
+                    (operator, passenger, mode, base_ore, per_km_ore, samples, updated_at)
+                SELECT operator, 'adult', mode, base_ore, per_km_ore, samples, updated_at
+                FROM operator_floor_old
+                """
+            )
+            self._conn.execute("DROP TABLE operator_floor_old")
+
         # Floor-calibration distance metric changed (endpoint chord -> ridden path). Samples
         # and fits recorded under the old metric would keep an over-tight floor alive, so they
         # are dropped once; defaults apply until calibration re-learns from path-metric rows.
@@ -250,7 +309,14 @@ class Database:
 
     # --- quote cache ------------------------------------------------------
 
-    def get_quote(self, source: str, leg: Leg, *, now: datetime | None = None) -> Quote | None:
+    def get_quote(
+        self,
+        source: str,
+        leg: Leg,
+        *,
+        now: datetime | None = None,
+        passenger: Passenger = ADULT,
+    ) -> Quote | None:
         """Return a cached quote, downgrading its confidence as it ages.
 
         Fresh -> CACHED. Past TTL -> STALE (still returned; the caller decides whether
@@ -258,7 +324,7 @@ class Database:
         the leg has no price).
         """
         now = now or datetime.now(UTC)
-        key = leg_cache_key(source, leg)
+        key = leg_cache_key(source, leg, passenger)
         with self._lock:
             row = self._conn.execute(
                 "SELECT * FROM quote_cache WHERE cache_key = ?", (key,)
@@ -299,12 +365,19 @@ class Database:
             ttl_seconds=row["ttl_seconds"],
         )
 
-    def put_quote(self, source: str, leg: Leg, quote: Quote, ttl_seconds: int) -> None:
+    def put_quote(
+        self,
+        source: str,
+        leg: Leg,
+        quote: Quote,
+        ttl_seconds: int,
+        passenger: Passenger = ADULT,
+    ) -> None:
         """Persist the ADAPTER's answer only. Deliberately not stored: `surcharge_ore`,
         `coupon_rental_id`, and `split_hint` are derived per search AFTER pricing (Arlanda
         fee, tickital coupon, split probe) and are re-derived on every cache hit - persisting
         them would double-apply a surcharge or replay another search's coupon identity."""
-        key = leg_cache_key(source, leg)
+        key = leg_cache_key(source, leg, passenger)
         fetched_at = (quote.fetched_at or datetime.now(UTC)).isoformat()
         with self._write() as conn:
             conn.execute(
@@ -480,14 +553,16 @@ class Database:
         distance_km: float | None,
         floor_ore: int,
         actual_ore: int,
+        passenger: Passenger = ADULT,
     ) -> None:
         """Log (floor, actual) so floors can be calibrated from real data, not guesses."""
         with self._write() as conn:
             conn.execute(
                 """
                 INSERT INTO reprice_delta
-                    (recorded_at, source, mode, operator, distance_km, floor_ore, actual_ore)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (recorded_at, source, mode, operator, distance_km, floor_ore, actual_ore,
+                     passenger)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     datetime.now(UTC).isoformat(),
@@ -497,6 +572,7 @@ class Database:
                     distance_km,
                     floor_ore,
                     actual_ore,
+                    passenger.category.value,
                 ),
             )
 
@@ -512,10 +588,10 @@ class Database:
             ).fetchall()
 
     def reprice_observations(self) -> list[sqlite3.Row]:
-        """Every (operator, mode, distance, actual) point, for floor calibration."""
+        """Every (operator, mode, distance, actual, passenger) point, for floor calibration."""
         with self._lock:
             return self._conn.execute(
-                "SELECT operator, mode, distance_km, actual_ore FROM reprice_delta "
+                "SELECT operator, mode, distance_km, actual_ore, passenger FROM reprice_delta "
                 "WHERE operator IS NOT NULL AND distance_km > 0 AND actual_ore > 0"
             ).fetchall()
 
@@ -686,18 +762,24 @@ class Database:
         rather than keep an old fit forever - a stale fit is exactly the kind of quietly
         over-tight floor the calibration loop exists to prevent.
         """
+        # A row without a category is an adult fit, matching the column default: floors
+        # written before categories existed, and any caller still building rows by hand.
+        floors = [{"passenger": ADULT.category.value, **floor} for floor in floors]
         with self._write() as conn:
             conn.execute("DELETE FROM operator_floor")
             conn.executemany(
                 """
-                INSERT INTO operator_floor (operator, mode, base_ore, per_km_ore, samples, updated_at)
-                VALUES (:operator, :mode, :base_ore, :per_km_ore, :samples, :updated_at)
+                INSERT INTO operator_floor
+                    (operator, passenger, mode, base_ore, per_km_ore, samples, updated_at)
+                VALUES (:operator, :passenger, :mode, :base_ore, :per_km_ore, :samples, :updated_at)
                 """,
                 floors,
             )
 
-    def get_operator_floors(self) -> list[sqlite3.Row]:
+    def get_operator_floors(self, passenger: str | None = None) -> list[sqlite3.Row]:
+        """Calibrated floors, all categories by default or just one when `passenger` is given."""
+        sql = "SELECT operator, passenger, mode, base_ore, per_km_ore, samples FROM operator_floor"
         with self._lock:
-            return self._conn.execute(
-                "SELECT operator, mode, base_ore, per_km_ore, samples FROM operator_floor"
-            ).fetchall()
+            if passenger is None:
+                return self._conn.execute(sql).fetchall()
+            return self._conn.execute(f"{sql} WHERE passenger = ?", (passenger,)).fetchall()

@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from tripps.models import Leg, PriceConfidence, Stop, TransportMode
+from tripps.models import ADULT, Leg, PriceConfidence, Stop, TransportMode
 from tripps.pricing.base import CallBudget
 from tripps.pricing.tora import (
     ToraAdapter,
@@ -48,7 +48,7 @@ def _adapter_returning(payload: dict) -> ToraAdapter:
     """A ToraAdapter whose network call is replaced by the fixture."""
     adapter = ToraAdapter(min_interval=0.0)
 
-    def fake_fetch(origin, destination, when):
+    def fake_fetch(origin, destination, when, passenger=ADULT):
         return payload
 
     adapter._fetch_offers_sync = fake_fetch  # type: ignore[method-assign]
@@ -148,7 +148,7 @@ def _counting_adapter(payload):
     calls = {"n": 0}
     adapter = ToraAdapter(min_interval=0.0)
 
-    def fake_fetch(origin, destination, when):
+    def fake_fetch(origin, destination, when, passenger=ADULT):
         calls["n"] += 1
         return payload
 

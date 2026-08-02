@@ -21,7 +21,7 @@ import pytest
 from tripps.config import PricingBudget
 from tripps.db import Database
 from tripps.interfaces import PriceAdapter
-from tripps.models import Leg, PriceConfidence, Quote, Stop, TransportMode
+from tripps.models import ADULT, Leg, Passenger, PriceConfidence, Quote, Stop, TransportMode
 from tripps.pricing.orchestrator import PricingOrchestrator
 from tripps.routing.floors import PriceFloorModel
 from tripps.routing.journey import (
@@ -81,7 +81,7 @@ class FaresByDeparture(PriceAdapter):
     def supports(self, leg: Leg) -> bool:
         return leg.mode is TransportMode.BUS
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         self.calls += 1
         key = leg.departure.strftime("%H:%M")
         amount = self.fares.get(key)

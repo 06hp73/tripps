@@ -49,7 +49,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .interfaces import PriceAdapter
-from .models import Leg, PriceConfidence, Quote, TransportMode
+from .models import ADULT, Leg, Passenger, PassengerCategory, PriceConfidence, Quote, TransportMode
 
 REGISTRY_PATH = Path(__file__).resolve().parent / "data" / "travelcards.json"
 
@@ -369,6 +369,8 @@ class PassAdapter(PriceAdapter):
     name = "travelcard"
     modes = frozenset(TransportMode)
     provides_price = True
+    #: All categories: a held card zeroes the leg for whoever holds it.
+    sells_categories = frozenset(PassengerCategory)
 
     def __init__(self, agency_stops: dict[str, list[str]] | None = None) -> None:
         self._agency_stops = agency_stops
@@ -415,7 +417,10 @@ class PassAdapter(PriceAdapter):
     def supports(self, leg: Leg) -> bool:
         return self._card_for(leg) is not None or self._combined_for(leg) is not None
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
+        # Category-independent: the leg costs 0 because the traveller already holds the card.
+        # Whether that card was itself bought at a student rate is a fact about the purchase,
+        # not about this journey.
         card = self._card_for(leg)
         if card is not None:
             return Quote(
@@ -469,6 +474,8 @@ class TickitalAdapter(PriceAdapter):
     name = TICKITAL_SOURCE
     modes = frozenset(TransportMode)
     provides_price = True
+    #: All categories: the rental's price was fixed when it was registered.
+    sells_categories = frozenset(PassengerCategory)
 
     def __init__(self, agency_stops: dict[str, list[str]] | None = None) -> None:
         self._agency_stops = agency_stops
@@ -500,7 +507,9 @@ class TickitalAdapter(PriceAdapter):
     def supports(self, leg: Leg) -> bool:
         return self.rental_for(leg) is not None
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
+        # Category-independent: the amount is what this specific second-hand rental costs,
+        # a price already fixed when it was registered.
         found = self.rental_for(leg)
         if found is None:
             return Quote.unavailable(self.name, note="no active rental covers this leg")

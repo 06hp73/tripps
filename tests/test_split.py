@@ -13,7 +13,16 @@ import pytest
 
 from tripps.config import PricingBudget
 from tripps.interfaces import HealthState, SourceHealth
-from tripps.models import Itinerary, Leg, PriceConfidence, Quote, Stop, TransportMode
+from tripps.models import (
+    ADULT,
+    Itinerary,
+    Leg,
+    Passenger,
+    PriceConfidence,
+    Quote,
+    Stop,
+    TransportMode,
+)
 from tripps.pricing.orchestrator import PricingOrchestrator
 from tripps.pricing.split import SPLIT_STATIONS, sub_legs
 
@@ -55,7 +64,7 @@ class FakeSJ:
     def supports(self, leg: Leg) -> bool:
         return leg.mode is TransportMode.TRAIN
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         amount = self.fares.get((leg.from_stop.id, leg.to_stop.id))
         if amount is None:
             return Quote.unavailable(source="sj", note="no fare")

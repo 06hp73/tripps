@@ -17,7 +17,7 @@ import enum
 import math
 from datetime import UTC, datetime
 
-from pydantic import BaseModel, Field, computed_field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
 SEK = 100  # öre per krona
 STOCKHOLM_TZ = "Europe/Stockholm"
@@ -102,6 +102,106 @@ PRICED_CONFIDENCES = frozenset(
         PriceConfidence.ESTIMATED,
     }
 )
+
+
+class PassengerCategory(str, enum.Enum):
+    """Who is travelling. Operators price the same seat differently per category.
+
+    Verified live on 2026-08-02, Stockholm C -> Göteborg C, the same 05:13 SJ departure:
+    adult 515, student 411, youth 411, child (age 8) 437, senior 463 SEK. The discount is
+    not a fixed percentage - it varies by operator and by age - so it is always *fetched*,
+    never computed from the adult fare.
+    """
+
+    ADULT = "adult"
+    STUDENT = "student"
+    YOUTH = "youth"
+    SENIOR = "senior"
+    CHILD = "child"
+
+    @property
+    def label(self) -> str:
+        return {
+            PassengerCategory.ADULT: "Adult",
+            PassengerCategory.STUDENT: "Student",
+            PassengerCategory.YOUTH: "Youth",
+            PassengerCategory.SENIOR: "Senior",
+            PassengerCategory.CHILD: "Child",
+        }[self]
+
+
+#: Age sent upstream when the traveller does not give their own. SJ rejects a non-adult
+#: category with a null age (HTTP 400, "Age cannot be null for type STUDENT"), and the fare
+#: genuinely moves with it - CHILD_AND_YOUTH is 437 SEK at age 8 and 411 at 16 on the same
+#: train - so a representative age per category is part of the request, not a formality.
+DEFAULT_PASSENGER_AGES: dict[PassengerCategory, int] = {
+    PassengerCategory.STUDENT: 22,
+    PassengerCategory.YOUTH: 20,
+    PassengerCategory.SENIOR: 70,
+    PassengerCategory.CHILD: 8,
+}
+
+#: Age bounds each category is sold within, from SJ's own `/v3/config` (`passengerCategories`,
+#: fetched 2026-08-02). Outside them the search is rejected upstream, so they are checked here
+#: where the error can name the field rather than arriving as an opaque 400 mid-search.
+PASSENGER_AGE_SPANS: dict[PassengerCategory, tuple[int, int]] = {
+    PassengerCategory.STUDENT: (15, 120),
+    PassengerCategory.YOUTH: (0, 25),
+    PassengerCategory.SENIOR: (18, 120),
+    PassengerCategory.CHILD: (0, 25),
+}
+
+
+class Passenger(BaseModel):
+    """The traveller a search is priced for: a category, and the age it is sold under.
+
+    Frozen: it is a value object that ends up in cache keys and in per-search state, and a
+    mid-search mutation would mean fares cached under one identity and quoted under another.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    category: PassengerCategory = PassengerCategory.ADULT
+    #: None for ADULT, which needs no age; otherwise the category's default unless given.
+    age: int | None = None
+
+    def model_post_init(self, _context: object) -> None:
+        if self.category is PassengerCategory.ADULT:
+            object.__setattr__(self, "age", None)
+            return
+        if self.age is None:
+            object.__setattr__(self, "age", DEFAULT_PASSENGER_AGES[self.category])
+        low, high = PASSENGER_AGE_SPANS[self.category]
+        if not low <= self.age <= high:
+            raise ValueError(
+                f"{self.category.value} is sold for ages {low}-{high}, got {self.age}"
+            )
+
+    @property
+    def is_adult(self) -> bool:
+        return self.category is PassengerCategory.ADULT
+
+    @property
+    def cache_token(self) -> str:
+        """Identity for cache keys. Two searches share a cached fare only if both match.
+
+        The age belongs in the key as much as the category does: child-8 and youth-16 are
+        both CHILD_AND_YOUTH to SJ and are priced differently.
+        """
+        return self.category.value if self.is_adult else f"{self.category.value}:{self.age}"
+
+    @property
+    def label(self) -> str:
+        return self.category.label if self.is_adult else f"{self.category.label} ({self.age})"
+
+    @classmethod
+    def adult(cls) -> Passenger:
+        return cls(category=PassengerCategory.ADULT)
+
+
+#: The default traveller. Module-level so adapters can use it as a signature default without
+#: constructing one per call.
+ADULT = Passenger(category=PassengerCategory.ADULT)
 
 
 class Stop(BaseModel):
@@ -387,6 +487,9 @@ class SearchConstraints(BaseModel):
     allowed_modes: frozenset[TransportMode] = frozenset(TransportMode)
     #: Freerider requires a driving licence and a Hertz account; let users exclude it.
     include_freerider: bool = True
+    #: Who is travelling. Not a filter like the rest - it changes the price of every leg, so
+    #: it is carried here rather than as a separate argument threaded through the whole chain.
+    passenger: Passenger = Passenger()
 
     def permits(self, itin: Itinerary) -> bool:
         if self.max_duration_seconds is not None:

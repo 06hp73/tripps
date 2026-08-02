@@ -23,7 +23,13 @@ from .ingest.freerider import (
     schema_drift,
 )
 from .ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable, load_timetable_cached
-from .models import SearchConstraints, TransportMode
+from .models import (
+    DEFAULT_PASSENGER_AGES,
+    Passenger,
+    PassengerCategory,
+    SearchConstraints,
+    TransportMode,
+)
 from .passes import PassAdapter, TickitalAdapter, TickitalRental
 from .pricing.flights import FlightAdapter
 from .pricing.flixbus import FlixBusAdapter
@@ -213,6 +219,22 @@ def _wants_freerider(args) -> bool:
     return not getattr(args, "no_freerider", False)
 
 
+def _add_passenger_args(parser) -> None:
+    """The traveller flags, shared by `search` and `fares`."""
+    parser.add_argument(
+        "--passenger",
+        choices=[c.value for c in PassengerCategory],
+        help="who is travelling; discounted fares are fetched from each source that sells them "
+        "(default: TRIPPS_PASSENGER, else adult)",
+    )
+    parser.add_argument(
+        "--age",
+        type=int,
+        help="age to price the discount at, when it is not the category default "
+        + ", ".join(f"{c.value} {a}" for c, a in DEFAULT_PASSENGER_AGES.items()),
+    )
+
+
 def _cli_constraints(args) -> SearchConstraints:
     # Connective modes are always allowed; --modes (if given) chooses the travel modes,
     # otherwise the defaults plus the --flights / --no-freerider switches decide.
@@ -236,7 +258,23 @@ def _cli_constraints(args) -> SearchConstraints:
         max_transfers=getattr(args, "max_transfers", None),
         max_duration_seconds=int(args.max_hours * 3600) if getattr(args, "max_hours", None) else None,
         include_freerider=include_freerider,
+        passenger=_cli_passenger(args),
     )
+
+
+def _cli_passenger(args) -> Passenger:
+    """--passenger / --age, falling back to the configured default traveller."""
+    settings = get_settings()
+    category = getattr(args, "passenger", None) or settings.passenger.value
+    age = getattr(args, "age", None)
+    if age is None and category == settings.passenger.value:
+        age = settings.passenger_age
+    try:
+        return Passenger(category=PassengerCategory(category), age=age)
+    except ValueError as exc:
+        # Covers both an unknown category and an age outside the tier's span, which the
+        # operator would otherwise reject mid-search with an opaque 400.
+        raise SystemExit(f"--passenger/--age: {exc}") from exc
 
 
 def _print_itinerary(itin, index: int) -> None:
@@ -732,6 +770,7 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("--modes", help="comma list: train,bus,ferry,freerider,flight (overrides the two flags)")
     se.add_argument("--no-freerider", action="store_true")
     se.add_argument("--flights", action="store_true", help="also scrape domestic flight prices")
+    _add_passenger_args(se)
 
     fa = sub.add_parser("fares", help="cheapest day to travel over the next N days")
     fa.add_argument("origin")
@@ -742,6 +781,7 @@ def main(argv: list[str] | None = None) -> int:
     fa.add_argument("--max-hours", type=float, default=None)
     fa.add_argument("--modes", help="comma list of travel modes")
     fa.add_argument("--no-freerider", action="store_true")
+    _add_passenger_args(fa)
     fa.add_argument("--flights", action="store_true")
 
     sv = sub.add_parser("serve", help="run the web UI and JSON API")

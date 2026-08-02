@@ -41,7 +41,7 @@ from datetime import date, datetime, timedelta
 
 import httpx
 
-from ..models import Leg, Quote, TransportMode
+from ..models import ADULT, Leg, Passenger, PassengerCategory, Quote, TransportMode
 from .base import HttpPriceAdapter, ore_from_major, unavailable
 from .base import exact as exact_quote
 
@@ -60,6 +60,30 @@ SJ_OPERATORS = frozenset({"SJ", "SJ Nord"})
 
 #: How far an SJ departure may sit from the timetabled leg and still be the same train.
 MATCH_TOLERANCE = timedelta(minutes=5)
+
+#: Our categories in SJ's vocabulary, from its own `/v3/config.passengerCategories`
+#: (fetched 2026-08-02): ADULT, CHILD_AND_YOUTH (0-25), STUDENT (15-120), SENIOR (18-120).
+#: SJ has no separate child tier - a child is a young CHILD_AND_YOUTH, and the age carries
+#: the difference (437 SEK at 8, 411 at 16 on the same Stockholm-Göteborg train).
+SJ_CATEGORIES: dict[PassengerCategory, str] = {
+    PassengerCategory.ADULT: "ADULT",
+    PassengerCategory.STUDENT: "STUDENT",
+    PassengerCategory.YOUTH: "CHILD_AND_YOUTH",
+    PassengerCategory.CHILD: "CHILD_AND_YOUTH",
+    PassengerCategory.SENIOR: "SENIOR",
+}
+
+
+def passenger_payload(passenger: Passenger) -> dict:
+    """The `passengers[0]` object for a search.
+
+    The age sits *inside* passengerCategory, not beside it: with it anywhere else SJ answers
+    400 `passengers[0].passengerCategory: Age cannot be null for type STUDENT`.
+    """
+    category: dict[str, object] = {"type": SJ_CATEGORIES[passenger.category]}
+    if passenger.age is not None:
+        category["age"] = passenger.age
+    return {"passengerCategory": category}
 
 #: The day search (steps 1-2) is stable for the day; cache it well inside the
 #: passengerListId expiry so a multi-leg search does not re-search per leg.
@@ -148,6 +172,7 @@ class SJAdapter(HttpPriceAdapter):
 
     name = SOURCE
     modes = frozenset({TransportMode.TRAIN})
+    sells_categories = frozenset(SJ_CATEGORIES)
 
     def __init__(
         self,
@@ -241,10 +266,15 @@ class SJAdapter(HttpPriceAdapter):
     # --- the three-call chain ---------------------------------------------
 
     async def _day_departures(
-        self, origin: str, destination: str, day: date
+        self, origin: str, destination: str, day: date, passenger: Passenger = ADULT
     ) -> tuple[str, list[SJDeparture]]:
-        """(passengerListId, departures) for one origin/destination/day. Cached and locked."""
-        cache_key = (origin, destination, day.isoformat())
+        """(passengerListId, departures) for one origin/destination/day. Cached and locked.
+
+        The passenger is part of the key: the passengerListId returned here is what step 3
+        prices against, so reusing an adult list for a student search would quote adult
+        fares under a student label.
+        """
+        cache_key = (origin, destination, day.isoformat(), passenger.cache_token)
         cached = self._day_cache.get(cache_key)
         if cached is not None and time.monotonic() - cached[0] < self.day_cache_ttl:
             return cached[1], cached[2]
@@ -262,7 +292,7 @@ class SJAdapter(HttpPriceAdapter):
                     "origin": origin,
                     "destination": destination,
                     "departureDate": day.isoformat(),
-                    "passengers": [{"passengerCategory": {"type": "ADULT"}}],
+                    "passengers": [passenger_payload(passenger)],
                 },
                 key,
                 budget_key=DAY_BUDGET_KEY,
@@ -335,14 +365,14 @@ class SJAdapter(HttpPriceAdapter):
             key=lambda d: (abs(d.departure - leg.departure), abs(d.arrival - leg.arrival)),
         )
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         if not self.supports(leg):
             return unavailable(self.name, deeplink(leg), "not an SJ-sold train leg")
 
         link = deeplink(leg)
         try:
             plid, departures = await self._day_departures(
-                leg.from_stop.id, leg.to_stop.id, leg.departure.date()
+                leg.from_stop.id, leg.to_stop.id, leg.departure.date(), passenger
             )
         except (httpx.HTTPError, ValueError) as exc:
             self.mark_down(f"SJ day search failed: {exc}")
@@ -368,5 +398,9 @@ class SJAdapter(HttpPriceAdapter):
             amount,
             deeplink=link,
             fare_class="cheapest available (second class)",
-            note="Live SJ fare; book on sj.se.",
+            note=(
+                "Live SJ fare; book on sj.se."
+                if passenger.is_adult
+                else f"Live SJ {passenger.label} fare; book on sj.se."
+            ),
         )

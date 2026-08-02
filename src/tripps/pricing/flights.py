@@ -15,7 +15,7 @@ from __future__ import annotations
 from urllib.parse import quote_plus
 
 from ..ingest.flights import FlightOffer
-from ..models import Leg, Quote, TransportMode
+from ..models import ADULT, Leg, Passenger, Quote, TransportMode
 from .base import HttpPriceAdapter, unavailable
 from .base import exact as exact_quote
 
@@ -57,7 +57,7 @@ class FlightAdapter(HttpPriceAdapter):
                 return offer
         return None
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         if not self.supports(leg):
             return unavailable(self.name, None, "not a flight leg")
 
@@ -75,7 +75,9 @@ class FlightAdapter(HttpPriceAdapter):
             deeplink=deeplink(offer),
             fare_class="economy, one way",
             note=(
-                f"{offer.carrier} {offer.from_iata}-{offer.to_iata}. "
-                "Scraped from Google Flights; book on the airline's own site."
+                f"{offer.carrier} {offer.from_iata}-{offer.to_iata}."
+                + (f" {self.category_fallback_note(passenger).capitalize()}."
+                   if not passenger.is_adult else "")
+                + " Scraped from Google Flights; book on the airline's own site."
             ),
         )

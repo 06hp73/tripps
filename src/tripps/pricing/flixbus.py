@@ -25,12 +25,24 @@ from datetime import date, datetime, timedelta
 
 import httpx
 
-from ..models import Leg, Quote, TransportMode
+from ..models import ADULT, Leg, Passenger, Quote, TransportMode
 from .base import HttpPriceAdapter, ore_from_major, unavailable
 from .base import exact as exact_quote
 
 SOURCE = "flixbus"
 DEFAULT_BASE = "https://global.api.flixbus.com"
+
+#: FlixBus sells no discounted passenger type in Sweden, so every category prices as adult.
+#:
+#: The search endpoint *does* accept `products={"student":1}` and answers a consistent 20%
+#: below adult (510 -> 410 SEK, every departure, probed 2026-08-02), and `senior` returns the
+#: byte-identical number. But shop.flixbus.se - where the deeplink sends the traveller - offers
+#: only "Vuxna", "Barn 0 till 15 år" and bikes: there is no student or senior ticket to buy
+#: (checked on the live shop, 2026-08-02). Quoting that 410 would rank journeys on a fare
+#: nobody can pay. `children` is worse than unusable standalone: it returns 11 SEK on some
+#: departures and the full adult fare on others, i.e. a companion supplement rather than a
+#: fare, and a child under 15 may not travel alone anyway.
+FLIX_SELLS_DISCOUNTS = False
 
 #: Operator strings in GTFS that this adapter is willing to price.
 FLIX_OPERATORS = ("flixbus", "flix", "swebus")
@@ -256,7 +268,7 @@ class FlixBusAdapter(HttpPriceAdapter):
             return cached
         return await self.resolve_city(stop.name)
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         if not self.supports(leg):
             return unavailable(self.name, None, "not a FlixBus leg")
 
@@ -288,24 +300,32 @@ class FlixBusAdapter(HttpPriceAdapter):
                 self.name,
                 cheapest.total_with_fee_ore,
                 deeplink=link,
-                note=(
-                    "no FlixBus departure matched this timetabled leg; "
-                    f"showing the cheapest departure on {day.isoformat()}"
+                note="; ".join(
+                    part
+                    for part in (
+                        "no FlixBus departure matched this timetabled leg; "
+                        f"showing the cheapest departure on {day.isoformat()}",
+                        self.category_fallback_note(passenger),
+                    )
+                    if part
                 ),
             )
 
         if not match.bookable:
             return unavailable(self.name, link, f"departure is {match.status}")
 
-        note = None
+        notes = []
         if match.seats_left is not None and match.seats_left <= 5:
-            note = f"only {match.seats_left} seats left at this price"
+            notes.append(f"only {match.seats_left} seats left at this price")
+        fallback = self.category_fallback_note(passenger)
+        if fallback:
+            notes.append(fallback)
         return exact_quote(
             self.name,
             match.total_with_fee_ore,
             deeplink=link,
             fare_class="standard (incl. booking fee)",
-            note=note,
+            note="; ".join(notes) or None,
         )
 
     def _match(

@@ -164,6 +164,18 @@
       <label for="max_transfers">Max transfers</label>
       <input type="number" id="max_transfers" name="max_transfers" min="0" max="5" placeholder="any">
     </div>
+    <div>
+      <label for="passenger">Traveller</label>
+      <select id="passenger" name="passenger">
+        {% for option in passenger_options %}
+        <option value="{{ option.value }}" {{ 'selected' if option.value == passenger.category.value }}>{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div id="age-field" hidden>
+      <label for="age">Age</label>
+      <input type="number" id="age" name="age" min="0" max="120" placeholder="{{ passenger.age or '' }}">
+    </div>
 
     <div class="full checks">
       <span class="checks-label">Travel by</span>
@@ -433,6 +445,19 @@
   document.getElementById("rental-add").addEventListener("click", addRental);
   loadRentals();
 
+  // --- traveller -------------------------------------------------------
+  // Age is only asked for when it changes the fare: SJ sells CHILD_AND_YOUTH from 0 to 25 and
+  // prices 8 apart from 16, while an adult ticket has no age at all.
+  const ageField = document.getElementById("age-field");
+
+  function syncAgeField() {
+    ageField.hidden = form.passenger.value === "adult";
+    if (ageField.hidden) form.age.value = "";
+  }
+
+  form.passenger.addEventListener("change", syncAgeField);
+  syncAgeField();
+
   // --- permalinks + recent searches -----------------------------------
   const recentEl = document.getElementById("recent");
 
@@ -441,6 +466,7 @@
       origin: form.origin.value.trim(), destination: form.destination.value.trim(),
       date: form.date.value, ret: form.return_date ? form.return_date.value : "",
       earliest: form.earliest.value,
+      passenger: form.passenger.value, age: form.age.value,
       train: form.mode_train.checked, bus: form.mode_bus.checked, ferry: form.mode_ferry.checked,
       freerider: form.mode_freerider.checked, flight: form.mode_flight.checked,
     };
@@ -452,6 +478,8 @@
     if (s.date) p.set("date", s.date);
     if (s.ret) p.set("return", s.ret);
     if (s.earliest && s.earliest !== "06:00") p.set("earliest", s.earliest);
+    if (s.passenger && s.passenger !== "adult") p.set("passenger", s.passenger);
+    if (s.age) p.set("age", s.age);
     p.set("modes", ["train", "bus", "ferry", "freerider", "flight"].filter(m => s[m]).join(","));
     return p.toString();
   }
@@ -463,6 +491,9 @@
     if (q.get("date")) form.date.value = q.get("date");
     if (q.get("return") && form.return_date) form.return_date.value = q.get("return");
     if (q.get("earliest")) form.earliest.value = q.get("earliest");
+    if (q.get("passenger")) form.passenger.value = q.get("passenger");
+    if (q.get("age")) form.age.value = q.get("age");
+    syncAgeField();
     if (q.has("modes")) {
       const m = q.get("modes").split(",");
       form.mode_train.checked = m.includes("train"); form.mode_bus.checked = m.includes("bus");

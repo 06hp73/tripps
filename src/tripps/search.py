@@ -13,6 +13,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
+from .calibration import DISCOUNT_FLOOR_SCALE, load_calibrated_floors
 from .db import Database
 from .ingest.airports import nearest_airports, resolve_airport_stop
 from .ingest.flights import (
@@ -374,7 +375,17 @@ class Planner:
         # zero is a valid lower bound, so the floor invariant still holds. A tickital rental
         # frees the same operators, but only on dates inside its window, so it contributes only
         # when this search date is in-window.
+        # A discounted traveller pays under every adult fare the floors were fitted to, so the
+        # adult model would bound their journeys ABOVE the truth and prune the cheapest one.
+        # With a database, use the floors calibrated for this category (falling back inside
+        # `load_calibrated_floors` to a scaled adult fit); without one, scale what we hold.
         floors = self.floors
+        if not constraints.passenger.is_adult:
+            floors = (
+                load_calibrated_floors(self.db, constraints.passenger)
+                if self.db is not None
+                else floors.scaled(DISCOUNT_FLOOR_SCALE)
+            )
         pass_ids = list(held_cards or [])
         pass_ids += [r.provider_id for r in (tickital_rentals or []) if r.active_on(service_date)]
         card_ops = honored_operators(pass_ids) if pass_ids else frozenset()
@@ -404,6 +415,9 @@ class Planner:
             # Operators whose floor was zeroed above: a paid quote below their calibrated floor
             # pruned nothing (the router used 0), so it must not read as a floor violation.
             zeroed_operators=card_ops,
+            # The very model the router just used, so the violation detector and the
+            # calibration samples describe the bound that actually shaped this search.
+            floors=floors,
         )
         stats.priced = len(priced.itineraries)
         stats.upstream_calls = priced.calls_made

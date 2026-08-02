@@ -118,6 +118,45 @@ The planner would rather say nothing than say something false.
   free. Short trips are genuinely free; a 713 km car costs ~200 SEK in fuel.
 - Booking a Freerider car is not automated. Listing is public; reserving needs the user's own
   Hertz login. The UI surfaces a deep link and the return deadline.
+- A discount is only ever shown where the traveller can actually buy it. FlixBus's search
+  endpoint happily answers `products={"student":1}` with 20% off, but shop.flixbus.se sells
+  only *Vuxna*, *Barn 0–15 år* and bikes — so tripps quotes FlixBus at the adult fare for
+  every category and says so, per leg and once per journey. Ranking on an unbookable fare
+  would be a lie in the one number this program exists to get right.
+
+## Passenger categories
+
+`--passenger student` (also `youth`, `senior`, `child`, or `TRIPPS_PASSENGER`) prices the
+whole search for that traveller. The discount is *fetched*, never derived: it varies by
+operator and by age, so every source is asked for its own number.
+
+Verified live on 2026-08-02, the 05:13 Stockholm C → Göteborg C:
+
+| source | adult | student | senior | child (8) |
+|---|---|---|---|---|
+| SJ | 515 | 411 | 463 | 437 |
+| Tora (Trainplanet) | 530 | 423 | 477 | not sold |
+| FlixBus | 510 | not sold | not sold | not sold |
+
+SJ names its own tiers in `/v3/config.passengerCategories` — `ADULT`, `CHILD_AND_YOUTH`
+(0–25), `STUDENT` (15–120), `SENIOR` (18–120) — and requires an `age` *inside*
+`passengerCategory`, answering `400 Age cannot be null for type STUDENT` otherwise. There is
+no separate child tier: a child is a young `CHILD_AND_YOUTH`, and the age carries the
+difference. Tora accepts `ADULT`/`STUDENT`/`SENIOR` and rejects `YOUTH`/`CHILD` outright.
+`--age` overrides the representative age per tier (student 22, youth 20, senior 70, child 8);
+an age outside a tier's span is refused locally rather than as an opaque 400 mid-search.
+
+Two things this touches that are easy to miss:
+
+- **The quote cache key** includes the category *and* the age, because the same seat on the
+  same train is 515 SEK for an adult and 411 for a student. Adult keys stay unsuffixed, so
+  fares cached before categories existed remain valid.
+- **The price floors** are calibrated per `(operator, category)`. An adult floor is fitted to
+  sit just under the cheapest *adult* fare, so applying it to a student search would put the
+  bound above the fare and let McRAPTOR prune the genuinely cheapest journey — the one failure
+  [the invariant](#the-invariant-everything-rests-on) exists to prevent. Until a category has
+  its own `MIN_SAMPLES`, it routes on the adult floor scaled by `DISCOUNT_FLOOR_SCALE` (0.5,
+  against a deepest observed discount of 0.80), and the violation detector backstops it.
 
 ## Install and run
 
@@ -132,6 +171,8 @@ uv pip install -e ".[dev,flights]"
 .venv/bin/tripps search "Kiruna" "Stockholm Centralstation" --date 2026-07-13
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --date 2026-07-13 --return 2026-07-16
 .venv/bin/tripps search "Stockholm C" "Göteborg C" --modes train,bus   # only these modes
+.venv/bin/tripps search "Stockholm C" "Göteborg C" --passenger student # discounted fares
+.venv/bin/tripps search "Stockholm C" "Göteborg C" --passenger child --age 8
 .venv/bin/tripps fares  "Stockholm C" "Göteborg C" --start 2026-07-13 --days 7
 .venv/bin/tripps serve                            # web UI + JSON API on :8000
 ```

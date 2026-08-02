@@ -19,7 +19,9 @@ from tripps.db import Database
 from tripps.ingest.freerider import FreeriderCostModel, parse_offers
 from tripps.interfaces import HealthState, PriceAdapter, SourceHealth
 from tripps.models import (
+    ADULT,
     Leg,
+    Passenger,
     PriceConfidence,
     Quote,
     SearchConstraints,
@@ -51,7 +53,7 @@ class StubAdapter(PriceAdapter):
     def supports(self, leg: Leg) -> bool:
         return leg.mode in self.modes and (leg.operator or "") in self.prices
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         self.calls += 1
         if self.fail:
             raise RuntimeError("upstream exploded")

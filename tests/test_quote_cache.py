@@ -14,7 +14,7 @@ import pytest
 
 from tripps.config import PricingBudget
 from tripps.db import Database
-from tripps.models import Leg, PriceConfidence, Quote, Stop, TransportMode
+from tripps.models import ADULT, Leg, Passenger, PriceConfidence, Quote, Stop, TransportMode
 from tripps.pricing.base import CallBudget
 from tripps.pricing.orchestrator import PricingOrchestrator, _Context
 
@@ -96,7 +96,7 @@ class ExplodingAdapter:
     def supports(self, leg: Leg) -> bool:
         return True
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         raise RuntimeError("upstream blip")
 
     async def health(self):

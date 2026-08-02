@@ -45,6 +45,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
+from .models import ADULT, Passenger, PassengerCategory
 from .routing.floors import DEFAULT_FLOORS, ModeFloor, PriceFloorModel
 
 #: Modes whose legs carry an exact precomputed fare (flights, Freerider cars). Their floors
@@ -54,6 +55,27 @@ _NEVER_CALIBRATE = frozenset({"flight", "freerider", "walk"})
 
 #: Below this many observations, one operator's data is too thin to trust; keep the default.
 MIN_SAMPLES = 8
+
+#: What an operator's ADULT floor is multiplied by when routing for a discounted traveller
+#: whose own category has not accrued `MIN_SAMPLES` yet.
+#:
+#: The adult floor is fitted to sit just under the cheapest adult fare seen, so a discounted
+#: fare goes straight through it - and a floor above the truth can prune the genuinely
+#: cheapest journey, the one failure this project refuses to ship. The deepest discount
+#: measured on 2026-08-02 was 20% off (SJ and Tora student, 411/515 and 423/530; senior 0.90,
+#: child 0.85), so halving leaves better than twice the observed headroom while still being
+#: far tighter than the hand-set defaults. A category that accrues its own samples stops
+#: using this and gets a real fit; until then the violation detector backstops it.
+DISCOUNT_FLOOR_SCALE = 0.5
+
+
+def _row_passenger(row) -> str:
+    """The category a stored row belongs to, defaulting to adult for pre-category rows."""
+    try:
+        value = row["passenger"]
+    except (KeyError, IndexError):
+        return PassengerCategory.ADULT.value
+    return value or PassengerCategory.ADULT.value
 
 #: Discount applied to the fitted floor for headroom against future cheaper fares. A fare
 #: unobserved during calibration can undercut the fitted minimum, so this leaves a wide
@@ -69,10 +91,12 @@ class CalibratedFloor:
     base_ore: int
     per_km_ore: int
     samples: int
+    passenger: str = PassengerCategory.ADULT.value
 
     def as_row(self, now: datetime | None = None) -> dict:
         return {
             "operator": self.operator,
+            "passenger": self.passenger,
             "mode": self.mode,
             "base_ore": self.base_ore,
             "per_km_ore": self.per_km_ore,
@@ -140,7 +164,11 @@ def calibrate(
     observations, *, min_samples: int = MIN_SAMPLES, margin: float = SAFETY_MARGIN
 ) -> list[CalibratedFloor]:
     """Fit a safe, tight per-operator floor from `(operator, mode, distance_km, actual_ore)` rows."""
-    groups: dict[str, list[tuple[str, float, int]]] = defaultdict(list)
+    # Keyed by (operator, passenger): one operator sells the same kilometre at several prices,
+    # and a fit pooling them would sit under the adult fares by the size of the discount -
+    # safe but slack - while a fit of adult rows alone would sit ABOVE the student fare it
+    # never saw. Each category is fitted only against fares actually quoted for it.
+    groups: dict[tuple[str, str], list[tuple[str, float, int]]] = defaultdict(list)
     for row in observations:
         operator = row["operator"]
         mode = row["mode"]
@@ -148,10 +176,11 @@ def calibrate(
         actual = row["actual_ore"]
         if not operator or mode in _NEVER_CALIBRATE or not distance or distance <= 0 or actual <= 0:
             continue
-        groups[operator].append((mode, float(distance), int(actual)))
+        passenger = _row_passenger(row)
+        groups[(operator, passenger)].append((mode, float(distance), int(actual)))
 
     calibrated: list[CalibratedFloor] = []
-    for operator, points in groups.items():
+    for (operator, passenger), points in groups.items():
         if len(points) < min_samples:
             continue
         mode = Counter(m for m, _, _ in points).most_common(1)[0][0]
@@ -163,30 +192,47 @@ def calibrate(
                 base_ore=int(base * margin),
                 per_km_ore=int(per_km * margin),
                 samples=len(points),
+                passenger=passenger,
             )
         )
     return calibrated
 
 
-def floors_from_rows(rows) -> PriceFloorModel:
+def floors_from_rows(rows, passenger: Passenger = ADULT) -> PriceFloorModel:
     """Build a `PriceFloorModel` whose operator overrides come from the calibrated table.
 
     Rows are the `operator_floor` records; the mode-level defaults stay in place for
     operators (and modes) without a calibration.
+
+    An operator with rows fitted for this traveller's own category uses them. One with only
+    adult rows falls back to the adult floor scaled by `DISCOUNT_FLOOR_SCALE` - never the
+    adult floor itself, which a discounted fare would slip under.
     """
-    overrides: dict[str, ModeFloor] = {}
+    by_category: dict[tuple[str, str], ModeFloor] = {}
     for row in rows:
         if row["mode"] in _NEVER_CALIBRATE:
             continue
-        overrides[row["operator"]] = ModeFloor(
+        by_category[(row["operator"], _row_passenger(row))] = ModeFloor(
             base_ore=int(row["base_ore"]), per_km_ore=int(row["per_km_ore"])
         )
+
+    category = passenger.category.value
+    adult = PassengerCategory.ADULT.value
+    overrides: dict[str, ModeFloor] = {}
+    for (operator, row_category), floor in by_category.items():
+        if row_category == category:
+            overrides[operator] = floor
+        elif row_category == adult and (operator, category) not in by_category:
+            overrides[operator] = ModeFloor(
+                base_ore=int(floor.base_ore * DISCOUNT_FLOOR_SCALE),
+                per_km_ore=int(floor.per_km_ore * DISCOUNT_FLOOR_SCALE),
+            )
     return PriceFloorModel(DEFAULT_FLOORS, overrides)
 
 
-def load_calibrated_floors(db) -> PriceFloorModel:
+def load_calibrated_floors(db, passenger: Passenger = ADULT) -> PriceFloorModel:
     """The floor model the planner should use: defaults refined by whatever calibration exists."""
-    return floors_from_rows(db.get_operator_floors())
+    return floors_from_rows(db.get_operator_floors(), passenger)
 
 
 def run_calibration(db, *, min_samples: int = MIN_SAMPLES, margin: float = SAFETY_MARGIN) -> list[CalibratedFloor]:

@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..interfaces import HealthState, PriceAdapter, SourceHealth
-from ..models import Leg, PriceConfidence, Quote, TransportMode
+from ..models import ADULT, Leg, Passenger, PassengerCategory, PriceConfidence, Quote, TransportMode
 from .base import estimated, unavailable
 
 #: Where a traveller actually buys a ticket for each operator in the national feed.
@@ -129,15 +129,20 @@ class StaticFareAdapter(PriceAdapter):
     def supports(self, leg: Leg) -> bool:
         return leg.mode in self.modes and self._row(leg) is not None
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         row = self._row(leg)
         if row is None:
             return unavailable(self.name, booking_url(leg.operator), "no fare table entry")
+        note = row.note or "Fixed published fare, not a live quote."
+        # The packaged table holds published *adult* fares. Several of these operators do sell
+        # a youth or student fare on their own site; until a row carries one, saying so beats
+        # quietly presenting the adult price as the traveller's.
+        fallback = self.category_fallback_note(passenger)
         return estimated(
             self.name,
             row.amount_ore,
             deeplink=booking_url(leg.operator),
-            note=row.note or "Fixed published fare, not a live quote.",
+            note=f"{note} {fallback.capitalize()}." if fallback else note,
         )
 
     async def health(self) -> SourceHealth:
@@ -158,11 +163,15 @@ class DeeplinkAdapter(PriceAdapter):
     )
     #: This adapter never returns an amount, only a booking link.
     provides_price = False
+    #: All categories: with no amount to discount, a fallback note would say nothing.
+    sells_categories = frozenset(PassengerCategory)
 
     def supports(self, leg: Leg) -> bool:
         return leg.mode in self.modes
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
+        # No amount is ever returned here, so a discount tier is meaningless: the note below
+        # already says the leg is unpriced, and "no student fare" on top would only add noise.
         operator = leg.operator or "this operator"
         if leg.mode is TransportMode.LOCAL_TRANSIT:
             note = (

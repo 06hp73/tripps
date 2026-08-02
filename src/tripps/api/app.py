@@ -36,7 +36,7 @@ from ..ingest.freerider import (
     schema_drift,
 )
 from ..ingest.gtfs import GtfsConfig, extract_agency_stops, load_timetable_cached
-from ..models import SearchConstraints, TransportMode
+from ..models import Passenger, PassengerCategory, SearchConstraints, TransportMode
 from ..passes import (
     PassAdapter,
     PassCoverage,
@@ -430,6 +430,19 @@ def _parse_date(value: str | None) -> date:
         raise HTTPException(400, f"bad date {value!r}, expected YYYY-MM-DD") from exc
 
 
+def _passenger(category: str | None, age: int | None) -> Passenger:
+    """The traveller for a request, falling back to the configured default."""
+    settings = get_settings()
+    chosen = category or settings.passenger.value
+    if age is None and chosen == settings.passenger.value:
+        age = settings.passenger_age
+    try:
+        return Passenger(category=PassengerCategory(chosen), age=age)
+    except ValueError as exc:
+        # An unknown category, or an age outside the tier the operator sells it in.
+        raise HTTPException(400, f"bad passenger: {exc}") from exc
+
+
 def _constraints(
     max_hours: float | None,
     max_transfers: int | None,
@@ -437,6 +450,8 @@ def _constraints(
     modes: list[str] | None,
     earliest: str | None,
     service_date: date,
+    passenger: str | None = None,
+    age: int | None = None,
 ) -> SearchConstraints:
     if modes:
         try:
@@ -465,6 +480,7 @@ def _constraints(
         include_freerider=include_freerider,
         allowed_modes=allowed,
         earliest_departure=earliest_dt,
+        passenger=_passenger(passenger, age),
     )
 
 
@@ -503,11 +519,14 @@ async def api_search(
     include_freerider: bool = True,
     earliest: str | None = None,
     modes: list[str] | None = Query(None),
+    passenger: str | None = None,
+    age: int | None = None,
 ) -> JSONResponse:
     state = _state(request)
     service_date = _parse_date(date_)
     constraints = _constraints(
-        max_hours, max_transfers, include_freerider, modes, earliest, service_date
+        max_hours, max_transfers, include_freerider, modes, earliest, service_date,
+        passenger, age,
     )
     response, stats = await _run_search(state, origin, destination, service_date, constraints)
     payload = response.model_dump(mode="json")
@@ -540,11 +559,13 @@ async def api_round_trip(
     max_transfers: int | None = None,
     include_freerider: bool = True,
     modes: list[str] | None = Query(None),
+    passenger: str | None = None,
+    age: int | None = None,
 ) -> JSONResponse:
     state = _state(request)
     out_date, back_date = _parse_date(outbound), _parse_date(return_date)
     constraints = _constraints(
-        max_hours, max_transfers, include_freerider, modes, None, out_date
+        max_hours, max_transfers, include_freerider, modes, None, out_date, passenger, age
     )
     try:
         result = await round_trip(
@@ -576,12 +597,14 @@ async def api_fares(
     max_transfers: int | None = None,
     include_freerider: bool = True,
     modes: list[str] | None = Query(None),
+    passenger: str | None = None,
+    age: int | None = None,
 ) -> JSONResponse:
     """Cheapest priced itinerary per day over a window - a fare calendar."""
     state = _state(request)
     start_date = _parse_date(start)
     constraints = _constraints(
-        max_hours, max_transfers, include_freerider, modes, None, start_date
+        max_hours, max_transfers, include_freerider, modes, None, start_date, passenger, age
     )
     rentals = _rentals(state.db)
     try:
@@ -1021,6 +1044,10 @@ async def index(request: Request) -> HTMLResponse:
             "today": now_local().date().isoformat(),
             "freerider_count": len(state.freerider_offers),
             "errors": state.errors,
+            "passenger": _passenger(None, None),
+            "passenger_options": [
+                {"value": c.value, "label": c.label} for c in PassengerCategory
+            ],
         },
     )
 
@@ -1039,6 +1066,8 @@ async def ui_search(
     mode_ferry: bool = Form(False),
     mode_freerider: bool = Form(False),
     mode_flight: bool = Form(False),
+    passenger: str | None = Form(None),
+    age: int | None = Form(None),
 ) -> HTMLResponse:
     state = _state(request)
     service_date = _parse_date(date_)
@@ -1057,7 +1086,7 @@ async def ui_search(
             modes.append(name)
 
     constraints = _constraints(
-        max_hours, max_transfers, mode_freerider, modes, earliest, service_date
+        max_hours, max_transfers, mode_freerider, modes, earliest, service_date, passenger, age
     )
     try:
         response, stats = await _run_search(

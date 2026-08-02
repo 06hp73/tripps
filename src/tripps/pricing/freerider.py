@@ -18,7 +18,7 @@ B2C session. The quote carries a deeplink and the itinerary carries a warning.
 from __future__ import annotations
 
 from ..ingest.freerider import FreeriderCostModel, FreeriderOffer
-from ..models import Leg, Quote, TransportMode
+from ..models import ADULT, Leg, Passenger, PassengerCategory, Quote, TransportMode
 from .base import HttpPriceAdapter, estimated, unavailable
 
 SOURCE = "freerider"
@@ -39,6 +39,9 @@ class FreeriderAdapter(HttpPriceAdapter):
 
     name = SOURCE
     modes = frozenset({TransportMode.FREERIDER})
+    #: Every category, because none of them changes the number: a Freerider car costs its
+    #: fuel whoever is driving. Claiming "no student fare here" would be noise, not honesty.
+    sells_categories = frozenset(PassengerCategory)
 
     def __init__(
         self,
@@ -70,7 +73,9 @@ class FreeriderAdapter(HttpPriceAdapter):
                 return offer
         return None
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
+        # The passenger category is deliberately ignored: the car is free whoever drives it,
+        # and this amount is a fuel estimate, not a ticket that could carry a discount.
         if not self.supports(leg):
             return unavailable(self.name, BOOKING_URL, "not a Freerider leg")
 

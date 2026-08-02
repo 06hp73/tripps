@@ -91,6 +91,26 @@ class PriceFloorModel(PriceFloor):
     def with_operator(self, operator: str, floor: ModeFloor) -> PriceFloorModel:
         return PriceFloorModel(self._table, {**self._operators, operator: floor})
 
+    def scaled(self, factor: float) -> PriceFloorModel:
+        """Every bound multiplied by `factor`, for pricing a traveller who pays less.
+
+        Only safe downward, and that is the only direction it is used: for `factor <= 1` the
+        result stays at or below the original, and the original is already at or below every
+        adult fare, so the contract survives any discount at least as deep as the factor.
+        Truncation to int rounds toward zero, which is also the safe side.
+        """
+        if factor > 1:
+            raise ValueError(f"scaling a floor UP can break floor <= true price: {factor}")
+        table = {
+            mode: ModeFloor(int(f.base_ore * factor), int(f.per_km_ore * factor))
+            for mode, f in self._table.items()
+        }
+        operators = {
+            name: ModeFloor(int(f.base_ore * factor), int(f.per_km_ore * factor))
+            for name, f in self._operators.items()
+        }
+        return PriceFloorModel(table, operators)
+
     def with_operators_zeroed(self, operators) -> PriceFloorModel:
         """A copy where the given operators have a zero floor (for pass-aware routing).
 

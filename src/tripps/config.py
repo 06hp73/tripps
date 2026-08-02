@@ -12,7 +12,7 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from .models import TransportMode
+from .models import PassengerCategory, TransportMode
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
@@ -112,6 +112,12 @@ class Settings(BaseSettings):
 
     http_timeout_seconds: float = 20.0
     user_agent: str = "tripps/0.1 (personal trip planner; +https://github.com/local/tripps)"
+
+    #: Who is travelling, when a search does not say. Someone who is a student every day
+    #: should not have to pass --passenger on every command.
+    passenger: PassengerCategory = PassengerCategory.ADULT
+    #: Age the default category is priced at. None uses that category's representative age.
+    passenger_age: int | None = None
 
     #: Freerider inventory poll interval. Community pollers run at 10s; we are a
     #: planner, not a sniper, so we stay well back from that.

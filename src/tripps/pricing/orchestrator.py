@@ -32,9 +32,11 @@ from ..config import CacheTTL, PricingBudget
 from ..db import Database
 from ..interfaces import PriceAdapter
 from ..models import (
+    ADULT,
     SEK,
     Itinerary,
     Leg,
+    Passenger,
     PriceConfidence,
     Quote,
     SearchConstraints,
@@ -116,6 +118,14 @@ class _Context:
     """Per-search state: the call budget and any floor violations observed."""
 
     call_budget: CallBudget
+    #: Who the search is priced for. Every quote, cache lookup and calibration sample in this
+    #: search is scoped to it, so an adult and a student search never see each other's fares.
+    passenger: Passenger = ADULT
+    #: The floor model the ROUTER actually used for this search. For a discounted traveller
+    #: that is not the adult model, so the violation check and the calibration samples must
+    #: both be judged against this one - otherwise every student fare looks like a violation
+    #: of a bound that was never applied to it.
+    floors: PriceFloorModel | None = None
     violations: list[str] = field(default_factory=list)
     #: Operators whose routing floor the search zeroed (held cards + active rentals). A leg on
     #: one of these was routed with a 0 floor, so a paid quote below the calibrated floor
@@ -172,7 +182,7 @@ class PricingOrchestrator:
         ttl = self.ttl.for_mode(leg.mode)
 
         if self.db is not None:
-            cached = self.db.get_quote(adapter.name, leg)
+            cached = self.db.get_quote(adapter.name, leg, passenger=ctx.passenger)
             if cached is not None and cached.confidence in (
                 PriceConfidence.CACHED,
                 PriceConfidence.ESTIMATED,
@@ -181,12 +191,12 @@ class PricingOrchestrator:
                 return cached
 
         try:
-            quote = await adapter.quote_leg(leg)
+            quote = await adapter.quote_leg(leg, ctx.passenger)
         except BudgetExceeded as exc:
             # The source ran out of requests for this search. A stale cached number beats no
             # number, and it is labelled stale rather than passed off as current.
             if self.db is not None:
-                stale = self.db.get_quote(adapter.name, leg)
+                stale = self.db.get_quote(adapter.name, leg, passenger=ctx.passenger)
                 if stale is not None and stale.is_priced:
                     return stale
             return Quote.unavailable(source=adapter.name, note=str(exc))
@@ -196,14 +206,14 @@ class PricingOrchestrator:
             # number. Without this, a transient upstream blip unpriced the leg and (under
             # require_priced) silently hid an itinerary that may be the genuinely cheapest.
             if self.db is not None:
-                stale = self.db.get_quote(adapter.name, leg)
+                stale = self.db.get_quote(adapter.name, leg, passenger=ctx.passenger)
                 if stale is not None and stale.is_priced:
                     return stale
             return Quote.unavailable(source=adapter.name, note=f"pricing failed: {exc}")
 
         if self.db is not None:
-            self.db.put_quote(adapter.name, leg, quote, ttl)
-            self._record_delta(leg, quote, adapter.name)
+            self.db.put_quote(adapter.name, leg, quote, ttl, ctx.passenger)
+            self._record_delta(leg, quote, adapter.name, ctx.passenger, ctx.floors)
         self._check_floor(leg, quote, ctx)
         return quote
 
@@ -229,14 +239,27 @@ class PricingOrchestrator:
         # Audited over the ridden polyline (leg_floor_km) - the same distance the router
         # integrated the floor over. Auditing the shorter endpoint chord would blind this
         # detector exactly on the winding routes where the invariant breaks.
-        floor = self.floors.floor_ore(leg.mode, leg.operator, leg_floor_km(leg))
+        floors = ctx.floors or self.floors
+        floor = floors.floor_ore(leg.mode, leg.operator, leg_floor_km(leg))
         if floor > quote.amount_ore:
             ctx.violations.append(
                 f"{leg.operator or leg.mode.value}: floor {floor} > actual {quote.amount_ore}"
             )
 
-    def _record_delta(self, leg: Leg, quote: Quote, source: str) -> None:
-        """Log (floor, actual) so the routing bound can be calibrated and audited."""
+    def _record_delta(
+        self,
+        leg: Leg,
+        quote: Quote,
+        source: str,
+        passenger: Passenger = ADULT,
+        floors: PriceFloorModel | None = None,
+    ) -> None:
+        """Log (floor, actual) so the routing bound can be calibrated and audited.
+
+        The category travels with the sample: a student fare filed as an adult observation
+        would drag that operator's adult floor down by the discount and quietly slacken the
+        routing bound for every adult search after it.
+        """
         if self.db is None or not quote.is_priced or quote.amount_ore is None:
             return
         if not self._prices_a_real_ticket(leg) or source in _FLOOR_EXEMPT_SOURCES:
@@ -244,7 +267,7 @@ class PricingOrchestrator:
         # Record the ridden polyline distance, so calibration fits per_km against the metric
         # the router actually applies it over. (Fit-on-chord + apply-on-path breaks the floor.)
         distance = leg_floor_km(leg)
-        floor = self.floors.floor_ore(leg.mode, leg.operator, distance)
+        floor = (floors or self.floors).floor_ore(leg.mode, leg.operator, distance)
         self.db.record_reprice_delta(
             source=source,
             mode=leg.mode.value,
@@ -252,6 +275,7 @@ class PricingOrchestrator:
             distance_km=distance,
             floor_ore=floor,
             actual_ore=quote.amount_ore,
+            passenger=passenger,
         )
 
     # --- split ticketing (advisory) ---------------------------------------
@@ -369,7 +393,7 @@ class PricingOrchestrator:
         warnings = list(itin.warnings)
         if arlanda_warning is not None:
             warnings.append(arlanda_warning)
-        warnings.extend(self._warnings_for(priced))
+        warnings.extend(self._warnings_for(priced, ctx.passenger))
         return Itinerary(
             legs=priced, warnings=warnings, floor_price_ore=itin.floor_price_ore
         )
@@ -452,8 +476,26 @@ class PricingOrchestrator:
                 )
         return result
 
-    def _warnings_for(self, legs: list[Leg]) -> list[str]:
+    def _warnings_for(self, legs: list[Leg], passenger: Passenger = ADULT) -> list[str]:
         warnings: list[str] = []
+        # Name the sources that cannot sell this traveller's tier once for the whole journey,
+        # rather than repeating it per leg. The legs still carry their own note; this is the
+        # headline, so nobody reads a total as a discounted one when part of it is full fare.
+        if not passenger.is_adult:
+            full_fare = sorted(
+                {
+                    leg.quote.source
+                    for leg in legs
+                    if leg.quote is not None
+                    and leg.quote.is_priced
+                    and (leg.quote.note or "").find("adult price shown") >= 0
+                }
+            )
+            if full_fare:
+                warnings.append(
+                    f"No {passenger.category.value} fare is sold by "
+                    f"{', '.join(full_fare)}; those legs are the adult price."
+                )
         freerider = next(
             (a for a in self.adapters if isinstance(a, FreeriderAdapter)), None
         )
@@ -512,6 +554,7 @@ class PricingOrchestrator:
         max_results: int = 5,
         require_priced: bool = True,
         zeroed_operators: frozenset[str] | None = None,
+        floors: PriceFloorModel | None = None,
     ) -> PricingResult:
         """Price the most promising candidates, then rank by true total price.
 
@@ -551,6 +594,8 @@ class PricingOrchestrator:
 
         ctx = _Context(
             call_budget=CallBudget.from_settings(self.budget),
+            passenger=constraints.passenger,
+            floors=floors or self.floors,
             zeroed_operators=zeroed_operators or frozenset(),
         )
         for adapter in self.adapters:

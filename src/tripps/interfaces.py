@@ -14,7 +14,7 @@ import enum
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from .models import Leg, Quote, Stop, TransportMode
+from .models import ADULT, Leg, Passenger, PassengerCategory, Quote, Stop, TransportMode
 
 
 class HealthState(str, enum.Enum):
@@ -50,14 +50,27 @@ class PriceAdapter(ABC):
     #: yields UNAVAILABLE sets this False, so the orchestrator can tell "priced elsewhere or
     #: not at all" apart from "reached the catch-all" without spending a call to find out.
     provides_price: bool = True
+    #: Passenger categories this source actually *sells*. Everything outside this set is
+    #: quoted at the adult fare and flagged, because that is what the traveller would really
+    #: pay here - an unbookable discount would make the cheapest-journey ranking a lie.
+    sells_categories: frozenset[PassengerCategory] = frozenset({PassengerCategory.ADULT})
+
+    def prices_natively(self, passenger: Passenger) -> bool:
+        return passenger.category in self.sells_categories
+
+    def category_fallback_note(self, passenger: Passenger) -> str | None:
+        """Why this leg shows the adult fare, or None when the category is sold here."""
+        if self.prices_natively(passenger):
+            return None
+        return f"no {passenger.category.value} fare at this source; adult price shown"
 
     @abstractmethod
     def supports(self, leg: Leg) -> bool:
         """Can this adapter price this specific leg (right mode, right operator)?"""
 
     @abstractmethod
-    async def quote_leg(self, leg: Leg) -> Quote:
-        """Price one leg. Never raises on upstream failure."""
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
+        """Price one leg for this traveller. Never raises on upstream failure."""
 
     async def quote_itinerary(self, legs: list[Leg]) -> Quote | None:
         """Optional through-fare for a run of consecutive legs on this source.

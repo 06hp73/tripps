@@ -11,7 +11,7 @@ import pytest
 from tripps.config import CacheTTL, PricingBudget
 from tripps.db import Database
 from tripps.ingest.gtfs import load_timetable, load_timetable_cached
-from tripps.models import PriceConfidence, Quote, Stop, TransportMode  # noqa: E402
+from tripps.models import ADULT, PriceConfidence, Quote, Stop, TransportMode  # noqa: E402
 from tripps.pricing.orchestrator import PricingOrchestrator
 from tripps.routing.floors import PriceFloorModel
 from tripps.routing.timetable import RouteInfo, TimetableBuilder, Trip
@@ -47,7 +47,7 @@ class PriceByOperator:
     def supports(self, leg):
         return (leg.operator or "") in self.fares
 
-    async def quote_leg(self, leg):
+    async def quote_leg(self, leg, passenger=ADULT):
         return Quote(source="stub", amount_ore=self.fares[leg.operator], confidence=PriceConfidence.EXACT)
 
     async def health(self):

@@ -37,7 +37,7 @@ import time
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
-from ..models import Leg, Quote, TransportMode
+from ..models import ADULT, Leg, Passenger, PassengerCategory, Quote, TransportMode
 from .base import BudgetExceeded, HttpPriceAdapter, unavailable
 from .base import exact as exact_quote
 
@@ -45,6 +45,16 @@ log = logging.getLogger(__name__)
 
 SOURCE = "tora"
 OFFERS_URL = "https://wl.tora.trainplanet.com/v1/offers"
+
+#: Tora's passengerSpecification types, probed live on 2026-08-02. ADULT, STUDENT and SENIOR
+#: are accepted and priced apart (530 / 423 / 477 SEK on the same Stockholm-Göteborg train);
+#: YOUTH and CHILD are rejected outright with HTTP 400 "Failed to read request", so those
+#: categories fall back to the adult fare rather than guessing a tier that is not sold.
+TORA_CATEGORIES: dict[PassengerCategory, str] = {
+    PassengerCategory.ADULT: "ADULT",
+    PassengerCategory.STUDENT: "STUDENT",
+    PassengerCategory.SENIOR: "SENIOR",
+}
 #: The Oresundstag tenant is not scoped to Oresundstag; it returns every operator Trainplanet
 #: resells. Verified to surface Malartag, Skanetrafiken, Vy Bus4You and more.
 REFERER = "https://boka.oresundstag.se"
@@ -175,6 +185,7 @@ class ToraAdapter(HttpPriceAdapter):
 
     name = SOURCE
     modes = frozenset({TransportMode.TRAIN, TransportMode.BUS})
+    sells_categories = frozenset(TORA_CATEGORIES)
 
     def __init__(
         self,
@@ -211,7 +222,9 @@ class ToraAdapter(HttpPriceAdapter):
 
     # --- HTTP via primp (browser impersonation, in a thread) --------------
 
-    def _fetch_offers_sync(self, origin: str, destination: str, when: datetime) -> dict:
+    def _fetch_offers_sync(
+        self, origin: str, destination: str, when: datetime, passenger: Passenger = ADULT
+    ) -> dict:
         from primp import Client  # noqa: PLC0415
 
         if self._primp is None:
@@ -219,11 +232,16 @@ class ToraAdapter(HttpPriceAdapter):
                 impersonate=_IMPERSONATE, impersonate_os="macos", referer=True,
                 timeout=self._timeout,
             )
+        spec_type = TORA_CATEGORIES.get(passenger.category, "ADULT")
+        spec: dict[str, object] = {"type": spec_type, "externalRef": f"{spec_type}-0"}
+        # Tora echoes the age back and prices on it; ADULT carries none, matching the site.
+        if spec_type != "ADULT" and passenger.age is not None:
+            spec["age"] = passenger.age
         body = {
             "currency": self.currency,
             "promotionCodes": [],
             "corporateCodes": [],
-            "passengerSpecifications": [{"type": "ADULT", "externalRef": "ADULT-0"}],
+            "passengerSpecifications": [spec],
             "interrail": False,
             "originPlace": place_urn(origin),
             "destinationPlace": place_urn(destination),
@@ -244,13 +262,18 @@ class ToraAdapter(HttpPriceAdapter):
         return json.loads(resp.text)
 
     async def _day_offers(
-        self, origin: str, destination: str, day: date, near: datetime
+        self,
+        origin: str,
+        destination: str,
+        day: date,
+        near: datetime,
+        passenger: Passenger = ADULT,
     ) -> list[ToraJourney]:
         # Key by departure HOUR, not day: the endpoint returns only a ~1 h window around the
         # requested time, so a single day-keyed memo would serve the first-probed hour's
         # journeys to every later departure and leave them "no matching Tora journey" (i.e.
         # unpriced and hidden). Per-hour keying gives each probed departure its own window.
-        cache_key = (origin, destination, day.isoformat(), near.hour)
+        cache_key = (origin, destination, day.isoformat(), near.hour, passenger.cache_token)
         cached = self._day_cache.get(cache_key)
         if cached is not None and time.monotonic() - cached[0] < self.day_cache_ttl:
             return cached[1]
@@ -264,7 +287,7 @@ class ToraAdapter(HttpPriceAdapter):
                 self._budget.consume(self.name)  # raises BudgetExceeded
             await self._limiter.acquire()
             payload = await asyncio.to_thread(
-                self._fetch_offers_sync, origin, destination, near
+                self._fetch_offers_sync, origin, destination, near, passenger
             )
             journeys = parse_offers(payload)
             self._day_cache[cache_key] = (time.monotonic(), journeys)
@@ -292,14 +315,18 @@ class ToraAdapter(HttpPriceAdapter):
             key=lambda j: (abs(j.departure - leg.departure), abs(j.arrival - leg.arrival)),
         )
 
-    async def quote_leg(self, leg: Leg) -> Quote:
+    async def quote_leg(self, leg: Leg, passenger: Passenger = ADULT) -> Quote:
         if not self.supports(leg):
             return unavailable(self.name, deeplink(leg), "not a Tora-sold operator")
 
         link = deeplink(leg)
         try:
             journeys = await self._day_offers(
-                leg.from_stop.id, leg.to_stop.id, leg.departure.date(), leg.departure
+                leg.from_stop.id,
+                leg.to_stop.id,
+                leg.departure.date(),
+                leg.departure,
+                passenger,
             )
         except BudgetExceeded as exc:
             # Out of calls for this search; the source is healthy, we just stopped asking.
@@ -317,12 +344,18 @@ class ToraAdapter(HttpPriceAdapter):
         if match.cheapest_ore is None:
             return unavailable(self.name, link, "Tora journey has no purchasable fare")
 
+        fallback = self.category_fallback_note(passenger)
+        tier = "" if passenger.is_adult or fallback else f"{passenger.label} "
+        note = (
+            f"Live {match.sole_carrier} {tier}fare via Trainplanet; "
+            "book on the operator's site."
+        )
         return exact_quote(
             self.name,
             match.cheapest_ore,
             deeplink=link,
             fare_class="cheapest available",
-            note=f"Live {match.sole_carrier} fare via Trainplanet; book on the operator's site.",
+            note=f"{note} {fallback.capitalize()}." if fallback else note,
         )
 
     async def aclose(self) -> None:
