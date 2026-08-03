@@ -1,14 +1,898 @@
 [
-  {"operator": "Vy flygbussarna", "from_stop": "740043310", "to_stop": "740000622", "amount_ore": 12900, "note": "Arlanda ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740043310", "amount_ore": 12900, "note": "Stockholm City ↔ Arlanda, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740020671", "to_stop": "740000622", "amount_ore": 12900, "note": "Arlanda ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740020671", "amount_ore": 12900, "note": "Stockholm City ↔ Arlanda, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740000554", "to_stop": "740020483", "amount_ore": 12900, "note": "Landvetter ↔ Göteborg, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740020483", "to_stop": "740000554", "amount_ore": 12900, "note": "Göteborg ↔ Landvetter, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740000953", "to_stop": "740072050", "amount_ore": 13900, "note": "Malmö Airport ↔ Malmö C, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740072050", "to_stop": "740000953", "amount_ore": 13900, "note": "Malmö C ↔ Malmö Airport, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740011384", "to_stop": "740000622", "amount_ore": 22900, "note": "Skavsta ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740011384", "amount_ore": 22900, "note": "Stockholm City ↔ Skavsta, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740024556", "to_stop": "740000622", "amount_ore": 22900, "note": "Västerås Airport ↔ Stockholm City, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."},
-  {"operator": "Vy flygbussarna", "from_stop": "740000622", "to_stop": "740024556", "amount_ore": 22900, "note": "Stockholm City ↔ Västerås Airport, standard adult single. flygbussarna.se, captured 2026-07-12; online/app fares are often lower."}
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740049185",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740049185",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740049185",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740049185",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020581",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020581",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740020581",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740020581",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740021661",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740021661",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740021661",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740021661",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740066545",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740066545",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066545",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066545",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740066610",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740066610",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066610",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066610",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740066544",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740066544",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066544",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066544",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740066542",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740066542",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066542",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066542",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740021658",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740021658",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740021658",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740021658",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740023254",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740023254",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740023254",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740023254",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740001179",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740001179",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740001179",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740001179",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740012883",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740012883",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740012883",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740012883",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016086",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016086",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740016086",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740016086",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740004046",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740004046",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740004046",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740004046",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016178",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016178",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740016178",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740016178",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740046187",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740046187",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046187",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046187",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740021665",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740021665",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740021665",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740021665",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000622",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000622",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740000622",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740000622",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740046073",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740046073",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046073",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046073",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740046154",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740046154",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046154",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046154",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740045571",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740045571",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740045571",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740045571",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740046074",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740046074",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046074",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740046074",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740066609",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740066609",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066609",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740066609",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740049197",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740049197",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740049197",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740049197",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020671",
+  "to_stop": "740050989",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740043310",
+  "to_stop": "740050989",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740050989",
+  "to_stop": "740020671",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740050989",
+  "to_stop": "740043310",
+  "amount_ore": 12900,
+  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000554",
+  "to_stop": "740025610",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Berzeliigatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740025610",
+  "to_stop": "740000554",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Berzeliigatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000554",
+  "to_stop": "740015578",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Korsvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740015578",
+  "to_stop": "740000554",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Korsvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000554",
+  "to_stop": "740016358",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Kungsportsplatsen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016358",
+  "to_stop": "740000554",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Kungsportsplatsen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000554",
+  "to_stop": "740020483",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Nils Ericsonterminal). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740020483",
+  "to_stop": "740000554",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Nils Ericsonterminal). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000554",
+  "to_stop": "740061273",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Hangarvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740061273",
+  "to_stop": "740000554",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Hangarvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000554",
+  "to_stop": "740061277",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Landvetterhotellet). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740061277",
+  "to_stop": "740000554",
+  "amount_ore": 12900,
+  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Landvetterhotellet). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740072050",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö C Norra Vallgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740072050",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö C Norra Vallgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740016779",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Jägersro Center). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016779",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Jägersro Center). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740001486",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Persborg station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740001486",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Persborg station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740015745",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Studentgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740015745",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Studentgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740016782",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Södervärn). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740016782",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Södervärn). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740001587",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Triangeln station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740001587",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Triangeln station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000953",
+  "to_stop": "740013614",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Svedala E65). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740013614",
+  "to_stop": "740000953",
+  "amount_ore": 13900,
+  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Svedala E65). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000009",
+  "to_stop": "740011384",
+  "amount_ore": 22900,
+  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Linköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740011384",
+  "to_stop": "740000009",
+  "amount_ore": 22900,
+  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Linköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000007",
+  "to_stop": "740011384",
+  "amount_ore": 22900,
+  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Norrköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740011384",
+  "to_stop": "740000007",
+  "amount_ore": 22900,
+  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Norrköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740000622",
+  "to_stop": "740011384",
+  "amount_ore": 22900,
+  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ },
+ {
+  "operator": "Vy flygbussarna",
+  "from_stop": "740011384",
+  "to_stop": "740000622",
+  "amount_ore": 22900,
+  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+ }
 ]
