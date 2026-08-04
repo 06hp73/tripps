@@ -284,6 +284,14 @@ def _print_itinerary(itin, index: int) -> None:
     print(f" {marker} {index}. {summarize(itin)}")
     for leg in itin.legs:
         if leg.mode is TransportMode.WALK:
+            # A walk is part of the journey and its length is named - never hidden. The
+            # traveller decides whether 400 m (or 2 km to a Freerider kiosk) is acceptable.
+            meters = int(round((leg.path_km or 0) * 1000))
+            dist = f"≈{meters / 1000:.1f} km" if meters >= 1000 else f"≈{meters} m"
+            print(
+                f"       {leg.departure:%H:%M}-{leg.arrival:%H:%M} {'walk':12} "
+                f"{leg.from_stop.name[:24]:26} -> {leg.to_stop.name[:24]:26} {dist} walk"
+            )
             continue
         quote = leg.quote
         if quote is None or quote.amount_ore is None:

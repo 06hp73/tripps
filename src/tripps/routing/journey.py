@@ -98,14 +98,20 @@ def _ride_leg(tt: Timetable, edge: RideEdge, service_date: date) -> Leg:
 def _walk_leg(
     tt: Timetable, edge: TransferEdge, node: Label, previous: Label, service_date: date
 ) -> Leg:
+    from .timetable import haversine_km
+
+    frm, to = tt.stops[edge.from_stop], tt.stops[node.stop]
     return Leg(
-        from_stop=tt.stops[edge.from_stop],
-        to_stop=tt.stops[node.stop],
+        from_stop=frm,
+        to_stop=to,
         mode=TransportMode.WALK,
         operator=None,
         departure=from_service_seconds(previous.arrival, service_date),
         arrival=from_service_seconds(node.arrival, service_date),
         service_ref=None,
+        # Straight-line walking distance, so every walk leg can NAME its length. A walk may
+        # be offered, never hidden - the traveller decides if 400 m with luggage is fine.
+        path_km=haversine_km(frm.lat, frm.lon, to.lat, to.lon),
     )
 
 
