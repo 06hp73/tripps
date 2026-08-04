@@ -128,7 +128,11 @@ def _ref_boardable(route, pos, ready, query, unboarded, fares_vary):
             break
         if ok(i):
             within.append(i)
-    cap = query.max_departures_per_route
+    cap = (
+        query.max_departures_per_route_intercity
+        if route.info.mode in (TransportMode.TRAIN, TransportMode.BUS)
+        else query.max_departures_per_route
+    )
     if fares_vary or len(within) <= cap:
         return within
     n = len(within)

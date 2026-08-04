@@ -134,8 +134,16 @@ class RaptorQuery:
     #: window silently excludes it from ever being priced.
     profile_window_seconds: int = 24 * 3600
     #: Cap on origin departures enumerated per route, so a metro line with a train every
-    #: three minutes does not swamp the frontier.
+    #: three minutes does not swamp the frontier. Applies to LOCAL_TRANSIT/FERRY and other
+    #: flat-fare-ish modes where any sampled departure prices like its neighbours.
     max_departures_per_route: int = 16
+    #: The cap for TRAIN and BUS routes, deliberately far higher: intercity operators are
+    #: yield-managed, so each departure carries its OWN price and a thinned-away departure
+    #: is a fare that never even becomes a candidate - FlixBus corridors run 34-37 trips a
+    #: day and the measured effect of cap 16 was every second bus never being priced. 64
+    #: comfortably covers every intercity route in the feed while still bounding a
+    #: pathological pattern.
+    max_departures_per_route_intercity: int = 64
     #: A*-style pruning against a per-stop lower bound on remaining travel time. Provably
     #: frontier-preserving (see module docstring); the switch exists for debugging only.
     target_potentials: bool = True
@@ -474,7 +482,11 @@ def _boardable_trips(
         no_board = trips[trip_idx].no_board
         if no_board is None or not no_board[pos]:
             within.append(trip_idx)
-    cap = query.max_departures_per_route
+    cap = (
+        query.max_departures_per_route_intercity
+        if route.info.mode in (TransportMode.TRAIN, TransportMode.BUS)
+        else query.max_departures_per_route
+    )
     if fares_vary or len(within) <= cap:
         return within
     # More departures than the cap. Taking the first `cap` in order would keep only the

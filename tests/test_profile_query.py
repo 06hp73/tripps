@@ -148,6 +148,9 @@ def test_max_departures_per_route_caps_the_frontier():
             origins=[(tt.index_of("STO"), _hhmm(6))],
             targets={tt.index_of("GBG")},
             max_departures_per_route=2,
+            # A coach route reads the intercity cap; pin both so the test exercises the
+            # capping mechanism itself rather than the (deliberately high) default.
+            max_departures_per_route_intercity=2,
         ),
     )
     assert len(res.labels) == 2
