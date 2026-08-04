@@ -386,7 +386,7 @@ def test_boardable_trips_spread_keeps_earliest_and_latest():
     tt = Net().route("R", ["STO", "GBG"], trips).build()
     route = tt.routes[0]
     q = _query(tt, "STO", "GBG", 0)
-    picks = _boardable_trips(route, 0, 0, q, unboarded=True, fares_vary=False)
+    picks = _boardable_trips(route, route.trips, 0, 0, q, unboarded=True, fares_vary=False)
     assert len(picks) == q.max_departures_per_route == 16
     assert picks[0] == 0, "earliest departure kept"
     assert picks[-1] == 33, "latest departure kept (was dropped by first-16 truncation)"
@@ -399,9 +399,9 @@ def test_boardable_trips_under_cap_returns_all():
     trips = [[at(hhmm(8) + i * 1800), at(hhmm(11) + i * 1800)] for i in range(5)]
     tt = Net().route("R", ["STO", "GBG"], trips).build()
     q = _query(tt, "STO", "GBG", 0)
-    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=True, fares_vary=False) == [
-        0, 1, 2, 3, 4,
-    ]
+    assert list(
+        _boardable_trips(tt.routes[0], tt.routes[0].trips, 0, 0, q, unboarded=True, fares_vary=False)
+    ) == [0, 1, 2, 3, 4]
 
 
 # --- per-trip exact fares: a later trip can be strictly cheaper ------------------------------
@@ -447,11 +447,13 @@ def test_same_fare_route_keeps_the_single_boarding_shortcut_mid_journey():
     ).build()
     q = _query(tt, "STO", "GBG", 0)
     # fares do not vary -> mid-journey shortcut intact
-    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=False, fares_vary=False) == [0]
+    assert list(
+        _boardable_trips(tt.routes[0], tt.routes[0].trips, 0, 0, q, unboarded=False, fares_vary=False)
+    ) == [0]
     # varying fares -> every catchable trip is generated, even mid-journey
-    assert _boardable_trips(tt.routes[0], 0, 0, q, unboarded=False, fares_vary=True) == [
-        0, 1, 2,
-    ]
+    assert list(
+        _boardable_trips(tt.routes[0], tt.routes[0].trips, 0, 0, q, unboarded=False, fares_vary=True)
+    ) == [0, 1, 2]
 
 
 def test_cap_never_drops_the_cheapest_varying_fare_trip():
