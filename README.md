@@ -250,6 +250,16 @@ Two things this touches that are easy to miss:
 
 Needs **Python 3.12+** and nothing else — no accounts, no API keys.
 
+**On a Mac, double-click `tripps` in the folder.** A Terminal window opens, the setup runs,
+and the browser lands on the planner. Nothing else to install first.
+
+> The first double-click on a folder you downloaded as a ZIP may say *"cannot be opened
+> because it is from an unidentified developer."* macOS quarantines anything that arrived via
+> a browser. Right-click `tripps` → **Open** → **Open** once, and it never asks again. Folders
+> from `git clone` are not quarantined and open on the first try.
+
+Same thing from a terminal, on any platform:
+
 ```bash
 ./run.sh
 ```
