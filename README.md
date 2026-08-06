@@ -248,11 +248,15 @@ Two things this touches that are easy to miss:
 
 ## Install and run
 
+Needs **Python 3.12+** and nothing else — no accounts, no API keys. The commands below use
+[uv](https://docs.astral.sh/uv/); if you do not have it, `python3.12 -m venv .venv` and
+`.venv/bin/pip install -e ".[dev]"` are equivalent.
+
 ```bash
 uv venv --python 3.12 .venv
-uv pip install -e ".[dev,flights]"
+uv pip install -e ".[dev]"                        # add ,flights for the Google Flights scrape
 
-.venv/bin/tripps fetch-gtfs                       # ~67 MB, CC0, no key required
+.venv/bin/tripps fetch-gtfs                       # ~65 MB, CC0, no key required
 .venv/bin/tripps freerider                        # list today's free cars
 .venv/bin/tripps search "Stockholm Centralstation" "Göteborg Centralstation" \
     --date 2026-07-13 --limit 5
@@ -266,6 +270,19 @@ uv pip install -e ".[dev,flights]"
 .venv/bin/tripps serve                            # web UI + JSON API on :8000
 ```
 
+**Hold a regional period ticket? Register it first — it changes the answer, not the display.**
+A covered leg prices at 0, so the cheapest journey itself can differ. The same
+Lund→Stockholm search costs 565 SEK with no card and 450 SEK with a Skånetrafiken one,
+because the first leg stops being a purchase.
+
+```bash
+.venv/bin/tripps cards providers                  # every known regional provider
+.venv/bin/tripps cards add skanetrafiken          # …then your own
+```
+
+The first search for a given date parses the whole feed (a few seconds to tens of seconds,
+logged as it happens) and caches the result, so every later search on that date is fast.
+
 ```bash
 .venv/bin/tripps canary                           # probe every live price source, alert on drift
 .venv/bin/tripps validate                         # route canonical corridors, report pass/warn/fail
@@ -273,8 +290,10 @@ uv pip install -e ".[dev,flights]"
 .venv/bin/tripps watch poll --interval 300        # …and announce new ones as they appear
 ```
 
-`--flights` enables the Google Flights scrape (slow, and gray under Google's ToS).
-Everything is configurable through `TRIPPS_*` environment variables; see `config.py`.
+`--flights` enables the Google Flights scrape (slow, and gray under Google's ToS); it needs
+the `flights` extra. Everything else — including all rail and coach pricing — works from the
+base install. Everything is configurable through `TRIPPS_*` environment variables; see
+`.env.example` for the ones worth knowing and `config.py` for the rest.
 
 `tripps canary` drives each real endpoint (FlixBus, SJ, Tora, Freerider, the GTFS feed) the
 way the planner does and asserts a price still comes back, exiting non-zero if any source is
@@ -380,16 +399,21 @@ Endpoints: `GET /` (UI), `GET /status` (ops dashboard), `POST /search`, `GET /ap
 ## Deploy
 
 ```bash
-export TRIPPS_TRAFIKLAB_GTFS_KEY=...       # free Trafiklab key for the daily GTFS download
 docker compose up --build                  # builds the image, serves on :8000
 ```
+
+No credentials, no env file: the entrypoint downloads the feed on first boot into the named
+volume and starts serving. (Trafiklab documents a key on that download but does not currently
+require one; `TRIPPS_TRAFIKLAB_GTFS_KEY` is wired through the compose file and sent when set,
+so a future change stays a one-line fix rather than a rebuild.)
 
 The image installs the package **editable** (`pip install -e ".[flights]"`) on purpose:
 `config.PROJECT_ROOT` is `parents[2]` of the package, so an editable install keeps it — and the
 data dir — resolving to `/app`, whereas a plain `pip install .` would relocate the package into
-site-packages and break that path. The `[flights]` extra pulls `fast-flights`, which transitively
-provides `primp` (the TLS-fingerprint-impersonating client the Tora rail adapter needs), so
-without it Tora and flights are down. `docker-entrypoint.sh` fetches the feed once into the
+site-packages and break that path. `primp` — the TLS-fingerprint-impersonating client the Tora
+rail adapter needs — is a core dependency, so the base install already prices rail; the
+`[flights]` extra adds `fast-flights` for the Google Flights scrape and nothing else.
+`docker-entrypoint.sh` fetches the feed once into the
 `tripps-data` volume if it is empty, then runs `tripps serve`. That volume also holds the parsed
 timetable cache and the SQLite DB, so a restart does not re-download or re-parse the ~500 MB
 feed. The healthcheck gives a **120 s** start period for the lifespan warmup (feed parse ~15 s +
@@ -450,3 +474,10 @@ schema change upstream fails a contract test instead of quietly mispricing a leg
 - Legal: unofficial endpoints and scraping are used here for personal, non-commercial use.
   Systematic extraction and redisplay would need a look at each source's terms and at Swedish
   *katalogskydd* / the EU database right first.
+
+## License
+
+Not open source. You may read the code and run it for your own personal, non-commercial
+travel planning; redistribution, commercial use, and running it as a service need written
+permission. The reasoning is in [LICENSE](LICENSE), and it is the same reasoning as the
+legal note above.
