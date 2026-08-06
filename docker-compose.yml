@@ -5,8 +5,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # Free Trafiklab key for the one daily GTFS Sweden download. Put it in a .env file
-      # next to this compose file, or export it before `docker compose up`.
+      # No credentials are needed to run: the GTFS Sweden download is CC0 and currently
+      # served unauthenticated, and every price source is reached without a key of ours.
+      # Trafiklab documents a key on that download, so if it ever starts demanding one,
+      # set TRIPPS_TRAFIKLAB_GTFS_KEY here and it is sent. See .env.example for the knobs.
       TRIPPS_TRAFIKLAB_GTFS_KEY: ${TRIPPS_TRAFIKLAB_GTFS_KEY:-}
     volumes:
       # Persist the 67 MB feed, its parsed timetable cache, and the SQLite DB across restarts,
