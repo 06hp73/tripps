@@ -25,6 +25,7 @@ import csv
 import io
 import logging
 import pickle
+import time
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -581,8 +582,21 @@ def load_timetable_cached(
         except Exception as exc:  # noqa: BLE001 - a corrupt cache must not be fatal
             log.warning("timetable cache %s unreadable, reparsing: %s", path, exc)
 
+    # A cache miss means parsing the whole feed — seconds to tens of seconds, depending on
+    # whether it is still in the page cache. Say so: the first search after a fresh clone
+    # would otherwise sit silent long enough to look hung, with nothing else on stdout
+    # until the itineraries land. No estimate here; the elapsed time is reported below.
+    log.info("parsing the GTFS feed for %s (first run for this date)…", service_date.isoformat())
+    started = time.monotonic()
     timetable, _stats = load_timetable(
         zip_path, service_date, config, merge_overnight=merge_overnight
+    )
+    log.info(
+        "parsed %s: %d stops, %d routes in %.1f s (cached for next time)",
+        service_date.isoformat(),
+        len(timetable.stops),
+        len(timetable.routes),
+        time.monotonic() - started,
     )
     tmp = path.with_suffix(".tmp")
     try:
