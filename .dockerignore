@@ -2,6 +2,7 @@
 .gitignore
 .venv
 venv
+run.sh
 data/
 **/__pycache__/
 *.py[cod]

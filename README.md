@@ -248,9 +248,27 @@ Two things this touches that are easy to miss:
 
 ## Install and run
 
-Needs **Python 3.12+** and nothing else — no accounts, no API keys. The commands below use
-[uv](https://docs.astral.sh/uv/); if you do not have it, `python3.12 -m venv .venv` and
-`.venv/bin/pip install -e ".[dev]"` are equivalent.
+Needs **Python 3.12+** and nothing else — no accounts, no API keys.
+
+```bash
+./run.sh
+```
+
+That is the whole thing: it builds the virtualenv, installs the package, downloads the
+~65 MB timetable feed, starts the server on http://127.0.0.1:8000 and opens it. Each step is
+skipped when it is already done, so the second run starts in about a second. Pass anything
+through to the CLI instead of serving:
+
+```bash
+./run.sh search "Lund C" "Stockholm C" --date 2026-08-09
+./run.sh cards providers
+TRIPPS_PORT=8010 ./run.sh                         # if 8000 is taken
+```
+
+### By hand
+
+The commands below use [uv](https://docs.astral.sh/uv/); if you do not have it,
+`python3.12 -m venv .venv` and `.venv/bin/pip install -e ".[dev]"` are equivalent.
 
 ```bash
 uv venv --python 3.12 .venv
