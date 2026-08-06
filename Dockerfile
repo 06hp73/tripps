@@ -11,9 +11,9 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Dependencies first (their own layer), then the source. The `[flights]` extra pulls
-# fast-flights, which transitively provides `primp` — needed for the Tora rail adapter's
-# TLS-fingerprint-impersonating client, so without it Tora and flights are down.
+# Dependencies first (their own layer), then the source. `primp` — the Tora rail adapter's
+# TLS-fingerprint-impersonating client — is a core dependency, so the base install already
+# prices rail; the `[flights]` extra adds only the Google Flights scrape.
 COPY pyproject.toml README.md ./
 COPY src ./src
 RUN pip install -e ".[flights]" \

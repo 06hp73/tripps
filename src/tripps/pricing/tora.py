@@ -225,7 +225,16 @@ class ToraAdapter(HttpPriceAdapter):
     def _fetch_offers_sync(
         self, origin: str, destination: str, when: datetime, passenger: Passenger = ADULT
     ) -> dict:
-        from primp import Client  # noqa: PLC0415
+        try:
+            from primp import Client  # noqa: PLC0415
+        except ImportError as exc:  # pragma: no cover - a broken install, not a code path
+            # `primp` is a core dependency; if it is missing the install predates that or was
+            # hand-assembled. Say what to run, because the alternative is a bare
+            # "No module named 'primp'" surfacing as an unpriced leg with no cause attached.
+            raise RuntimeError(
+                "Tora needs `primp` for its browser TLS fingerprint. "
+                "Reinstall to pick it up: pip install -e '.[dev]'"
+            ) from exc
 
         if self._primp is None:
             self._primp = Client(

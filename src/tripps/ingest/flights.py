@@ -132,9 +132,16 @@ class GoogleFlightsProvider:
         self.consent_cookie = consent_cookie or GOOGLE_CONSENT_COOKIE
 
     def _fetch_sync(self, origin: Airport, destination: Airport, day: date) -> list[FlightOffer]:
-        from fast_flights import FlightQuery, Passengers, create_query  # noqa: PLC0415
-        from fast_flights.parser import parse  # noqa: PLC0415
-        from primp import Client  # noqa: PLC0415
+        try:
+            from fast_flights import FlightQuery, Passengers, create_query  # noqa: PLC0415
+            from fast_flights.parser import parse  # noqa: PLC0415
+            from primp import Client  # noqa: PLC0415
+        except ImportError as exc:
+            # This one really is optional, so name the extra rather than leaving the caller
+            # with a bare module name to guess from.
+            raise RuntimeError(
+                "flight pricing needs the `flights` extra: pip install -e '.[flights]'"
+            ) from exc
 
         query = create_query(
             flights=[

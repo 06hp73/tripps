@@ -11,6 +11,11 @@ dependencies = [
     "pydantic-settings>=2.6",
     "jinja2>=3.1",
     "python-multipart>=0.0.12",
+    # The Tora rail adapter needs a browser TLS fingerprint to get past the WAF in front of
+    # Öresundståg / Mälartåg / Skånetrafiken / Tåg i Bergslagen / Vy Bus4You fares. That is
+    # core pricing, not an optional extra: it used to arrive transitively through
+    # `fast-flights`, so a plain `pip install -e .` silently lost most rail and coach prices.
+    "primp>=1.3",
 ]
 
 [project.optional-dependencies]
