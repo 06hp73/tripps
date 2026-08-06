@@ -13,3 +13,6 @@ __pycache__/
 
 # serena MCP tooling
 .serena/
+
+# local dev-harness config (ports, run commands) — personal, not part of the project
+.claude/

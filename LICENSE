@@ -1,0 +1,46 @@
+tripps — terms of use
+Copyright (c) 2026 Hampus Erik Storp. All rights reserved.
+
+This is NOT open-source software. The source is published so that it can be read, and so
+that individuals can run it for themselves. No broader grant is given or implied.
+
+GRANT
+
+You may, at no charge:
+
+  1. Read, study and privately modify this source code.
+  2. Run it, modified or unmodified, for your own personal, non-commercial travel planning.
+
+RESTRICTIONS
+
+You may not, without prior written permission from the copyright holder:
+
+  1. Redistribute this software or any derivative of it, in source or binary form.
+  2. Use it, or any output derived from it, for any commercial purpose — including
+     operating it as a service, whether or not a fee is charged.
+  3. Run it as a public or multi-tenant service, or otherwise make its functionality
+     available to people other than yourself.
+  4. Remove or alter this notice.
+
+WHY THESE TERMS
+
+tripps reads several transport operators' endpoints that are unofficial and undocumented,
+and it presents timetable and fare data that those operators own. Personal use is one thing;
+systematic extraction and redisplay is another, and would need each source's terms — and
+Swedish katalogskydd / the EU database right — looked at properly first. These terms keep
+that question where it belongs: with anyone who wants to go further than personal use, and
+who should ask first.
+
+The GTFS Sweden feed this software downloads is licensed CC0 by its publisher and is not
+covered by these terms. Third-party Python dependencies carry their own licenses.
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Prices, schedules and free-car availability shown by this software are estimates drawn from
+third-party sources and are not offers. Verify with the operator before you travel.
