@@ -38,7 +38,7 @@ from ..timeutil import parse_gtfs_time
 log = logging.getLogger(__name__)
 
 #: Bump when the parse output changes shape, so stale pickles are ignored after an upgrade.
-_TIMETABLE_CACHE_VERSION = 3
+_TIMETABLE_CACHE_VERSION = 4
 
 #: Trips from the previous service day that run past midnight are re-expressed relative to this
 #: day's midnight; their id is suffixed so the tail is distinguishable from the same train's own
@@ -129,6 +129,15 @@ class GtfsConfig:
     max_transfer_seconds: int = 1800
     #: Fallback change time when the feed does not specify one.
     default_transfer_seconds: int = 300
+    #: Synthesize footpaths between stops closer than this, because `transfers.txt` is
+    #: nearly empty in the national feed (55 of 1324 intercity stops carry any link at
+    #: all), which made mid-journey interchanges between unlinked neighbouring stations
+    #: simply unfindable. Kept short: this is "cross the square", not "walk across town".
+    #: 0 disables. The resulting walk legs always display their distance - a walk may be
+    #: offered, never hidden.
+    synth_walk_max_meters: int = 400
+    #: Assumed walking pace for synthesized links (same as the Freerider station links).
+    walk_speed_kmh: float = 4.5
     #: Collapse platforms onto their parent station. Intercity routing does not care which
     #: platform a train leaves from, and collapsing removes a large class of pointless
     #: intra-station transfers.
@@ -702,6 +711,45 @@ def _load_transfers(
             current = raw[x].get(y)
             if current is None or seconds < current:
                 raw[x][y] = seconds
+
+    # Synthesized near-stop footpaths: the feed's transfers.txt links almost nothing, so
+    # without these a change between two stations a couple hundred metres apart is a
+    # journey the router cannot represent. Fed into the same map BEFORE closure so both
+    # kinds are treated uniformly - but ONLY for pairs the feed says nothing about: an
+    # explicit transfers.txt time is the operator's engineered estimate (stairs, crowds),
+    # and letting straight-line optimism undercut it would fabricate connections a real
+    # traveller cannot make. Grid-bucketed so the pair scan stays near-linear.
+    if config.synth_walk_max_meters > 0:
+        from ..routing.timetable import haversine_km
+
+        max_km = config.synth_walk_max_meters / 1000.0
+        cell = max(config.synth_walk_max_meters / 111_000.0, 1e-6)  # ~degrees latitude
+        buckets: dict[tuple[int, int], list] = defaultdict(list)
+        for sid in used_stops:
+            st = builder.get_stop(sid)
+            buckets[(int(st.lat / cell), int(st.lon / (cell * 3)))].append(st)
+        for (cx, cy), members in buckets.items():
+            neighbours = [
+                s
+                for dx in (-1, 0, 1)
+                for dy in (-1, 0, 1)
+                for s in buckets.get((cx + dx, cy + dy), ())
+            ]
+            for a_stop in members:
+                for b_stop in neighbours:
+                    if b_stop.id <= a_stop.id:
+                        continue  # each unordered pair exactly once
+                    km = haversine_km(a_stop.lat, a_stop.lon, b_stop.lat, b_stop.lon)
+                    if km > max_km:
+                        continue
+                    a, b = idx(a_stop.id), idx(b_stop.id)
+                    if a is None or b is None:
+                        continue
+                    if b in raw[a] or a in raw[b]:
+                        continue  # the feed spoke for this pair; its number stands
+                    seconds = max(60, int(km / config.walk_speed_kmh * 3600))
+                    raw[a][b] = seconds
+                    raw[b][a] = seconds
 
     closed = close_transfers(raw, config.max_transfer_seconds)
     for a, targets in closed.items():

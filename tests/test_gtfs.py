@@ -370,3 +370,73 @@ def test_router_honours_boarding_restrictions(tmp_path: Path):
     assert go("MMX", "GBG"), "boarding at the board-only stop is exactly what it offers"
     assert go("STO", "NRK"), "alighting at the set-down-only stop is exactly what it offers"
     assert go("STO", "GBG"), "riding through restricted stops is unaffected"
+
+
+# --- synthesized near-stop footpaths ----------------------------------------
+
+
+def _two_station_feed(tmp_path: Path, lat_b: float, name: str) -> Path:
+    """Two rail stations with NO transfers.txt: STO_A at (59.3300, 18.0590) and a second
+    station at (lat_b, 18.0590) - about 111 km per degree of latitude."""
+    stops = (
+        "stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n"
+        "SA,Station A,59.3300,18.0590,0,\n"
+        f"SB,Station B,{lat_b},18.0590,0,\n"
+        "SC,Away,58.0000,15.0000,0,\n"
+    )
+    routes = (
+        "route_id,agency_id,route_short_name,route_long_name,route_type\n"
+        "R1,SJ,,into A,102\nR2,SJ,,out of B,102\n"
+    )
+    stop_times = (
+        "trip_id,arrival_time,departure_time,stop_id,stop_sequence\n"
+        "T1,08:00:00,08:00:00,SC,1\nT1,10:00:00,10:00:00,SA,2\n"
+        "T2,10:30:00,10:30:00,SB,1\nT2,12:30:00,12:30:00,SC,2\n"
+    )
+    trips = (
+        "route_id,service_id,trip_id,trip_headsign\n"
+        "R1,DAILY,T1,A\nR2,DAILY,T2,C\n"
+    )
+    path = tmp_path / name
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("agency.txt", AGENCY)
+        zf.writestr("stops.txt", stops)
+        zf.writestr("routes.txt", routes)
+        zf.writestr("calendar.txt", "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date\nDAILY,1,1,1,1,1,1,1,20260101,20261231\n")
+        zf.writestr("trips.txt", trips)
+        zf.writestr("stop_times.txt", stop_times)
+    return path
+
+
+def test_nearby_stations_get_a_synthesized_footpath(tmp_path: Path):
+    """~250 m apart, no transfers.txt: the link must be synthesized (walking pace), or a
+    change between the two stations is a journey the router cannot represent."""
+    feed = _two_station_feed(tmp_path, 59.3300 + 0.00225, "near.zip")  # ~250 m north
+    tt, _ = load_timetable(feed, date(2026, 7, 8))
+    a, b = tt.index_of("SA"), tt.index_of("SB")
+    seconds = dict(tt.transfers[a]).get(b)
+    assert seconds is not None, "synthesized footpath missing"
+    assert 60 <= seconds <= 300  # 250 m at 4.5 km/h = 200 s
+    # And it is actually routable end to end: arrive SA, walk, depart SB.
+    from tripps.routing.floors import zero_floors
+    from tripps.routing.mcraptor import RaptorQuery, run_mcraptor
+
+    res = run_mcraptor(
+        tt, zero_floors(),
+        RaptorQuery(origins=[(tt.index_of("SC"), 6 * 3600)], targets={tt.index_of("SC")}),
+    )
+    assert res.labels, "round trip via the synthesized interchange must exist"
+
+
+def test_distant_stations_are_not_walk_linked(tmp_path: Path):
+    feed = _two_station_feed(tmp_path, 59.3300 + 0.0072, "far.zip")  # ~800 m north
+    tt, _ = load_timetable(feed, date(2026, 7, 8))
+    a, b = tt.index_of("SA"), tt.index_of("SB")
+    assert dict(tt.transfers[a]).get(b) is None, "800 m exceeds the synthesis cap"
+
+
+def test_walk_synthesis_can_be_disabled(tmp_path: Path):
+    feed = _two_station_feed(tmp_path, 59.3300 + 0.00225, "off.zip")
+    tt, _ = load_timetable(feed, date(2026, 7, 8), GtfsConfig(synth_walk_max_meters=0))
+    a, b = tt.index_of("SA"), tt.index_of("SB")
+    assert dict(tt.transfers[a]).get(b) is None

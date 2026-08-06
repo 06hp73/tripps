@@ -19,10 +19,26 @@ violations are detectable rather than silent.
 
 Rounds carry the third criterion: a label found in round k used at most k vehicles, so
 transfers need not enter the Pareto comparison.
+
+Two engineering layers keep the exact search fast (both proven frontier-identical to the
+straightforward implementation by tests/support.py's reference copy):
+
+- Bags hold `(arrival, price, departure, ready, Label)` tuples so dominance compares
+  local ints, and the frozen Label is only constructed once an entry actually survives
+  domination. Per-route cumulative floor arrays replace the per-stop ride increment (the
+  same `int(per_km * segment)` per segment, so prices are bit-identical).
+- A*-style target potentials: a backward Dijkstra from the targets over the static
+  min-segment-time graph yields `rem[stop]`, a true lower bound on the remaining seconds
+  to any target (waiting, minimum change times, and boarding restrictions are ignored,
+  which only ever UNDERestimates - the safe side). A label is discarded when even its
+  optimistic completion `(arrival + rem, price, departure)` is dominated by a finished
+  journey: extensions only arrive later and cost more, so the real completion would be
+  dominated too. Same argument as plain target pruning, just with a tighter clock.
 """
 
 from __future__ import annotations
 
+import heapq
 from dataclasses import dataclass, field, replace
 
 from ..models import TransportMode
@@ -78,75 +94,14 @@ class Label:
         return self.arrival + (min_transfer_seconds if self.arrived_by_vehicle else 0)
 
 
-@dataclass(slots=True)
-class _Ride:
-    """A label currently on board, used only inside one route scan."""
-
-    trip_idx: int
-    price_ore: int
-    board_pos: int
-    departure: int
-    parent: Label
-
-
+# Profile dominance: no later, no dearer, and leaves no earlier. The departure criterion
+# is what makes this a range (profile) query - a FlixBus is 800 SEK at 07:30 and 420 SEK
+# at 22:55 with the SAME distance-derived floor, so without it the night bus would be
+# "later arrival, same price" and be pruned before phase 2 ever prices it. In the hot
+# loops the comparison is inlined over bag-entry ints; this named form is for reference
+# and for the cold paths.
 def _dominates(a_arr: int, a_price: int, a_dep: int, b_arr: int, b_price: int, b_dep: int) -> bool:
-    """Profile dominance: no later, no dearer, and leaves no earlier.
-
-    The third criterion is what makes this a range (profile) query rather than a single
-    earliest-arrival search, and it is not optional for a planner that claims to find the
-    cheapest trip.
-
-    The price a leg *actually* costs varies by departure - a FlixBus from Stockholm to
-    Goteborg is 800 SEK at 07:30 and 420 SEK at 22:55 on the same day - but the routing
-    price floor is derived from distance and operator, so it is identical for both. Without
-    a departure criterion the night bus is "later arrival, same price" and gets pruned
-    before phase 2 ever prices it. Keeping later-departing journeys on the frontier is the
-    only way the cheapest one survives to be priced.
-    """
     return a_arr <= b_arr and a_price <= b_price and a_dep >= b_dep
-
-
-def _merge(bag: list[Label], label: Label, *, max_size: int | None = None) -> bool:
-    """Insert `label` if non-dominated; drop everything it dominates. True if inserted."""
-    for existing in bag:
-        if _dominates(
-            existing.arrival, existing.price_ore, existing.departure,
-            label.arrival, label.price_ore, label.departure,
-        ):
-            return False
-    bag[:] = [
-        keep
-        for keep in bag
-        if not _dominates(
-            label.arrival, label.price_ore, label.departure,
-            keep.arrival, keep.price_ore, keep.departure,
-        )
-    ]
-    bag.append(label)
-    if max_size is not None and len(bag) > max_size:
-        # Bounded mode is approximate by construction: keep the extremes of the frontier
-        # (fastest and cheapest) and thin the middle.
-        bag.sort(key=lambda x: (x.arrival, x.price_ore))
-        keep_head = bag[: max_size // 2]
-        keep_tail = sorted(bag, key=lambda x: (x.price_ore, -x.departure))[
-            : max_size - len(keep_head)
-        ]
-        merged = {id(x): x for x in (*keep_head, *keep_tail)}
-        bag[:] = list(merged.values())
-    return True
-
-
-def _dominated_by_any(bag: list[Label], arrival: int, price_ore: int, departure: int) -> bool:
-    """Target pruning.
-
-    Extending a journey can only push its arrival later and its price higher, and never
-    changes when it left. So a label that some finished journey already dominates can be
-    discarded outright.
-    """
-    return any(
-        _dominates(x.arrival, x.price_ore, x.departure, arrival, price_ore, departure)
-        for x in bag
-    )
 
 
 @dataclass(slots=True)
@@ -179,8 +134,74 @@ class RaptorQuery:
     #: window silently excludes it from ever being priced.
     profile_window_seconds: int = 24 * 3600
     #: Cap on origin departures enumerated per route, so a metro line with a train every
-    #: three minutes does not swamp the frontier.
+    #: three minutes does not swamp the frontier. Applies to LOCAL_TRANSIT/FERRY and other
+    #: flat-fare-ish modes where any sampled departure prices like its neighbours.
     max_departures_per_route: int = 16
+    #: The cap for TRAIN and BUS routes, deliberately far higher: intercity operators are
+    #: yield-managed, so each departure carries its OWN price and a thinned-away departure
+    #: is a fare that never even becomes a candidate - FlixBus corridors run 34-37 trips a
+    #: day and the measured effect of cap 16 was every second bus never being priced. 64
+    #: comfortably covers every intercity route in the feed while still bounding a
+    #: pathological pattern.
+    max_departures_per_route_intercity: int = 64
+    #: A*-style pruning against a per-stop lower bound on remaining travel time. Provably
+    #: frontier-preserving (see module docstring); the switch exists for debugging only.
+    target_potentials: bool = True
+
+
+def target_potentials(tt: Timetable, query: RaptorQuery) -> list[int]:
+    """`rem[stop]`: lower bound on seconds from `stop` to the nearest target.
+
+    Backward Dijkstra over the static graph whose edge weights are the minimum
+    in-vehicle time of any trip over each route segment, plus footpaths. Waiting time,
+    minimum change time, and no_board/no_alight restrictions are deliberately ignored:
+    each omission only lowers the bound, and only a bound that is never above the truth
+    may prune. INFINITY means no target is reachable at all under the allowed modes.
+    """
+    n = tt.num_stops
+    radj: list[list[tuple[int, int]]] = [[] for _ in range(n)]  # to -> [(from, seconds)]
+    for route in tt.routes:
+        if route.info.mode not in query.allowed_modes:
+            continue
+        stops = route.stops
+        trips = route.trips
+        for i in range(len(stops) - 1):
+            w = min(t.arrivals[i + 1] - t.departures[i] for t in trips)
+            if w < 0:
+                w = 0
+            radj[stops[i + 1]].append((stops[i], w))
+    if TransportMode.WALK in query.allowed_modes:
+        for a in range(n):
+            for b, seconds in tt.transfers[a]:
+                radj[b].append((a, seconds))
+
+    rem = [INFINITY] * n
+    pq: list[tuple[int, int]] = []
+    for t in query.targets:
+        rem[t] = 0
+        pq.append((0, t))
+    heapq.heapify(pq)
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > rem[u]:
+            continue
+        for v, w in radj[u]:
+            nd = d + w
+            if nd < rem[v]:
+                rem[v] = nd
+                heapq.heappush(pq, (nd, v))
+    return rem
+
+
+def _thin(bag: list[tuple], max_size: int) -> None:
+    """Bounded-mode thinning, same policy as always: keep the extremes of the frontier
+    (fastest and cheapest ends) and drop the middle. Approximate by construction."""
+    if len(bag) <= max_size:
+        return
+    head = sorted(bag, key=lambda e: (e[0], e[1]))[: max_size // 2]
+    tail = sorted(bag, key=lambda e: (e[1], -e[2]))[: max_size - len(head)]
+    merged = {id(e[4]): e for e in (*head, *tail)}
+    bag[:] = list(merged.values())
 
 
 def run_mcraptor(
@@ -188,38 +209,94 @@ def run_mcraptor(
 ) -> RaptorResult:
     """Exact multi-criteria RAPTOR. Returns the Pareto frontier over the target stops."""
     n = tt.num_stops
-    # bags[k][stop]: labels using exactly k vehicle boardings.
-    prev_bag: list[list[Label]] = [[] for _ in range(n)]
-    best_bag: list[list[Label]] = [[] for _ in range(n)]
-    target_bag: list[Label] = []
+    mts = query.min_transfer_seconds
+    latest = query.latest_arrival
+    max_size = query.max_bag_size
+    targets = query.targets
     capped = False
     stats = {"route_scans": 0, "boardings": 0, "labels_created": 0}
 
+    rem = (
+        target_potentials(tt, query)
+        if query.target_potentials
+        else [0] * n  # a zero potential degenerates to plain target pruning
+    )
+
+    # Bags hold (arrival, price, departure, ready, Label); dominance compares the ints.
+    prev_bag: list[list[tuple]] = [[] for _ in range(n)]
+    best_bag: list[list[tuple]] = [[] for _ in range(n)]
+    target_bag: list[tuple] = []
+    # Scalar guards over target_bag: a candidate beating any of these minima/maximum
+    # cannot be dominated, so the linear scan is skipped for most probes.
+    tguard = [INFINITY, INFINITY, -1]  # min arrival, min price, max departure
+
+    def bag_insert(bag: list[tuple], arr: int, price: int, dep: int, ready: int, label) -> bool:
+        for e in bag:
+            if e[0] <= arr and e[1] <= price and e[2] >= dep:
+                return False
+        bag[:] = [e for e in bag if not (arr <= e[0] and price <= e[1] and dep >= e[2])]
+        bag.append((arr, price, dep, ready, label))
+        if max_size is not None:
+            _thin(bag, max_size)
+        return True
+
+    def target_insert(arr: int, price: int, dep: int, ready: int, label) -> None:
+        if bag_insert(target_bag, arr, price, dep, ready, label):
+            if arr < tguard[0]:
+                tguard[0] = arr
+            if price < tguard[1]:
+                tguard[1] = price
+            if dep > tguard[2]:
+                tguard[2] = dep
+
+    def future_dead(stop_idx: int, arr: int, price: int, dep: int) -> bool:
+        """Target pruning with the potential's tighter clock.
+
+        Any completion of this label arrives at `arr + rem[stop]` at the earliest, costs
+        at least `price`, and departs exactly at `dep` - so if a finished journey already
+        dominates that OPTIMISTIC completion, it dominates every real one.
+        """
+        opt = arr + rem[stop_idx]
+        if opt > latest:
+            return True  # also catches rem == INFINITY: the target is unreachable
+        if opt < tguard[0] or price < tguard[1] or dep > tguard[2]:
+            return False
+        for e in target_bag:
+            if e[0] <= opt and e[1] <= price and e[2] >= dep:
+                return True
+        return False
+
+    allowed = [r.info.mode in query.allowed_modes for r in tt.routes]
+    cum_cache: dict[int, list[int]] = {}
+    fares_vary_cache: dict[int, bool] = {}
+
     marked: set[int] = set()
     for stop_idx, depart_at in query.origins:
+        if future_dead(stop_idx, depart_at, 0, INFINITY):
+            continue  # target unreachable from here (or past latest_arrival already)
         label = Label(stop=stop_idx, arrival=depart_at, price_ore=0)
-        if _merge(prev_bag[stop_idx], label, max_size=query.max_bag_size):
-            _merge(best_bag[stop_idx], label, max_size=query.max_bag_size)
+        if bag_insert(prev_bag[stop_idx], depart_at, 0, INFINITY, depart_at, label):
+            bag_insert(best_bag[stop_idx], depart_at, 0, INFINITY, depart_at, label)
             marked.add(stop_idx)
 
     # Origin footpaths: reaching a nearby stop on foot costs no boarding.
-    _relax_transfers(tt, prev_bag, best_bag, marked, query, target_bag)
-    for stop_idx in query.targets:
-        for lbl in best_bag[stop_idx]:
-            _merge(target_bag, lbl, max_size=query.max_bag_size)
+    _relax_transfers(tt, prev_bag, best_bag, marked, query, target_insert, future_dead, bag_insert)
+    for stop_idx in targets:
+        for e in best_bag[stop_idx]:
+            target_insert(*e)
 
     rounds_run = 0
     for _round in range(1, query.max_rounds + 1):
         if not marked:
             break
         rounds_run = _round
-        curr_bag: list[list[Label]] = [[] for _ in range(n)]
+        curr_bag: list[list[tuple]] = [[] for _ in range(n)]
 
         # Collect routes touched by marked stops, remembering the earliest boardable position.
         route_entry: dict[int, int] = {}
         for stop_idx in marked:
             for route_idx, pos in tt.stop_routes[stop_idx]:
-                if tt.routes[route_idx].info.mode not in query.allowed_modes:
+                if not allowed[route_idx]:
                     continue
                 current = route_entry.get(route_idx)
                 if current is None or pos < current:
@@ -229,89 +306,122 @@ def run_mcraptor(
         for route_idx, first_pos in route_entry.items():
             stats["route_scans"] += 1
             route = tt.routes[route_idx]
-            per_km = floors.per_km_ore(route.info.mode, route.info.operator)
+            trips = route.trips
+            rstops = route.stops
+
+            cum = cum_cache.get(route_idx)
+            if cum is None:
+                # Prefix sums of the per-segment floor increments - the same
+                # int(per_km * segment) rounding per segment as the incremental form,
+                # so prices are bit-identical while rides stay O(1) per stop.
+                per_km = floors.per_km_ore(route.info.mode, route.info.operator)
+                acc = 0
+                cum = [0]
+                for seg in route.segment_km:
+                    acc += int(per_km * seg)
+                    cum.append(acc)
+                cum_cache[route_idx] = cum
             base_fare = floors.boarding_ore(route.info.mode, route.info.operator)
+
             # Do this route's trips carry differing exact fares (one flight per departure)?
             # If so, a LATER trip can be strictly cheaper, and the usual "only the earliest
-            # catchable trip matters" boarding shortcut is unsound. Hoisted per route: GTFS
-            # trips are all None and Freerider trips share one fare, so both stay False.
-            fares_vary = len({t.precomputed_fare_ore for t in route.trips}) > 1
-            rides: list[_Ride] = []
+            # catchable trip matters" boarding shortcut is unsound (see _boardable_trips).
+            fares_vary = fares_vary_cache.get(route_idx)
+            if fares_vary is None:
+                fares_vary = len({t.precomputed_fare_ore for t in trips}) > 1
+                fares_vary_cache[route_idx] = fares_vary
 
-            for pos in range(first_pos, len(route.stops)):
-                stop_idx = route.stops[pos]
+            # Rides as (trip_idx, base_price, board_pos, departure, parent_label), where
+            # base_price = price_at(pos) - cum[pos]; constant along the ride, so ride
+            # dominance on it is equivalent to dominance on the running price.
+            rides: list[tuple] = []
 
-                if rides and pos > first_pos:
-                    increment = int(per_km * route.segment_km[pos - 1])
-                    for ride in rides:
-                        ride.price_ore += increment
+            for pos in range(first_pos, len(rstops)):
+                stop_idx = rstops[pos]
+                cpos = cum[pos]
 
                 # Alight: every on-board label offers an arrival at this stop.
                 for ride in rides:
-                    trip = route.trips[ride.trip_idx]
-                    if trip.no_alight is not None and trip.no_alight[pos]:
+                    trip_idx, ride_base, board_pos, ride_dep, ride_parent = ride
+                    trip = trips[trip_idx]
+                    no_alight = trip.no_alight
+                    if no_alight is not None and no_alight[pos]:
                         continue  # set-down forbidden here (GTFS drop_off_type != 0)
                     arrival = trip.arrivals[pos]
-                    if arrival > query.latest_arrival:
+                    if arrival > latest:
                         continue
-                    if _dominated_by_any(target_bag, arrival, ride.price_ore, ride.departure):
-                        continue  # target pruning: remaining legs only add time and cost
+                    price = ride_base + cpos
+                    if future_dead(stop_idx, arrival, price, ride_dep):
+                        continue
+                    bb = best_bag[stop_idx]
+                    dominated = False
+                    for e in bb:
+                        if e[0] <= arrival and e[1] <= price and e[2] >= ride_dep:
+                            dominated = True
+                            break
+                    if dominated:
+                        continue
+                    # Survived: only now pay for the frozen Label construction.
                     label = Label(
                         stop=stop_idx,
                         arrival=arrival,
-                        price_ore=ride.price_ore,
-                        departure=ride.departure,
-                        parent=ride.parent,
-                        edge=RideEdge(route_idx, ride.trip_idx, ride.board_pos, pos),
+                        price_ore=price,
+                        departure=ride_dep,
+                        parent=ride_parent,
+                        edge=RideEdge(route_idx, trip_idx, board_pos, pos),
                     )
-                    if _merge(best_bag[stop_idx], label, max_size=query.max_bag_size):
-                        _merge(curr_bag[stop_idx], label, max_size=query.max_bag_size)
-                        marked.add(stop_idx)
-                        stats["labels_created"] += 1
-                        if stop_idx in query.targets:
-                            _merge(target_bag, label, max_size=query.max_bag_size)
+                    ready = arrival + mts
+                    bb[:] = [
+                        e for e in bb
+                        if not (arrival <= e[0] and price <= e[1] and ride_dep >= e[2])
+                    ]
+                    bb.append((arrival, price, ride_dep, ready, label))
+                    if max_size is not None:
+                        _thin(bb, max_size)
+                    bag_insert(curr_bag[stop_idx], arrival, price, ride_dep, ready, label)
+                    marked.add(stop_idx)
+                    stats["labels_created"] += 1
+                    if stop_idx in targets:
+                        target_insert(arrival, price, ride_dep, ready, label)
 
                 # Board: labels from the previous round may catch a trip here.
-                for label in prev_bag[stop_idx]:
-                    ready = label.ready_at(query.min_transfer_seconds)
-                    unboarded = label.departure == INFINITY
+                for entry in prev_bag[stop_idx]:
+                    _larr, lprice, ldep, ready, llabel = entry
+                    unboarded = ldep == INFINITY
                     for trip_idx in _boardable_trips(
-                        route, pos, ready, query, unboarded, fares_vary
+                        route, trips, pos, ready, query, unboarded, fares_vary
                     ):
-                        trip = route.trips[trip_idx]
-                        boarding_fare = (
-                            trip.precomputed_fare_ore
-                            if trip.precomputed_fare_ore is not None
-                            else base_fare  # hoisted: constant per route, not per (label, trip)
-                        )
-                        price = label.price_ore + boarding_fare
+                        pf = trips[trip_idx].precomputed_fare_ore
+                        boarding_fare = pf if pf is not None else base_fare
+                        price = lprice + boarding_fare
                         # The journey's departure is fixed by its first boarding.
-                        departure = (
-                            trip.departures[pos]
-                            if label.departure == INFINITY
-                            else label.departure
-                        )
-                        new_ride = _Ride(
-                            trip_idx=trip_idx,
-                            price_ore=price,
-                            board_pos=pos,
-                            departure=departure,
-                            parent=label,
-                        )
-                        if not _dominates_existing_ride(rides, new_ride):
-                            rides = _insert_ride(rides, new_ride)
+                        departure = trips[trip_idx].departures[pos] if unboarded else ldep
+                        base = price - cpos
+                        # An earlier, no dearer, no earlier-departing ride makes this one
+                        # pointless (trips are sorted and validated non-overtaking).
+                        pointless = False
+                        for r in rides:
+                            if r[0] <= trip_idx and r[1] <= base and r[3] >= departure:
+                                pointless = True
+                                break
+                        if not pointless:
+                            rides = [
+                                r for r in rides
+                                if not (trip_idx <= r[0] and base <= r[1] and departure >= r[3])
+                            ]
+                            rides.append((trip_idx, base, pos, departure, llabel))
                             stats["boardings"] += 1
 
-            if query.max_bag_size is not None and any(
-                len(b) >= query.max_bag_size for b in curr_bag
-            ):
+            if max_size is not None and any(len(b) >= max_size for b in curr_bag):
                 capped = True
 
-        _relax_transfers(tt, curr_bag, best_bag, marked, query, target_bag)
+        _relax_transfers(
+            tt, curr_bag, best_bag, marked, query, target_insert, future_dead, bag_insert
+        )
         prev_bag = curr_bag
 
     return RaptorResult(
-        labels=sorted(target_bag, key=lambda x: (x.price_ore, x.arrival)),
+        labels=sorted((e[4] for e in target_bag), key=lambda x: (x.price_ore, x.arrival)),
         rounds_run=rounds_run,
         bag_capped=capped,
         stats=stats,
@@ -319,8 +429,8 @@ def run_mcraptor(
 
 
 def _boardable_trips(
-    route, pos: int, ready: int, query: RaptorQuery, unboarded: bool, fares_vary: bool
-) -> list[int]:
+    route, trips, pos: int, ready: int, query: RaptorQuery, unboarded: bool, fares_vary: bool
+) -> list[int] | tuple[int, ...]:
     """Which trips on this route are worth boarding at `pos`, given readiness at `ready`.
 
     Mid-journey, only the earliest catchable trip can ever help: a later one on the same
@@ -342,30 +452,41 @@ def _boardable_trips(
     day), so the full enumeration is bounded. The ride-level Pareto keeps only the
     non-dominated ones.
     """
-    first = route.earliest_trip_from(pos, ready)
-    if first is None:
-        return []
-
-    def boardable(idx: int) -> bool:
-        nb = route.trips[idx].no_board
-        return nb is None or not nb[pos]
+    # Inlined binary search over departures at `pos` (route.earliest_trip_from, without
+    # the method-call overhead: this runs once per (label, stop) probe).
+    lo, hi = 0, len(trips)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if trips[mid].departures[pos] < ready:
+            lo = mid + 1
+        else:
+            hi = mid
+    if lo >= len(trips):
+        return ()
+    first = lo
 
     if not fares_vary and not (unboarded and query.profile):
         # The earliest catchable trip may be set-down-only here (pickup_type != 0); the
         # earliest trip that actually SELLS a boarding at this stop is the dominating one.
-        for trip_idx in range(first, len(route.trips)):
-            if boardable(trip_idx):
-                return [trip_idx]
-        return []
+        for trip_idx in range(first, len(trips)):
+            no_board = trips[trip_idx].no_board
+            if no_board is None or not no_board[pos]:
+                return (trip_idx,)
+        return ()
 
     horizon = ready + query.profile_window_seconds
     within: list[int] = []
-    for trip_idx in range(first, len(route.trips)):
-        if route.trips[trip_idx].departures[pos] > horizon:
+    for trip_idx in range(first, len(trips)):
+        if trips[trip_idx].departures[pos] > horizon:
             break
-        if boardable(trip_idx):
+        no_board = trips[trip_idx].no_board
+        if no_board is None or not no_board[pos]:
             within.append(trip_idx)
-    cap = query.max_departures_per_route
+    cap = (
+        query.max_departures_per_route_intercity
+        if route.info.mode in (TransportMode.TRAIN, TransportMode.BUS)
+        else query.max_departures_per_route
+    )
     if fares_vary or len(within) <= cap:
         return within
     # More departures than the cap. Taking the first `cap` in order would keep only the
@@ -377,70 +498,60 @@ def _boardable_trips(
     return [within[i] for i in picks]
 
 
-def _dominates_existing_ride(rides: list[_Ride], candidate: _Ride) -> bool:
-    """An earlier, no dearer, no earlier-departing ride makes `candidate` pointless.
-
-    Trips are index-ordered by departure and validated non-overtaking, so a lower trip_idx
-    arrives no later at every remaining stop.
-    """
-    return any(
-        r.trip_idx <= candidate.trip_idx
-        and r.price_ore <= candidate.price_ore
-        and r.departure >= candidate.departure
-        for r in rides
-    )
-
-
-def _insert_ride(rides: list[_Ride], candidate: _Ride) -> list[_Ride]:
-    kept = [
-        r
-        for r in rides
-        if not (
-            candidate.trip_idx <= r.trip_idx
-            and candidate.price_ore <= r.price_ore
-            and candidate.departure >= r.departure
-        )
-    ]
-    kept.append(candidate)
-    return kept
-
-
 def _relax_transfers(
     tt: Timetable,
-    curr_bag: list[list[Label]],
-    best_bag: list[list[Label]],
+    curr_bag: list[list[tuple]],
+    best_bag: list[list[tuple]],
     marked: set[int],
     query: RaptorQuery,
-    target_bag: list[Label],
+    target_insert,
+    future_dead,
+    bag_insert,
 ) -> None:
     """Walk from every stop marked in this round. Footpaths are transitively closed,
     so one relaxation pass suffices and walking never chains into another walk."""
     if TransportMode.WALK not in query.allowed_modes:
         return
+    latest = query.latest_arrival
+    max_size = query.max_bag_size
     newly_marked: set[int] = set()
     for stop_idx in list(marked):
-        for label in list(curr_bag[stop_idx]):
+        for entry in list(curr_bag[stop_idx]):
+            arr, price, dep, _ready, label = entry
             if isinstance(label.edge, TransferEdge):
                 continue  # no walk-after-walk; the closure already covers it
             for to_stop, seconds in tt.transfers[stop_idx]:
-                arrival = label.arrival + seconds
-                if arrival > query.latest_arrival:
+                w_arr = arr + seconds
+                if w_arr > latest:
                     continue
-                if _dominated_by_any(target_bag, arrival, label.price_ore, label.departure):
+                if future_dead(to_stop, w_arr, price, dep):
+                    continue
+                bb = best_bag[to_stop]
+                dominated = False
+                for e in bb:
+                    if e[0] <= w_arr and e[1] <= price and e[2] >= dep:
+                        dominated = True
+                        break
+                if dominated:
                     continue
                 walked = Label(
                     stop=to_stop,
-                    arrival=arrival,
-                    price_ore=label.price_ore,
-                    departure=label.departure,
+                    arrival=w_arr,
+                    price_ore=price,
+                    departure=dep,
                     parent=label,
                     edge=TransferEdge(from_stop=stop_idx, seconds=seconds),
                 )
-                if _merge(best_bag[to_stop], walked, max_size=query.max_bag_size):
-                    _merge(curr_bag[to_stop], walked, max_size=query.max_bag_size)
-                    newly_marked.add(to_stop)
-                    if to_stop in query.targets:
-                        _merge(target_bag, walked, max_size=query.max_bag_size)
+                bb[:] = [
+                    e for e in bb if not (w_arr <= e[0] and price <= e[1] and dep >= e[2])
+                ]
+                bb.append((w_arr, price, dep, w_arr, walked))
+                if max_size is not None:
+                    _thin(bb, max_size)
+                bag_insert(curr_bag[to_stop], w_arr, price, dep, w_arr, walked)
+                newly_marked.add(to_stop)
+                if to_stop in query.targets:
+                    target_insert(w_arr, price, dep, w_arr, walked)
     marked |= newly_marked
 
 

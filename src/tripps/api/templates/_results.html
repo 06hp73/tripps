@@ -119,7 +119,12 @@
             </span>
             <span class="cost">
               {% if leg.mode.value == "walk" %}
-                <span class="meta">walk</span>
+                {% set walk_m = ((leg.path_km or 0) * 1000) | round | int %}
+                <span class="meta">
+                  {%- if walk_m >= 1000 -%}≈{{ "%.1f" | format(walk_m / 1000) }} km walk
+                  {%- elif walk_m > 0 -%}≈{{ walk_m }} m walk
+                  {%- else -%}walk{%- endif -%}
+                </span>
               {% elif leg.quote and leg.quote.amount_ore is not none %}
                 {% if leg.quote.amount_ore == 0 %}
                   <span class="badge free">free</span>
