@@ -4,131 +4,320 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>tripps — cheapest way across Sweden</title>
+<meta name="color-scheme" content="dark light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* ------------------------------------------------------------------ *
+     Avgångstavlan — the station departure board.
+
+     The vernacular is deliberate: this is a tool for reading timetables and
+     prices, so it borrows the instrument that does that job best. Condensed
+     grotesque for names, tabular monospace for every number that must line up,
+     amber for times, green reserved for "this costs you nothing".
+
+     Dark is the default identity. Light is a real second skin (a printed
+     timetable, warm paper), not an afterthought — both are contrast-checked.
+   * ------------------------------------------------------------------ */
   :root {
-    --bg: #fbfaf8; --fg: #1c1b1a; --muted: #6b6764; --line: #e3e0dc;
-    --card: #ffffff; --accent: #1d6f52; --warn: #8a5a1a; --warn-bg: #fdf6e9;
-    --free: #1d6f52; --free-bg: #eaf5ef;
+    --bg:#0E1116; --panel:#161B22; --raise:#1B212A; --edge:#232A34; --edge-soft:#1C222B;
+    --ink:#E8E6E1; --dim:#8A93A0; --faint:#5C6672;
+    --amber:#F5C518; --amber-ink:#0B0E13;
+    --free:#3DD68C; --free-bg:rgba(61,214,140,.10);
+    --warn:#FF9E6D; --warn-bg:#1A1310; --warn-edge:#48291B;
+    --train:#7FB2FF; --bus:#FFA05C; --ferry:#5ED3E0; --car:#3DD68C; --air:#C08CFF;
+    --shadow:0 1px 0 rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03);
+    --focus:#F5C518;
   }
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: light) {
     :root {
-      --bg: #16150f; --fg: #edeae4; --muted: #9b958d; --line: #33312b;
-      --card: #1f1e18; --accent: #6fbf95; --warn: #d9a441; --warn-bg: #2a2317;
-      --free: #6fbf95; --free-bg: #1b2a22;
+      --bg:#F4F1EA; --panel:#FFFFFF; --raise:#FBF9F4; --edge:#DDD7C9; --edge-soft:#E9E4D9;
+      --ink:#15181D; --dim:#5F6670; --faint:#8A9099;
+      --amber:#8A5A00; --amber-ink:#FFFFFF;
+      --free:#0B7A4E; --free-bg:rgba(11,122,78,.09);
+      --warn:#8A4416; --warn-bg:#FBF1E7; --warn-edge:#E3CDB6;
+      --train:#1B4D8F; --bus:#B24A12; --ferry:#116E7A; --car:#0B7A4E; --air:#6B3FA0;
+      --shadow:0 1px 2px rgba(20,23,28,.06);
+      --focus:#8A5A00;
     }
   }
-  * { box-sizing: border-box; }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0; background: var(--bg); color: var(--fg);
-    font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Barlow Condensed", "Oswald", "Arial Narrow", system-ui, sans-serif;
+    font-size:17px; line-height:1.45; -webkit-font-smoothing:antialiased;
   }
-  main { max-width: 60rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
-  h1 { font-size: 1.9rem; margin: 0 0 .25rem; letter-spacing: -.02em; }
-  .tagline { color: var(--muted); margin: 0 0 2rem; }
-  form {
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    padding: 1.25rem; display: grid; gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  .mono, input, select, .time, .cost, .price, .statline {
+    font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
   }
-  form > div { position: relative; }
-  label { display: block; font-size: .8rem; text-transform: uppercase;
-          letter-spacing: .04em; color: var(--muted); margin-bottom: .35rem; }
+  :focus-visible { outline:2px solid var(--focus); outline-offset:2px; border-radius:2px; }
+
+  /* ---------- station header strip ---------- */
+  .strip {
+    background:linear-gradient(180deg, var(--raise), var(--panel));
+    border-bottom:2px solid var(--amber);
+    padding:.75rem 1.25rem; display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap;
+    position:sticky; top:0; z-index:30;
+  }
+  .wordmark { font-size:1.7rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; line-height:1; }
+  .wordmark b { color:var(--amber); }
+  .strip .dest { font-size:.95rem; letter-spacing:.3em; text-transform:uppercase; color:var(--dim); }
+  .strip .right { margin-left:auto; display:flex; align-items:baseline; gap:1rem; }
+  .strip a { color:var(--dim); text-decoration:none; font-size:.9rem; letter-spacing:.12em; text-transform:uppercase; }
+  .strip a:hover { color:var(--amber); }
+  #clock { font-family:"JetBrains Mono", monospace; font-size:1.25rem; color:var(--amber); letter-spacing:.05em; }
+
+  main { max-width:72rem; margin:0 auto; padding:0 1.25rem 5rem; }
+
+  /* ---------- the query board ---------- */
+  form#search {
+    background:var(--panel); border:1px solid var(--edge); border-bottom-width:2px;
+    box-shadow:var(--shadow); margin:1.25rem 0 0; padding:1.1rem 1.15rem;
+    display:grid; gap:.9rem 1rem;
+    grid-template-columns:repeat(auto-fit, minmax(10.5rem, 1fr));
+  }
+  form#search > div { position:relative; min-width:0; }
+  label {
+    display:block; font-size:.78rem; text-transform:uppercase; letter-spacing:.2em;
+    color:var(--dim); margin-bottom:.3rem; font-weight:500;
+  }
+  input[type=text], input[type=date], input[type=time], input[type=number], select {
+    width:100%; padding:.5rem .6rem; border:1px solid var(--edge);
+    background:var(--bg); color:var(--ink); font-size:.95rem; border-radius:2px;
+  }
+  select { font-family:"Barlow Condensed", sans-serif; font-size:1rem; }
+  input::placeholder { color:var(--faint); }
+
   .suggest {
-    position: absolute; z-index: 20; left: 0; right: 0; top: 100%; margin: .25rem 0 0;
-    list-style: none; padding: .25rem; background: var(--card); color: var(--fg);
-    border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18);
-    max-height: 16rem; overflow-y: auto;
+    position:absolute; z-index:40; left:0; right:0; top:100%; margin:.2rem 0 0;
+    list-style:none; padding:.2rem; background:var(--panel); color:var(--ink);
+    border:1px solid var(--edge); border-radius:2px; box-shadow:0 10px 28px rgba(0,0,0,.45);
+    max-height:16rem; overflow-y:auto;
   }
-  .suggest li {
-    padding: .5rem .6rem; border-radius: 5px; cursor: pointer; font-size: .95rem;
+  .suggest li { padding:.45rem .55rem; cursor:pointer; font-size:.95rem; border-radius:2px; }
+  .suggest li[aria-selected="true"], .suggest li:hover { background:var(--amber); color:var(--amber-ink); }
+
+  .full { grid-column:1 / -1; }
+  .checks { display:flex; gap:1.1rem; align-items:center; flex-wrap:wrap; }
+  .checks label {
+    text-transform:none; letter-spacing:0; font-size:1rem; color:var(--ink);
+    margin:0; display:flex; gap:.4rem; align-items:center; cursor:pointer;
   }
-  .suggest li[aria-selected="true"], .suggest li:hover { background: var(--accent); color: #fff; }
-  input[type=text], input[type=date], input[type=time], input[type=number] {
-    width: 100%; padding: .55rem .65rem; border: 1px solid var(--line);
-    border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit;
+  .checks input[type=checkbox] { accent-color:var(--amber); width:1rem; height:1rem; }
+  .checks-label {
+    font-size:.78rem; text-transform:uppercase; letter-spacing:.2em; color:var(--dim);
+    align-self:center; margin-right:.2rem; font-weight:500;
   }
-  .checks { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
-  .checks label { text-transform: none; letter-spacing: 0; font-size: .95rem;
-                  color: var(--fg); margin: 0; display: flex; gap: .45rem; align-items: center; }
-  .checks-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em;
-                  color: var(--muted); align-self: center; margin-right: .25rem; }
-  .link-btn { background: none; border: none; color: var(--accent); font: inherit;
-              cursor: pointer; padding: 0; text-decoration: underline; }
-  .card-chips { display: inline-flex; gap: .4rem; flex-wrap: wrap; margin-left: .5rem; vertical-align: middle; }
-  .chip { display: inline-flex; align-items: center; gap: .35rem; background: var(--free-bg);
-          color: var(--free); border: 1px solid var(--free); border-radius: 999px;
-          padding: .15rem .6rem; font-size: .82rem; }
-  .chip button { background: none; border: none; color: var(--free); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0; }
-  .card-picker { margin-top: .6rem; border: 1px solid var(--line); border-radius: 10px; padding: .75rem; background: var(--card); }
-  .card-picker input { width: 100%; padding: .5rem .6rem; border: 1px solid var(--line);
-                       border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; margin-bottom: .5rem; }
-  .card-list { list-style: none; margin: 0; padding: 0; max-height: 15rem; overflow-y: auto; }
-  .card-list li { display: flex; justify-content: space-between; align-items: center; gap: .5rem;
-                  padding: .45rem .5rem; border-radius: 6px; cursor: pointer; }
-  .card-list li:hover { background: var(--bg); }
-  .card-list li.held { color: var(--free); }
-  .card-list li.limited { opacity: .55; cursor: default; }
-  .card-list .rgn { font-size: .8rem; color: var(--muted); }
-  .card-list .add { font-size: .82rem; color: var(--accent); }
-  .card-list li.held .add { color: var(--free); }
-  .chip.warn { background: rgba(191, 138, 0, .14); color: #b8860b; border-color: #b8860b; }
-  .chip.warn button { color: #b8860b; }
-  .rental-form { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .6rem; }
-  .rental-form select, .rental-form input { width: auto; flex: 1 1 8rem; margin-bottom: 0; }
-  .rental-form button { padding: .5rem .9rem; }
-  .warn-note { color: #b8860b; }
-  .recent { max-width: 880px; margin: .75rem auto 0; display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
-  .recent-label { color: var(--muted); font-size: .82rem; }
-  .recent-chip { background: var(--card); border: 1px solid var(--line); color: var(--fg);
-                 border-radius: 999px; padding: .25rem .7rem; font-size: .82rem; cursor: pointer; }
-  .recent-chip:hover { border-color: var(--accent); color: var(--accent); }
-  .full { grid-column: 1 / -1; }
+  .opt { text-transform:none; color:var(--dim); font-weight:400; letter-spacing:0; font-size:.9rem; }
+
   button {
-    padding: .7rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent);
-    color: #fff; font: inherit; font-weight: 600; cursor: pointer;
+    padding:.6rem 1.3rem; border:0; border-radius:2px; background:var(--amber);
+    color:var(--amber-ink); font-family:"Barlow Condensed", sans-serif; font-weight:700;
+    font-size:1.05rem; letter-spacing:.14em; text-transform:uppercase; cursor:pointer;
   }
-  button:disabled { opacity: .55; cursor: progress; }
-  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-left: .5rem; }
-  .opt { text-transform: none; color: var(--muted); font-weight: 400; letter-spacing: 0; }
-  .fare-cal { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
-  .fare-day { border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; background: var(--card); }
-  .fare-day[role=button] { cursor: pointer; transition: border-color .1s, transform .05s; }
-  .fare-day[role=button]:hover { border-color: var(--accent); }
-  .fare-day.open { border-color: var(--accent); border-width: 2px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
-  .fare-day.best { border-color: var(--accent); border-width: 2px; }
-  .fare-day.disabled { opacity: .5; }
-  .fare-day .d { font-size: .8rem; color: var(--muted); }
-  .fare-day .p { font-size: 1.25rem; font-weight: 700; }
-  .fare-day .m { font-size: .8rem; color: var(--muted); }
-  .fare-day .hint { font-size: .68rem; color: var(--accent); margin-top: .35rem; }
-  /* Itineraries rendered client-side (round-trip, fare detail) share the server partial's look. */
-  .itin { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; margin-bottom: 1rem; }
-  .itin .head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: .5rem; }
-  .itin .price { font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em; }
-  .itin .meta { color: var(--muted); font-size: .9rem; }
-  .itin .legs { list-style: none; margin: 0; padding: 0; }
-  .itin .legs li { padding: .4rem 0; border-top: 1px solid var(--line); font-size: .92rem; }
-  a.book { color: var(--accent); text-decoration: none; font-weight: 600; }
-  a.book:hover { text-decoration: underline; }
-  .incl { color: var(--free); font-size: .82rem; }
-  .split-tip { color: var(--accent); font-size: .82rem; font-weight: 600; }
-  .split-scan { font-size: .82rem; color: var(--muted); }
-  .split-scan-box { margin-top: .35rem; padding: .5rem .7rem; border: 1px solid var(--line);
-                    border-radius: 8px; background: var(--card); }
-  .split-scan-box ul { margin: .35rem 0; padding-left: 1.1rem; }
-  .rt-head { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.25rem 0 .5rem; }
-  .rt-total { font-size: 1.3rem; font-weight: 700; margin: 1rem 0; }
-  .note { color: var(--muted); font-size: .85rem; }
-  .banner { background: var(--warn-bg); border: 1px solid var(--warn);
-            color: var(--warn); border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1.5rem; }
-  #results { margin-top: 2rem; }
+  button:hover { filter:brightness(1.08); }
+  button:disabled { opacity:.5; cursor:progress; }
+  button.secondary {
+    background:transparent; color:var(--amber); border:1px solid var(--amber); margin-left:.5rem;
+  }
+  .link-btn {
+    background:none; border:0; color:var(--amber); font:inherit; font-size:.95rem;
+    letter-spacing:0; text-transform:none; cursor:pointer; padding:0; text-decoration:underline;
+  }
+
+  /* card + rental pickers */
+  .card-chips { display:inline-flex; gap:.35rem; flex-wrap:wrap; margin-left:.5rem; vertical-align:middle; }
+  .chip {
+    display:inline-flex; align-items:center; gap:.3rem; background:var(--free-bg);
+    color:var(--free); border:1px solid var(--free); border-radius:2px;
+    padding:.1rem .5rem; font-size:.85rem;
+  }
+  .chip button { background:none; border:0; color:inherit; cursor:pointer; font-size:1rem;
+                 line-height:1; padding:0; letter-spacing:0; }
+  .chip.warn { background:var(--warn-bg); color:var(--warn); border-color:var(--warn); }
+  .card-picker {
+    margin-top:.55rem; border:1px solid var(--edge); background:var(--raise);
+    padding:.75rem; border-radius:2px;
+  }
+  .card-picker > input { margin-bottom:.5rem; }
+  .card-list { list-style:none; margin:0; padding:0; max-height:15rem; overflow-y:auto; }
+  .card-list li {
+    display:flex; justify-content:space-between; align-items:center; gap:.5rem;
+    padding:.4rem .45rem; cursor:pointer; border-radius:2px;
+  }
+  .card-list li:hover { background:var(--bg); }
+  .card-list li.held { color:var(--free); }
+  .card-list li.limited { opacity:.5; cursor:default; }
+  .card-list .rgn { font-size:.85rem; color:var(--dim); }
+  .card-list .add { font-size:.85rem; color:var(--amber); }
+  .card-list li.held .add { color:var(--free); }
+  .rental-form { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.55rem; }
+  .rental-form select, .rental-form input { width:auto; flex:1 1 8rem; margin-bottom:0; }
+  .warn-note { color:var(--warn); }
+
+  /* ---------- recent ---------- */
+  .recent { display:flex; flex-wrap:wrap; gap:.35rem; align-items:center; margin:.85rem 0 0; }
+  .recent-label { color:var(--dim); font-size:.8rem; letter-spacing:.2em; text-transform:uppercase; }
+  .recent-chip {
+    background:var(--panel); border:1px solid var(--edge); color:var(--ink);
+    padding:.2rem .65rem; font-size:.9rem; letter-spacing:0; text-transform:none;
+    font-weight:400; border-radius:2px;
+  }
+  .recent-chip:hover { border-color:var(--amber); color:var(--amber); filter:none; }
+
+  #results { margin-top:1.5rem; }
+
+  /* ---------- the frontier chart (signature) ---------- */
+  .frontier {
+    background:var(--panel); border:1px solid var(--edge); box-shadow:var(--shadow);
+    padding:1rem 1.15rem .6rem; margin-bottom:1.25rem;
+  }
+  .frontier h2 {
+    margin:0 0 .15rem; font-size:1.1rem; font-weight:600; letter-spacing:.01em;
+  }
+  .frontier p.sub { margin:0 0 .5rem; color:var(--dim); font-size:.95rem; max-width:62ch; }
+  .frontier.solo { border-left:3px solid var(--free); }
+  .frontier.solo b { color:var(--free); }
+  .frontier svg { display:block; width:100%; height:auto; overflow:visible; }
+  .fr-ax { stroke:var(--edge); stroke-width:1; }
+  .fr-grid { stroke:var(--edge-soft); stroke-width:1; stroke-dasharray:2 4; }
+  .fr-lab { fill:var(--dim); font-family:"JetBrains Mono", monospace; font-size:11px; }
+  .fr-line { fill:none; stroke:var(--free); stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+  .fr-band { fill:var(--free); opacity:.07; }
+  .fr-dot { fill:var(--panel); stroke:var(--faint); stroke-width:2; }
+  .fr-dot.on { fill:var(--free); stroke:var(--panel); }
+  .fr-dot.best { fill:var(--free); stroke:var(--ink); stroke-width:3; }
+  .fr-tag { font-family:"JetBrains Mono", monospace; font-size:11.5px; font-weight:700; fill:var(--ink); }
+  .fr-sub { font-family:"JetBrains Mono", monospace; font-size:10px; fill:var(--dim); }
+  .fr-legend { display:flex; gap:1rem; font-size:.82rem; color:var(--dim); flex-wrap:wrap; margin-top:.2rem; }
+  .fr-legend i { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:.3rem; vertical-align:middle; }
+
+  /* ---------- itineraries: board rows ---------- */
+  .itin {
+    background:var(--panel); border:1px solid var(--edge); box-shadow:var(--shadow);
+    padding:.9rem 1.1rem; margin-bottom:.55rem;
+  }
+  .itin.best { border-color:var(--free); border-left-width:3px; }
+  @keyframes flap { from { transform:rotateX(-88deg); opacity:0; } to { transform:rotateX(0); opacity:1; } }
+  .itin { transform-origin:top center; animation:flap .34s cubic-bezier(.2,.8,.3,1) both; }
+  .itin:nth-child(2){animation-delay:.03s} .itin:nth-child(3){animation-delay:.06s}
+  .itin:nth-child(4){animation-delay:.09s} .itin:nth-child(5){animation-delay:.12s}
+  .itin:nth-child(n+6){animation-delay:.15s}
+  @media (prefers-reduced-motion: reduce) { .itin { animation:none; } }
+
+  .head { display:flex; justify-content:space-between; align-items:baseline; gap:1rem;
+          flex-wrap:wrap; margin-bottom:.6rem; }
+  .price { font-size:2rem; font-weight:700; letter-spacing:-.02em; color:var(--amber); line-height:1; }
+  .itin.best .price { color:var(--free); }
+  .price.none { font-size:1.05rem; font-weight:600; color:var(--warn); }
+  .cur { font-family:"JetBrains Mono", monospace; font-size:.7rem; letter-spacing:.18em;
+         color:var(--dim); margin-left:.1rem; }
+  /* Mode chips: the shape of a journey before any of its detail. Colour is the mode's own,
+     so a free car reads green next to a paid coach without needing to say so. */
+  .modechips { display:inline-flex; gap:.3rem; flex-wrap:wrap; margin-left:.5rem; vertical-align:middle; }
+  .mchip {
+    font-family:"JetBrains Mono", monospace; font-size:.62rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.1em; padding:.14rem .38rem;
+    border:1px solid currentColor; border-radius:2px; color:var(--dim);
+  }
+  .mchip.train { color:var(--train); } .mchip.bus { color:var(--bus); }
+  .mchip.ferry { color:var(--ferry); } .mchip.freerider { color:var(--car); }
+  .mchip.flight { color:var(--air); } .mchip.local.transit, .mchip.local_transit { color:var(--dim); }
+  .meta { color:var(--dim); font-size:.92rem; }
+  .badge {
+    display:inline-block; font-family:"JetBrains Mono", monospace; font-size:.62rem;
+    text-transform:uppercase; letter-spacing:.12em; padding:.12rem .4rem; border-radius:2px;
+    border:1px solid var(--edge); color:var(--dim); vertical-align:middle;
+  }
+  .badge.exact { color:var(--free); border-color:var(--free); }
+  .badge.cached { color:var(--dim); border-color:var(--edge); }
+  .badge.estimated, .badge.stale, .badge.unavailable { color:var(--warn); border-color:var(--warn); }
+  .badge.free { color:var(--free); border-color:var(--free); background:var(--free-bg); }
+
+  .legs { list-style:none; margin:0; padding:0; }
+  .leg {
+    display:grid; grid-template-columns:6.2rem 1fr auto; gap:.85rem;
+    padding:.5rem 0; border-top:1px dotted var(--edge); align-items:baseline;
+  }
+  .leg .time { color:var(--amber); font-size:.86rem; }
+  .leg .what strong { font-weight:600; }
+  .leg .cost { text-align:right; white-space:nowrap; font-size:.95rem; }
+  .mode {
+    font-family:"JetBrains Mono", monospace; font-size:.62rem; text-transform:uppercase;
+    letter-spacing:.14em; color:var(--dim);
+  }
+  .leg.walk { opacity:.7; }
+  .leg.walk .time { color:var(--dim); }
+  a.book { color:var(--amber); text-decoration:none; font-size:.88rem; letter-spacing:.04em; }
+  a.book:hover { text-decoration:underline; }
+  .incl { color:var(--free); font-size:.85rem; }
+  .split-tip { color:var(--amber); font-size:.86rem; font-weight:600; }
+  .split-scan { font-size:.86rem; color:var(--dim); }
+  .split-scan-box {
+    margin-top:.35rem; padding:.5rem .7rem; border:1px solid var(--edge);
+    background:var(--raise); border-radius:2px;
+  }
+  .split-scan-box ul { margin:.35rem 0; padding-left:1.1rem; }
+
+  /* ---------- notices ---------- */
+  .banner, .warnbox {
+    background:var(--warn-bg); border:1px solid var(--warn-edge); border-left:3px solid var(--warn);
+    color:var(--ink); padding:.75rem 1rem; margin-bottom:1.25rem; font-size:.95rem;
+  }
+  .warnbox strong { color:var(--warn); text-transform:uppercase; letter-spacing:.16em;
+                    font-size:.78rem; display:block; margin-bottom:.25rem; }
+  .warnbox ul { margin:.35rem 0 0; padding-left:1.1rem; }
+  .refine-btn {
+    font-family:"Barlow Condensed", sans-serif; font-size:.95rem; background:var(--warn);
+    color:var(--bg); border:0; border-radius:2px; padding:.35rem .9rem; cursor:pointer;
+    margin-top:.6rem; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+  }
+  .refine-btn[disabled] { opacity:.6; cursor:default; }
+  .refine-note { display:block; color:var(--dim); font-size:.82rem; margin-top:.35rem; }
+  .statline { color:var(--faint); font-size:.78rem; margin-top:1.25rem; letter-spacing:.02em; }
+  .empty { color:var(--dim); }
+  .note { color:var(--dim); font-size:.9rem; }
+
+  /* ---------- round trip + fare calendar ---------- */
+  .rt-head { font-size:.8rem; text-transform:uppercase; letter-spacing:.22em; color:var(--dim);
+             margin:1.5rem 0 .6rem; }
+  .rt-total { font-size:1.6rem; font-weight:700; margin:1rem 0; color:var(--amber); }
+  .fare-cal { display:grid; gap:.5rem; grid-template-columns:repeat(auto-fill, minmax(9rem, 1fr)); }
+  .fare-day { border:1px solid var(--edge); background:var(--panel); padding:.6rem .7rem;
+              box-shadow:var(--shadow); }
+  .fare-day[role=button] { cursor:pointer; }
+  .fare-day[role=button]:hover { border-color:var(--amber); }
+  .fare-day.open, .fare-day.best { border-color:var(--free); border-left-width:3px; }
+  .fare-day.disabled { opacity:.45; }
+  .fare-day .d { font-size:.8rem; color:var(--dim); text-transform:uppercase; letter-spacing:.1em; }
+  .fare-day .p { font-family:"JetBrains Mono", monospace; font-size:1.3rem; font-weight:700; color:var(--amber); }
+  .fare-day.best .p { color:var(--free); }
+  .fare-day .m { font-size:.82rem; color:var(--dim); }
+  .fare-day .hint { font-size:.7rem; color:var(--amber); margin-top:.3rem; }
+
+  @media (max-width: 34rem) {
+    .leg { grid-template-columns:1fr auto; }
+    .leg .time { grid-column:1 / -1; }
+    .price { font-size:1.6rem; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>tripps</h1>
-  <p class="tagline">The cheapest way from A to B in Sweden — train, bus, flight, and free Hertz Freerider cars, combined. <a href="/status" style="color:var(--muted)">· status</a></p>
 
+<div class="strip">
+  <div class="wordmark">trip<b>ps</b></div>
+  <div class="dest">Avgångar · Departures</div>
+  <div class="right">
+    <a href="/status">status</a>
+    <span id="clock" aria-hidden="true">--:--</span>
+  </div>
+</div>
+
+<main>
   {% if errors %}
     <div class="banner">
       {% for e in errors %}<div>{{ e }}</div>{% endfor %}
@@ -137,39 +326,39 @@
 
   <form id="search" method="post" action="/search">
     <div>
-      <label for="origin">From</label>
+      <label for="origin">Från</label>
       <input type="text" id="origin" name="origin" required placeholder="Stockholm C"
              autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list">
       <ul class="suggest" id="origin-suggest" role="listbox" hidden></ul>
     </div>
     <div>
-      <label for="destination">To</label>
+      <label for="destination">Till</label>
       <input type="text" id="destination" name="destination" required placeholder="Göteborg C"
              autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list">
       <ul class="suggest" id="destination-suggest" role="listbox" hidden></ul>
     </div>
     <div>
-      <label for="date">Date</label>
+      <label for="date">Datum</label>
       <input type="date" id="date" name="date" value="{{ today }}" required>
     </div>
     <div>
-      <label for="return_date">Return <span class="opt">(optional)</span></label>
+      <label for="return_date">Retur <span class="opt">(valfritt)</span></label>
       <input type="date" id="return_date" name="return_date">
     </div>
     <div>
-      <label for="earliest">Leave after</label>
+      <label for="earliest">Efter</label>
       <input type="time" id="earliest" name="earliest" value="06:00">
     </div>
     <div>
-      <label for="max_hours">Max hours</label>
-      <input type="number" id="max_hours" name="max_hours" min="1" max="48" step="0.5" placeholder="any">
+      <label for="max_hours">Max timmar</label>
+      <input type="number" id="max_hours" name="max_hours" min="1" max="48" step="0.5" placeholder="valfri">
     </div>
     <div>
-      <label for="max_transfers">Max transfers</label>
-      <input type="number" id="max_transfers" name="max_transfers" min="0" max="5" placeholder="any">
+      <label for="max_transfers">Max byten</label>
+      <input type="number" id="max_transfers" name="max_transfers" min="0" max="5" placeholder="valfri">
     </div>
     <div>
-      <label for="passenger">Traveller</label>
+      <label for="passenger">Resenär</label>
       <select id="passenger" name="passenger">
         {% for option in passenger_options %}
         <option value="{{ option.value }}" {{ 'selected' if option.value == passenger.category.value }}>{{ option.label }}</option>
@@ -177,25 +366,25 @@
       </select>
     </div>
     <div id="age-field" hidden>
-      <label for="age">Age</label>
+      <label for="age">Ålder</label>
       <input type="number" id="age" name="age" min="0" max="120" placeholder="{{ passenger.age or '' }}">
     </div>
 
     <div class="full checks">
-      <span class="checks-label">Travel by</span>
-      <label><input type="checkbox" name="mode_train" checked> Train</label>
-      <label><input type="checkbox" name="mode_bus" checked> Bus</label>
-      <label><input type="checkbox" name="mode_ferry" checked> Ferry</label>
-      <label><input type="checkbox" name="mode_freerider" checked> Freerider <span class="opt">({{ freerider_count }} cars)</span></label>
-      <label><input type="checkbox" name="mode_flight"> Flight <span class="opt">(slow)</span></label>
+      <span class="checks-label">Färdsätt</span>
+      <label><input type="checkbox" name="mode_train" checked> Tåg</label>
+      <label><input type="checkbox" name="mode_bus" checked> Buss</label>
+      <label><input type="checkbox" name="mode_ferry" checked> Färja</label>
+      <label><input type="checkbox" name="mode_freerider" checked> Freerider <span class="opt">({{ freerider_count }} bilar)</span></label>
+      <label><input type="checkbox" name="mode_flight"> Flyg <span class="opt">(långsamt)</span></label>
     </div>
 
     <div class="full">
-      <span class="checks-label">My travel cards</span>
+      <span class="checks-label">Mina periodkort</span>
       <button type="button" id="cards-toggle" class="link-btn">none registered</button>
       <div id="card-chips" class="card-chips"></div>
       <div id="card-picker" class="card-picker" hidden>
-        <input type="text" id="card-search" placeholder="Search region or provider…" autocomplete="off">
+        <input type="text" id="card-search" placeholder="Sök region eller bolag…" autocomplete="off">
         <ul id="card-list" class="card-list"></ul>
         <label class="opt" style="display:block"><input type="checkbox" id="card-partial"> I only hold part of the zones (partial ticket)</label>
         <p class="opt">Covered legs (e.g. Öresundståg within Skåne with a Skånetrafiken card) price at 0. Assumes an all-zone period ticket; SJ is never auto-freed. A partial-zone ticket is registered but priced as paid (its exact zones can't be verified from the data).</p>
@@ -203,16 +392,16 @@
     </div>
 
     <div class="full">
-      <span class="checks-label">Tickital rentals</span>
+      <span class="checks-label">Tickital-hyror</span>
       <button type="button" id="rentals-toggle" class="link-btn">none registered ▾</button>
       <div id="rental-chips" class="card-chips"></div>
       <div id="rental-picker" class="card-picker" hidden>
         <div class="rental-form">
           <select id="rental-provider"></select>
-          <input type="number" id="rental-price" min="0" step="1" placeholder="price SEK">
+          <input type="number" id="rental-price" min="0" step="1" placeholder="pris SEK">
           <input type="date" id="rental-from" title="valid from">
           <input type="date" id="rental-to" title="valid to">
-          <button type="button" id="rental-add" class="secondary">Add</button>
+          <button type="button" id="rental-add" class="secondary">Lägg till</button>
         </div>
         <ul id="rental-list" class="card-list"></ul>
         <p class="opt warn-note">A tickital rental is a second-hand period ticket: covered legs price at 0 within its date window. Renting a period ticket violates the operator's terms and the ticket can be blocked; its period cost is not added to the trip total, so it only beats singles across enough covered travel. Registered by hand — tickital has no public listings.</p>
@@ -220,8 +409,8 @@
     </div>
 
     <div class="full">
-      <button type="submit" id="go">Find the cheapest</button>
-      <button type="button" id="fares" class="secondary">Cheapest day (next 7)</button>
+      <button type="submit" id="go">Sök billigast</button>
+      <button type="button" id="fares" class="secondary">Billigaste dag (7)</button>
       <span class="note" id="status"></span>
     </div>
   </form>
@@ -235,6 +424,14 @@
   const results = document.getElementById("results");
   const button = document.getElementById("go");
   const status = document.getElementById("status");
+
+  // --- station clock ----------------------------------------------------
+  const clockEl = document.getElementById("clock");
+  const tick = () => {
+    const d = new Date();
+    clockEl.textContent = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  };
+  tick(); setInterval(tick, 20000);
 
   // --- station autocomplete -------------------------------------------
   // Backed by /api/stops, which resolves free text against the real timetable, so a user
@@ -462,6 +659,110 @@
   form.passenger.addEventListener("change", syncAgeField);
   syncAgeField();
 
+  // --- the frontier chart ----------------------------------------------
+  // The signature of this page: every journey we priced, plotted price against time, with
+  // the Pareto frontier drawn. It is the one thing tripps can show that a booking site
+  // cannot — the router optimises price *during* the search, so "these are the only ones
+  // worth considering, and here is what the others were beaten by" is a fact we own.
+  // Dominated options stay visible on purpose: they were checked, not missed.
+  function drawFrontier() {
+    const src = document.getElementById("frontier-data");
+    if (!src) return;
+    let pts;
+    try { pts = JSON.parse(src.textContent); } catch (_) { return; }
+    if (!Array.isArray(pts) || pts.length < 2) return;
+
+    // A journey is dominated when another is no dearer AND no slower, and strictly better
+    // on at least one of the two. What is left is the frontier.
+    pts.forEach(a => {
+      a.dom = pts.some(b => b !== a && b.p <= a.p && b.m <= a.m && (b.p < a.p || b.m < a.m));
+    });
+    const front = pts.filter(p => !p.dom).sort((a, b) => a.m - b.m);
+
+    // A frontier of one means a single journey beats every other on BOTH price and time.
+    // A chart of that is a single dot and teaches nothing — but the finding itself is worth
+    // stating plainly, so say it in a line instead of drawing silence.
+    if (front.length < 2) {
+      const win = front[0];
+      const note = document.createElement("section");
+      note.className = "frontier solo";
+      note.innerHTML = `<h2>One journey wins outright.</h2><p class="sub">`
+        + `The <b>${esc(win.p)} kr</b> option (${esc(win.modes)}, ${esc(win.dep)}→${esc(win.arr)}) is both the `
+        + `cheapest and the fastest of the ${pts.length} we priced — the other ${pts.length - 1} `
+        + `cost more <em>and</em> take longer.</p>`;
+      results.insertBefore(note, results.firstChild);
+      return;
+    }
+
+    const W = 800, H = 330, L = 62, R = 20, T = 26, B = 34;
+    const ps = pts.map(p => p.p), ms = pts.map(p => p.m);
+    const p0 = Math.min(...ps), p1 = Math.max(...ps);
+    const m0 = Math.min(...ms), m1 = Math.max(...ms);
+    const padP = Math.max((p1 - p0) * 0.18, 20), padM = Math.max((m1 - m0) * 0.12, 15);
+    const pLo = Math.max(0, p0 - padP), pHi = p1 + padP;
+    const mLo = Math.max(0, m0 - padM), mHi = m1 + padM;
+    const X = m => L + (m - mLo) / (mHi - mLo || 1) * (W - L - R);
+    const Y = p => (H - B) - (p - pLo) / (pHi - pLo || 1) * (H - B - T);
+
+    const nice = (lo, hi, n) => {
+      const step = Math.pow(10, Math.floor(Math.log10((hi - lo) / n)));
+      const s = [1, 2, 2.5, 5, 10].map(k => k * step).find(k => (hi - lo) / k <= n) || step * 10;
+      const out = [];
+      for (let v = Math.ceil(lo / s) * s; v <= hi; v += s) out.push(v);
+      return out;
+    };
+    const hhmm = m => Math.floor(m / 60) + " h" + (m % 60 ? " " + (m % 60) : "");
+
+    let g = "";
+    nice(pLo, pHi, 4).forEach(v => {
+      g += `<line class="fr-grid" x1="${L}" y1="${Y(v).toFixed(1)}" x2="${W - R}" y2="${Y(v).toFixed(1)}"/>`
+        + `<text class="fr-lab" x="${L - 8}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${Math.round(v)}</text>`;
+    });
+    nice(mLo, mHi, 4).forEach(v => {
+      g += `<text class="fr-lab" x="${X(v).toFixed(1)}" y="${H - B + 18}" text-anchor="middle">${hhmm(Math.round(v))}</text>`;
+    });
+
+    const band = `M${X(front[0].m).toFixed(1)},${Y(front[0].p).toFixed(1)} `
+      + front.slice(1).map(f => `L${X(f.m).toFixed(1)},${Y(f.p).toFixed(1)}`).join(" ")
+      + ` L${X(front[front.length - 1].m).toFixed(1)},${H - B} L${X(front[0].m).toFixed(1)},${H - B} Z`;
+    const line = front.map(f => `${X(f.m).toFixed(1)},${Y(f.p).toFixed(1)}`).join(" ");
+
+    const cheapest = pts.reduce((a, b) => (b.p < a.p ? b : a));
+    let dots = "";
+    pts.forEach(pt => {
+      const cls = pt === cheapest ? "fr-dot best" : (pt.dom ? "fr-dot" : "fr-dot on");
+      const r = pt === cheapest ? 8 : (pt.dom ? 5.5 : 6.5);
+      dots += `<circle class="${cls}" cx="${X(pt.m).toFixed(1)}" cy="${Y(pt.p).toFixed(1)}" r="${r}">`
+        + `<title>${esc(pt.p)} SEK · ${hhmm(pt.m)} · ${esc(pt.dep)}→${esc(pt.arr)}${pt.dom ? " · beaten on both price and time" : ""}</title></circle>`;
+      if (!pt.dom) {
+        const flip = X(pt.m) > W * 0.72;
+        const tx = X(pt.m) + (flip ? -12 : 12);
+        const anchor = flip ? "end" : "start";
+        dots += `<text class="fr-tag" x="${tx.toFixed(1)}" y="${(Y(pt.p) - 2).toFixed(1)}" text-anchor="${anchor}">${esc(pt.p)} kr</text>`
+          + `<text class="fr-sub" x="${tx.toFixed(1)}" y="${(Y(pt.p) + 11).toFixed(1)}" text-anchor="${anchor}">${esc(pt.modes)}</text>`;
+      }
+    });
+
+    const beaten = pts.filter(p => p.dom).length;
+    const panel = document.createElement("section");
+    panel.className = "frontier";
+    panel.innerHTML =
+      `<h2>${pts.length} priced journey${pts.length === 1 ? "" : "s"}. `
+      + `${front.length} worth considering.</h2>`
+      + `<p class="sub">Each dot is a real journey, priced. The ones on the green line are those `
+      + `where nothing else is both cheaper and faster`
+      + (beaten ? ` — the other ${beaten} lost on both counts.` : `.`) + `</p>`
+      + `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Price against journey time for the priced journeys">`
+      + `<line class="fr-ax" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/>`
+      + `<line class="fr-ax" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/>`
+      + g + `<path class="fr-band" d="${band}"/><polyline class="fr-line" points="${line}"/>` + dots
+      + `</svg>`
+      + `<div class="fr-legend"><span><i style="background:var(--free)"></i>on the frontier</span>`
+      + `<span><i style="background:var(--panel);border:2px solid var(--faint)"></i>beaten on price and time</span>`
+      + `<span>↑ price (SEK) · → journey time</span></div>`;
+    results.insertBefore(panel, results.firstChild);
+  }
+
   // --- permalinks + recent searches -----------------------------------
   const recentEl = document.getElementById("recent");
 
@@ -529,7 +830,7 @@
   function renderRecent() {
     const list = loadRecent();
     if (!list.length) { recentEl.innerHTML = ""; return; }
-    recentEl.innerHTML = '<span class="recent-label">Recent</span> ' + list.map((j, i) =>
+    recentEl.innerHTML = '<span class="recent-label">Senaste</span> ' + list.map((j, i) =>
       `<button type="button" class="recent-chip" data-i="${i}">${esc(j.origin)} → ${esc(j.destination)}</button>`).join(" ");
     recentEl.querySelectorAll(".recent-chip").forEach(b => b.addEventListener("click", () => {
       const j = list[+b.dataset.i];
@@ -617,25 +918,26 @@
     syncUrl();
     const returnDate = form.return_date.value;
     if (returnDate) {
-      status.textContent = "Pricing both directions…";
+      status.textContent = "Prissätter båda riktningarna…";
       const p = modeParams();
       p.set("date", form.date.value);
       p.set("return", returnDate);
       const data = await runJson("/api/round-trip?" + p.toString());
       if (!data) return;
       const total = data.total_price_sek != null
-        ? `<div class="rt-total">Round-trip total: ${Math.round(data.total_price_sek)} SEK</div>` : "";
+        ? `<div class="rt-total">Tur och retur: ${Math.round(data.total_price_sek)} SEK</div>` : "";
       results.innerHTML = total
-        + `<div class="rt-head">Outbound · ${form.date.value}</div>` + renderResponse(data.outbound)
-        + `<div class="rt-head">Return · ${returnDate}</div>` + renderResponse(data.inbound);
+        + `<div class="rt-head">Utresa · ${form.date.value}</div>` + renderResponse(data.outbound)
+        + `<div class="rt-head">Hemresa · ${returnDate}</div>` + renderResponse(data.inbound);
       return;
     }
     button.disabled = true;
-    status.textContent = "Routing, then pricing the survivors…";
+    status.textContent = "Söker rutter, prissätter de som överlever…";
     results.innerHTML = "";
     try {
       const response = await fetch("/search", { method: "POST", body: new FormData(form) });
       results.innerHTML = await response.text();
+      drawFrontier();
     } catch (err) {
       results.innerHTML = '<p class="banner">Search failed: ' + esc(err) + "</p>";
     } finally {
@@ -652,12 +954,13 @@
     const button = event.target.closest("#refine");
     if (!button) return;
     button.disabled = true;
-    button.textContent = "Pricing the options the first pass could not…";
+    button.textContent = "Prissätter det första passet inte hann med…";
     const body = new FormData(form);
     body.set("refine", "1");
     try {
       const response = await fetch("/search", { method: "POST", body });
       results.innerHTML = await response.text();
+      drawFrontier();
     } catch (err) {
       button.disabled = false;
       button.textContent = "Refine failed — try again";
@@ -708,7 +1011,7 @@
   });
 
   document.getElementById("fares").addEventListener("click", async () => {
-    status.textContent = "Pricing each of the next 7 days… (first run is slow)";
+    status.textContent = "Prissätter de 7 närmaste dagarna… (första körningen är långsam)";
     const p = modeParams();
     p.set("start", form.date.value);
     p.set("days", "7");
@@ -725,8 +1028,8 @@
         + `<div class="d">${label}</div><div class="p">${price}</div><div class="m">${esc(modes)}</div>`
         + `<div class="hint">${d.itinerary ? "tap for legs & booking" : ""}</div></div>`;
     }).join("");
-    results.innerHTML = `<div class="rt-head">Cheapest day · ${esc(form.origin.value)} → ${esc(form.destination.value)} `
-      + `<span class="opt">(tap a day to see the journey)</span></div>`
+    results.innerHTML = `<div class="rt-head">Billigaste dag · ${esc(form.origin.value)} → ${esc(form.destination.value)} `
+      + `<span class="opt">(tryck på en dag för resan)</span></div>`
       + `<div class="fare-cal">${cells}</div><div id="fare-detail"></div>`;
 
     const detail = document.getElementById("fare-detail");

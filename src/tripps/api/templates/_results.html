@@ -1,42 +1,8 @@
 {# Results partial, injected into #results. Price confidence is always visible: a Freerider
-   estimate and a live FlixBus fare must never look like the same kind of number. #}
-<style>
-  .warnbox { background: var(--warn-bg); border: 1px solid var(--warn); color: var(--warn);
-             border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1.25rem; font-size: .9rem; }
-  .warnbox ul { margin: .35rem 0 0; padding-left: 1.1rem; }
-  .itin { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-          padding: 1rem 1.15rem; margin-bottom: 1rem; }
-  .itin.best { border-color: var(--accent); border-width: 2px; }
-  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
-          flex-wrap: wrap; margin-bottom: .75rem; }
-  .price { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
-  .price.none { font-size: 1rem; font-weight: 600; color: var(--warn); }
-  .meta { color: var(--muted); font-size: .9rem; }
-  .badge { display: inline-block; font-size: .7rem; text-transform: uppercase;
-           letter-spacing: .05em; padding: .15rem .45rem; border-radius: 4px;
-           border: 1px solid var(--line); color: var(--muted); vertical-align: middle; }
-  .badge.exact { color: var(--accent); border-color: var(--accent); }
-  .badge.estimated, .badge.stale { color: var(--warn); border-color: var(--warn); }
-  .badge.unavailable { color: var(--warn); border-color: var(--warn); }
-  .badge.free { color: var(--free); border-color: var(--free); background: var(--free-bg); }
-  .legs { list-style: none; margin: 0; padding: 0; }
-  .leg { display: grid; grid-template-columns: 5.5rem 1fr auto; gap: .75rem;
-         padding: .5rem 0; border-top: 1px solid var(--line); align-items: baseline; }
-  .leg .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; }
-  .leg .what strong { font-weight: 600; }
-  .leg .cost { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-  .mode { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-  .walk { opacity: .65; }
-  a.book { color: var(--accent); text-decoration: none; font-size: .85rem; }
-  a.book:hover { text-decoration: underline; }
-  .statline { color: var(--muted); font-size: .8rem; margin-top: 1.5rem; }
-  .empty { color: var(--muted); }
-  .refine-btn { font: inherit; font-size: .85rem; background: var(--warn); color: #0b0d12;
-                border: 0; border-radius: 7px; padding: .35rem .8rem; cursor: pointer;
-                margin-top: .6rem; }
-  .refine-btn[disabled] { opacity: .6; cursor: default; }
-  .refine-note { display: block; color: var(--muted); font-size: .78rem; margin-top: .35rem; }
-</style>
+   estimate and a live FlixBus fare must never look like the same kind of number.
+
+   Styling lives in index.html's design system, not here — this partial is only ever injected
+   into that page, and one stylesheet means the board and its rows cannot drift apart. #}
 
 {% if error %}
   <div class="warnbox">{{ error }}</div>
@@ -48,6 +14,27 @@
     </div>
   {% endif %}
 {% else %}
+
+  {# Data for the frontier chart: every priced journey as (price, minutes). The page draws
+     the Pareto frontier from it — which options nothing else beats on BOTH price and time.
+     Emitted as data rather than markup so the chart stays a view concern. #}
+  {% set pts = [] %}
+  {% for itin in itineraries %}
+    {% if itin.total_price_sek is not none %}
+      {% set modes = itin.legs | rejectattr("mode.value", "equalto", "walk")
+                              | map(attribute="mode.value") | unique | list %}
+      {% set _ = pts.append({
+           "p": itin.total_price_sek | round | int,
+           "m": itin.duration_seconds // 60,
+           "dep": itin.departure.strftime("%H:%M"),
+           "arr": itin.arrival.strftime("%H:%M"),
+           "modes": modes | join(" + "),
+         }) %}
+    {% endif %}
+  {% endfor %}
+  {% if pts | length > 1 %}
+    <script type="application/json" id="frontier-data">{{ pts | tojson }}</script>
+  {% endif %}
 
   {% if response.warnings %}
     <div class="warnbox">
@@ -80,7 +67,8 @@
       <div class="head">
         <div>
           {% if itin.total_price_sek is not none %}
-            <span class="price">{{ "%.0f"|format(itin.total_price_sek) }} SEK</span>
+            <span class="price">{{ "%.0f"|format(itin.total_price_sek) }}</span>
+            <span class="cur">SEK</span>
           {% else %}
             <span class="price none">Price unavailable</span>
           {% endif %}
@@ -88,6 +76,13 @@
           {% if loop.first and itin.total_price_sek is not none %}
             <span class="badge free">cheapest</span>
           {% endif %}
+          {# Mode chips: the shape of the journey at a glance, before any of the detail. #}
+          <span class="modechips">
+            {% for m in itin.legs | rejectattr("mode.value", "equalto", "walk")
+                                 | map(attribute="mode.value") | unique %}
+              <span class="mchip {{ m }}">{{ m.replace("_", " ") }}</span>
+            {% endfor %}
+          </span>
         </div>
         <div class="meta">
           {{ itin.departure.strftime("%H:%M") }} → {{ itin.arrival.strftime("%H:%M") }}
@@ -106,7 +101,7 @@
               <strong>{{ leg.from_stop.name }}</strong> → <strong>{{ leg.to_stop.name }}</strong>
               {% if leg.operator %}<br><span class="meta">{{ leg.operator }}{% if leg.headsign %} · {{ leg.headsign }}{% endif %}</span>{% endif %}
               {% if leg.quote and leg.quote.note %}<br><span class="meta">{{ leg.quote.note }}</span>{% endif %}
-              {% if leg.quote and leg.quote.split_hint %}<br><span class="split-tip">💡 {{ leg.quote.split_hint }}</span>{% endif %}
+              {% if leg.quote and leg.quote.split_hint %}<br><span class="split-tip">◆ {{ leg.quote.split_hint }}</span>{% endif %}
               {% if leg.quote and leg.quote.source == "sj" %}
                 {# On demand only: a scan spends hundreds of SJ calls on this one train. #}
                 <br><button type="button" class="link-btn scan-splits"
