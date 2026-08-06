@@ -56,7 +56,17 @@ if [ ! -f "$STAMP" ] || [ pyproject.toml -nt "$STAMP" ]; then
 fi
 
 # --- 4. the timetable feed --------------------------------------------------
+# A feed that is present but unreadable is worse than none: without this check the run
+# skips the download and fails deep in the parser. Downloads are atomic now, so this only
+# catches files left by an older version or copied in by hand — but it costs milliseconds
+# and turns "delete this file yourself" into something the button just handles.
 FEED="${TRIPPS_GTFS_ZIP_PATH:-${TRIPPS_DATA_DIR:-data}/sweden.zip}"
+if [ -f "$FEED" ] && ! "$VENV/bin/python" -c \
+     'import sys, zipfile; sys.exit(0 if zipfile.is_zipfile(sys.argv[1]) else 1)' "$FEED"; then
+  say "the timetable feed is incomplete — discarding it and fetching again"
+  rm -f "$FEED"
+fi
+
 if [ ! -f "$FEED" ]; then
   say "downloading the national timetable feed (~65 MB, CC0, no key needed)"
   "$VENV/bin/tripps" fetch-gtfs

@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import logging
 import sys
+import zipfile
 from datetime import date
 
 import httpx
@@ -72,17 +73,38 @@ async def _fetch_gtfs() -> int:
     if settings.trafiklab_gtfs_key:
         url = f"{url}?key={settings.trafiklab_gtfs_key}"
     target = settings.gtfs_zip_path
+    # Download beside the target and rename only once it is whole. 65 MB over a laptop's
+    # network is long enough to be interrupted — ctrl-c, dropped wifi, a closed lid — and a
+    # truncated file at the real path is worse than no file at all: every later run sees a
+    # feed present, skips the download, and dies on BadZipFile deep in the parser.
+    partial = target.with_suffix(target.suffix + ".part")
     print(f"downloading GTFS feed -> {target}")
-    async with httpx.AsyncClient(timeout=300.0, follow_redirects=True) as client:
-        async with client.stream("GET", url) as response:
-            if response.status_code != 200:
-                print(f"error: feed returned HTTP {response.status_code}", file=sys.stderr)
-                return 1
-            written = 0
-            with target.open("wb") as handle:
-                async for chunk in response.aiter_bytes(1 << 20):
-                    handle.write(chunk)
-                    written += len(chunk)
+    try:
+        async with httpx.AsyncClient(timeout=300.0, follow_redirects=True) as client:
+            async with client.stream("GET", url) as response:
+                if response.status_code != 200:
+                    print(f"error: feed returned HTTP {response.status_code}", file=sys.stderr)
+                    return 1
+                written = 0
+                with partial.open("wb") as handle:
+                    async for chunk in response.aiter_bytes(1 << 20):
+                        handle.write(chunk)
+                        written += len(chunk)
+
+        # A feed we cannot open is a failed download whatever the transport said.
+        if not zipfile.is_zipfile(partial):
+            print(
+                f"error: downloaded {written / 1e6:.1f} MB but it is not a zip archive; "
+                "the feed host may have served an error page. Try again.",
+                file=sys.stderr,
+            )
+            return 1
+
+        partial.replace(target)  # atomic: the real path only ever holds a complete feed
+    except BaseException:
+        partial.unlink(missing_ok=True)
+        raise
+
     print(f"wrote {written / 1e6:.1f} MB")
     return 0
 

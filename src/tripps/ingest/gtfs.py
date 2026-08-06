@@ -161,6 +161,22 @@ class GtfsStats:
     problems: list[str] = field(default_factory=list)
 
 
+def open_feed(zip_path: Path | str) -> zipfile.ZipFile:
+    """Open the GTFS zip, or explain what to do about it.
+
+    Every entry point into the feed goes through here — the timetable parse and the agency-stop
+    extraction both open it, and whichever runs first is the one a person sees fail. An
+    unopenable feed is nearly always a download cut short, so name the file and the command
+    that fixes it: `BadZipFile` raised five frames deep in the parser is not actionable.
+    """
+    if not zipfile.is_zipfile(zip_path):
+        raise ValueError(
+            f"the GTFS feed at {zip_path} is not a readable zip archive — most likely an "
+            f"interrupted download. Delete it and run `tripps fetch-gtfs` again."
+        )
+    return zipfile.ZipFile(zip_path)
+
+
 def _read_csv(zf: zipfile.ZipFile, name: str) -> list[dict[str, str]]:
     if name not in zf.namelist():
         return []
@@ -272,7 +288,7 @@ def load_timetable(
     stats = GtfsStats()
     builder = TimetableBuilder()
 
-    with zipfile.ZipFile(zip_path) as zf:
+    with open_feed(zip_path) as zf:
         agencies = {
             row["agency_id"]: row.get("agency_name", row["agency_id"])
             for row in _read_csv(zf, "agency.txt")
@@ -502,7 +518,7 @@ def extract_agency_stops(
 
 def _compute_agency_stops(zip_path: Path) -> dict[str, set[str]]:
     config = GtfsConfig()
-    with zipfile.ZipFile(zip_path) as zf:
+    with open_feed(zip_path) as zf:
         agencies = {
             row["agency_id"]: row.get("agency_name", row["agency_id"])
             for row in _read_csv(zf, "agency.txt")
