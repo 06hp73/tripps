@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .models import PassengerCategory, TransportMode
@@ -157,6 +157,22 @@ class Settings(BaseSettings):
     #: threshold: a server starting with rows older than this re-probes before the first
     #: scheduled maintenance pass, instead of serving a dead reading for `scheduler_seconds`.
     canary_stale_hours: int = 24
+
+    @model_validator(mode="after")
+    def _follow_data_dir(self) -> Settings:
+        """Keep the feed and the database inside `data_dir` when it moves.
+
+        Both defaults are built from the module-level DATA_DIR at class-definition time, so
+        setting TRIPPS_DATA_DIR alone used to move the directory and nothing in it: the app
+        created the new directory and went on reading the old one. Anything the caller set
+        explicitly is left alone — an absolute TRIPPS_DB_PATH outside the data dir stays put.
+        """
+        if "data_dir" in self.model_fields_set:
+            if "db_path" not in self.model_fields_set:
+                self.db_path = self.data_dir / "tripps.sqlite3"
+            if "gtfs_zip_path" not in self.model_fields_set:
+                self.gtfs_zip_path = self.data_dir / "sweden.zip"
+        return self
 
     def ensure_dirs(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)
