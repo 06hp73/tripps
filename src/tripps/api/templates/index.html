@@ -299,9 +299,39 @@
   .fare-day .m { font-size:.82rem; color:var(--dim); }
   .fare-day .hint { font-size:.7rem; color:var(--amber); margin-top:.3rem; }
 
+  /* On a phone the three-column board row costs more than it earns: the middle column
+     shrinks to a sliver and every station name wraps three deep. Give the row a header
+     line — departure on the left, what it costs on the right — and hand the full width
+     to the names underneath. The cost's <br>-stacked badges run inline there instead. */
   @media (max-width: 34rem) {
-    .leg { grid-template-columns:1fr auto; }
-    .leg .time { grid-column:1 / -1; }
+    /* One row for the strip: the wordmark and the clock earn their space, the
+       "Avgångar · Departures" subtitle does not once the screen is this narrow. */
+    .strip { padding:.4rem 1rem; gap:.7rem; flex-wrap:nowrap; }
+    .strip .dest { display:none; }
+    .wordmark { font-size:1.25rem; }
+    .strip .right { gap:.7rem; }
+    .strip a { font-size:.75rem; }
+    #clock { font-size:1rem; }
+
+    /* The price is the thing you are comparing, so it stays put: each itinerary's
+       head sticks under the strip while its own legs scroll beneath it, and hands
+       over to the next itinerary's head as that card arrives. */
+    .itin { padding-top:.55rem; }
+    .itin .head {
+      position:sticky; top:2.5rem; z-index:20; background:var(--panel);
+      margin:0 -1.1rem .45rem; padding:.4rem 1.1rem .4rem;
+      border-bottom:1px solid var(--edge);
+    }
+
+    .leg { grid-template-columns:1fr auto; gap:.3rem .7rem; padding:.55rem 0; }
+    .leg .time { grid-column:1; grid-row:1; font-size:.82rem; }
+    .leg .cost { grid-column:2; grid-row:1; white-space:normal; font-size:.9rem; }
+    .leg .cost br { display:none; }
+    .leg .cost .badge, .leg .cost a.book { margin-left:.35rem; }
+    .leg .what { grid-column:1 / -1; grid-row:2; }
+    /* the mode reads fine as an inline prefix; as an eyebrow it costs a line per leg */
+    .leg .what .mode { margin-right:.45rem; }
+    .leg .what .mode + br { display:none; }
     .price { font-size:1.6rem; }
   }
 </style>
