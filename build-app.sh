@@ -43,8 +43,15 @@ PLIST
 # needs to see is on the boot screen in their browser.
 cat > "$APP/Contents/MacOS/tripps" <<'LAUNCH'
 #!/bin/bash
-here="$(cd "$(dirname "$0")/../../.." && pwd)"
-cd "$here" || exit 1
+# A packaged bundle carries everything in Contents/Resources — that is what lets one
+# signature cover the whole app. A bundle built inside a source checkout carries nothing,
+# so it falls back to the project folder three levels up.
+res="$(cd "$(dirname "$0")/../Resources" && pwd)"
+if [ -f "$res/run.sh" ]; then
+  cd "$res" || exit 1
+else
+  cd "$(dirname "$0")/../../.." || exit 1
+fi
 exec ./run.sh
 LAUNCH
 chmod +x "$APP/Contents/MacOS/tripps"

@@ -103,7 +103,10 @@ fi
 #
 # A packaged download already has its dependencies inside .python, so it needs neither a
 # virtualenv nor pip nor a network. Skip straight to running.
-if [ -f ".tripps-packaged" ] && [ -x "$PY_DIR/bin/tripps" ]; then
+if [ -f ".tripps-packaged" ] && [ -x "python/bin/python3" ]; then
+  VENV="python"          # inside the bundle it is Contents/Resources/python
+  STAMP=""
+elif [ -f ".tripps-packaged" ] && [ -x "$PY_DIR/bin/python3" ]; then
   VENV="$PY_DIR"
   STAMP=""
 elif [ ! -x "$VENV/bin/python" ]; then
@@ -159,13 +162,13 @@ fi
 
 if [ ! -f "$FEED" ]; then
   say "downloading the national timetable feed (~65 MB, CC0, no key needed)"
-  "$VENV/bin/tripps" fetch-gtfs
+  "$VENV/bin/python" -m tripps fetch-gtfs
 fi
 
 # --- 5. go ------------------------------------------------------------------
 # Any argument means "you know what you want" — hand it straight to the CLI.
 if [ $# -gt 0 ]; then
-  exec "$VENV/bin/tripps" "$@"
+  exec "$VENV/bin/python" -m tripps "$@"
 fi
 
 if "$VENV/bin/python" -c "
@@ -196,4 +199,4 @@ sys.exit(0 if socket.socket().connect_ex(('127.0.0.1', $PORT)) == 0 else 1)
   done
 ) &
 
-exec "$VENV/bin/tripps" serve --port "$PORT"
+exec "$VENV/bin/python" -m tripps serve --port "$PORT"

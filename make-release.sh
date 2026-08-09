@@ -47,24 +47,41 @@ say "installing dependencies into it"
 "$OUT/.python/bin/python3" -m pip install -q . >/dev/null
 
 # --- the app ------------------------------------------------------------------
+# Everything goes INSIDE the bundle. Gatekeeper only vouches for what a signature covers, so
+# an interpreter sitting next to the .app rather than within it would leave the download
+# quarantined however well the launcher itself were notarized — and the whole point of
+# notarizing is to remove that prompt. One bundle, one signature, one verdict.
 say "building tripps.app"
 ./build-app.sh >/dev/null
 cp -R "tripps.app" "$OUT/tripps.app"
-cp run.sh pyproject.toml README.md LICENSE .env.example "$OUT/"
-cp -R src "$OUT/src"
+
+RES="$OUT/tripps.app/Contents/Resources"
+mv "$OUT/.python" "$RES/python"
+cp -R src "$RES/src"
+cp pyproject.toml README.md LICENSE .env.example "$RES/"
+cp run.sh "$RES/run.sh"
 
 if [ "$WITH_FEED" = "1" ]; then
   [ -f data/sweden.zip ] || die "no data/sweden.zip to bake in. Run ./run.sh once first."
   say "baking in today's timetable feed"
-  mkdir -p "$OUT/data"
-  cp data/sweden.zip "$OUT/data/sweden.zip"
+  mkdir -p "$RES/data"
+  cp data/sweden.zip "$RES/data/sweden.zip"
 fi
 
-# In the packaged folder the dependencies are already inside .python, so run.sh must use it
-# directly instead of building a virtualenv on the far end. This marker says so.
-cat > "$OUT/.tripps-packaged" <<'NOTE'
-This folder ships its own Python with the dependencies already installed.
-run.sh sees this file and uses .python directly instead of creating a virtualenv.
+cat > "$RES/.tripps-packaged" <<'NOTE'
+This bundle ships its own Python with the dependencies already installed.
+run.sh sees this file and uses it directly instead of creating a virtualenv.
+NOTE
+
+# A short note beside the app, for anyone who opens the folder before the app.
+cat > "$OUT/README.txt" <<'NOTE'
+tripps — the cheapest way across Sweden.
+
+Double-click "tripps". Nothing to install first.
+
+The first launch opens a browser showing what it is loading, then the planner.
+Your searches, travel cards and downloaded timetables are kept in
+~/Library/Application Support/tripps, so replacing this app never loses them.
 NOTE
 
 say "zipping"
