@@ -7,6 +7,8 @@ truly need a credential get disabled.
 
 from __future__ import annotations
 
+import os
+import sys
 from pathlib import Path
 
 from pydantic import Field, model_validator
@@ -15,7 +17,36 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from .models import PassengerCategory, TransportMode
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = PROJECT_ROOT / "data"
+
+
+def _default_data_dir() -> Path:
+    """Where the feed, the timetable cache and the database live.
+
+    Order matters, and each branch exists for a real deployment:
+
+    1. `TRIPPS_DATA_DIR` — an explicit choice always wins. Docker sets it.
+    2. `<checkout>/data` when the package sits in a source tree (`.../src/tripps/config.py`
+       with a `pyproject.toml` two levels up). A developer's state stays in their checkout,
+       which is what every existing install expects.
+    3. The platform's user data directory. This is the packaged-app case: a `.app` may live
+       in /Applications, be quarantined, be replaced wholesale on update, or be read-only, so
+       writing 68 MB of feed and a SQLite database *inside the bundle* is wrong. It also frees
+       the Docker image from the editable-install requirement, since nothing depends any more
+       on the package's own path.
+    """
+    env = os.environ.get("TRIPPS_DATA_DIR")
+    if env:
+        return Path(env).expanduser()
+
+    if (PROJECT_ROOT / "pyproject.toml").is_file():
+        return PROJECT_ROOT / "data"
+
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / "tripps"
+    return Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / "tripps"
+
+
+DATA_DIR = _default_data_dir()
 
 
 class PricingBudget(BaseSettings):

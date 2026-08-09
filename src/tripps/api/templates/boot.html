@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tripps — starting up</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzBFMTExNiIvPjxyZWN0IHg9IjQiIHk9IjI0IiB3aWR0aD0iMjQiIGhlaWdodD0iMi41IiBmaWxsPSIjRjVDNTE4Ii8+PHJlY3QgeD0iNSIgeT0iNyIgd2lkdGg9IjgiIGhlaWdodD0iMyIgZmlsbD0iI0U4RTZFMSIvPjxyZWN0IHg9IjE1IiB5PSI3IiB3aWR0aD0iMTIiIGhlaWdodD0iMyIgZmlsbD0iI0Y1QzUxOCIvPjxyZWN0IHg9IjUiIHk9IjEzIiB3aWR0aD0iMTQiIGhlaWdodD0iMyIgZmlsbD0iIzhBOTNBMCIvPjxyZWN0IHg9IjIxIiB5PSIxMyIgd2lkdGg9IjYiIGhlaWdodD0iMyIgZmlsbD0iIzNERDY4QyIvPjxyZWN0IHg9IjUiIHk9IjE5IiB3aWR0aD0iMTAiIGhlaWdodD0iMyIgZmlsbD0iIzhBOTNBMCIvPjwvc3ZnPg==">
+<meta name="color-scheme" content="dark light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ------------------------------------------------------------------ *
+     The board waking up.
+
+     Same instrument as the app itself — a station departure board — caught in
+     the moment before it has anything to display. Each startup stage is a row,
+     and its result lands the way a mechanical board lands: the character cells
+     flutter, then settle. That is the one flourish here; everything around it
+     stays still, because a person watching a progress screen wants to read it,
+     not be performed at.
+
+     Nothing is invented for effect. Every row reports a real stage, and the
+     numbers that land in it are the real counts.
+   * ------------------------------------------------------------------ */
+  :root {
+    --bg:#0E1116; --panel:#161B22; --raise:#1B212A; --edge:#232A34;
+    --ink:#E8E6E1; --dim:#8A93A0; --faint:#5C6672;
+    --amber:#F5C518; --free:#3DD68C; --warn:#FF9E6D;
+    --shadow:0 1px 0 rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg:#F4F1EA; --panel:#FFFFFF; --raise:#FBF9F4; --edge:#DDD7C9;
+      --ink:#15181D; --dim:#5F6670; --faint:#8A9099;
+      --amber:#8A5A00; --free:#0B7A4E; --warn:#8A4416;
+      --shadow:0 1px 2px rgba(20,23,28,.06);
+    }
+  }
+
+  *, *::before, *::after { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+    font-family:"Barlow Condensed","Oswald","Arial Narrow",system-ui,sans-serif;
+    font-size:17px; line-height:1.45; -webkit-font-smoothing:antialiased;
+    display:flex; align-items:center; justify-content:center; padding:1.5rem;
+    /* a faint pool of light above the board, so the panel reads as lit rather than flat */
+    background-image:radial-gradient(120% 80% at 50% -20%, rgba(245,197,24,.07), transparent 60%);
+  }
+  .mono { font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+          font-variant-numeric:tabular-nums; }
+
+  .board { width:min(52rem,100%); }
+
+  .masthead {
+    display:flex; align-items:baseline; gap:.9rem; flex-wrap:nowrap;
+    border-bottom:2px solid var(--amber); padding-bottom:.7rem; margin-bottom:1.6rem;
+  }
+  .wordmark { font-size:1.9rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+              line-height:1; white-space:nowrap; }
+  .wordmark b { color:var(--amber); }
+  /* Wide tracking is the point of this label, so it does not survive being wrapped —
+     below the width where it fits on one line it is dropped rather than folded. */
+  .masthead .what { font-size:.82rem; letter-spacing:.34em; text-transform:uppercase;
+                    color:var(--dim); white-space:nowrap; overflow:hidden; }
+  .masthead .clock { margin-left:auto; font-size:.9rem; color:var(--faint);
+                     letter-spacing:.1em; white-space:nowrap; }
+
+  /* The rows are the subject of this screen, so the words above them stay out of the way:
+     on a short window the board has to be visible without scrolling, or it is not a
+     progress screen at all. */
+  h1 { font-size:clamp(2rem, 5.2vw, 3.4rem); font-weight:600; letter-spacing:-.025em;
+       line-height:1; margin:0 0 .45rem; }
+  .lede { color:var(--dim); margin:0 0 1.8rem; font-size:clamp(1rem, 1.5vw, 1.2rem); max-width:44ch; }
+
+  /* --- the rows ---------------------------------------------------- */
+  .rows { border:1px solid var(--edge); background:var(--panel); box-shadow:var(--shadow); }
+  .row {
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+    gap:1rem; padding:1.15rem 1.35rem; border-top:1px dotted var(--edge);
+  }
+  .row:first-child { border-top:0; }
+
+  /* the lamp: the only moving thing besides the flaps */
+  .lamp { width:9px; height:9px; border-radius:50%; background:var(--faint); opacity:.45; flex:0 0 auto; }
+  .row[data-state="active"] .lamp { background:var(--amber); opacity:1; animation:pulse 1.15s ease-in-out infinite; }
+  .row[data-state="done"]   .lamp { background:var(--free); opacity:1; box-shadow:0 0 10px rgba(61,214,140,.5); }
+  .row[data-state="failed"] .lamp { background:var(--warn); opacity:1; }
+  @keyframes pulse { 0%,100%{opacity:.28} 50%{opacity:1} }
+
+  .label { font-size:1.22rem; font-weight:500; color:var(--dim); }
+  .row[data-state="active"] .label,
+  .row[data-state="done"] .label { color:var(--ink); }
+
+  .detail { font-size:.92rem; letter-spacing:.06em; color:var(--free); text-align:right; white-space:nowrap; }
+  .row[data-state="failed"] .detail { color:var(--warn); }
+  .row[data-state="pending"] .detail,
+  .row[data-state="active"]  .detail { color:var(--faint); }
+
+  /* --- progress rail ------------------------------------------------ */
+  .rail { height:3px; background:var(--edge); margin-top:1.6rem; overflow:hidden; }
+  .rail i { display:block; height:100%; width:0; background:var(--amber); transition:width .6s cubic-bezier(.2,.8,.3,1); }
+  .foot { display:flex; justify-content:space-between; align-items:baseline;
+          margin-top:.7rem; font-size:.78rem; color:var(--faint); letter-spacing:.08em; }
+
+  .trouble { margin-top:1.5rem; padding:.9rem 1.1rem; border:1px solid var(--edge);
+             border-left:3px solid var(--warn); background:var(--raise); display:none; }
+  .trouble.on { display:block; }
+  .trouble p { margin:0; color:var(--dim); font-size:.95rem; }
+  .trouble code { color:var(--amber); font-family:"JetBrains Mono",monospace; font-size:.85rem; }
+  .trouble .anyway { margin-top:.55rem; }
+  .trouble .anyway a { color:var(--amber); text-decoration:none; font-size:.9rem; letter-spacing:.04em; }
+  .trouble .anyway a:hover { text-decoration:underline; }
+
+  @media (max-width:44rem) {
+    .masthead .what { display:none; }
+  }
+  @media (max-width:34rem) {
+    h1 { font-size:1.8rem; }
+    .lede { font-size:.95rem; margin-bottom:1rem; }
+    .label { font-size:1.02rem; }
+    .detail { font-size:.78rem; }
+    .row { gap:.6rem; padding:.7rem .85rem; }
+  }
+  /* Only when the label and its result genuinely cannot share a line do they stop trying.
+     Stacking earlier than this tripled every row's height and pushed the board off screen. */
+  @media (max-width:25rem) {
+    .row { grid-template-columns:auto 1fr; }
+    .detail { grid-column:2; text-align:left; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row[data-state="active"] .lamp { animation:none; opacity:1; }
+    .rail i { transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="board">
+  <div class="masthead">
+    <div class="wordmark">trip<b>ps</b></div>
+    <div class="what">Startar · Warming up</div>
+    <div class="clock mono" id="clock">0.0 s</div>
+  </div>
+
+  <h1>Reading Sweden.</h1>
+  <p class="lede">Every train, coach and free rental car, once. Then it opens straight away.</p>
+
+  <div class="rows" id="rows"></div>
+
+  <div class="rail"><i id="rail"></i></div>
+  <div class="foot">
+    <span id="foot-note">Reading the national feed</span>
+    <span class="mono" id="foot-count"></span>
+  </div>
+
+  <div class="trouble" id="trouble">
+    <p id="trouble-text"></p>
+    <p class="anyway"><a href="/?boot=skip">Open tripps anyway →</a></p>
+  </div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·";
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const rowsEl = document.getElementById("rows");
+  const railEl = document.getElementById("rail");
+  const clockEl = document.getElementById("clock");
+  const troubleEl = document.getElementById("trouble");
+  const troubleText = document.getElementById("trouble-text");
+  const footNote = document.getElementById("foot-note");
+  const footCount = document.getElementById("foot-count");
+
+  let boot = {{ boot | tojson }};
+  const settled = new Map();   // key -> the detail text already displayed
+
+  const esc = s => String(s).replace(/[&<>"']/g, c =>
+    ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  function render() {
+    rowsEl.innerHTML = boot.steps.map(s => `
+      <div class="row" data-state="${esc(s.state)}" data-key="${esc(s.key)}">
+        <span class="lamp"></span>
+        <span class="label">${esc(s.label)}</span>
+        <span class="detail mono" data-detail>${esc(detailFor(s))}</span>
+      </div>`).join("");
+
+    for (const s of boot.steps) {
+      const cell = rowsEl.querySelector(`.row[data-key="${s.key}"] [data-detail]`);
+      if (!cell) continue;
+      // Flap only on the transition into a real result — never on every poll, which
+      // would leave the board permanently twitching.
+      if (s.detail && settled.get(s.key) !== s.detail) {
+        settled.set(s.key, s.detail);
+        flap(cell, s.detail);
+      }
+    }
+
+    railEl.style.width = Math.round(boot.progress * 100) + "%";
+    const active = boot.steps.find(s => s.state === "active");
+    footNote.textContent = active ? active.label
+      : boot.failed ? "Stopped" : "Ready";
+    footCount.textContent =
+      boot.steps.filter(s => s.state === "done").length + " / " + boot.steps.length;
+
+    const failed = boot.steps.find(s => s.state === "failed");
+    if (failed) {
+      troubleEl.classList.add("on");
+      troubleText.innerHTML = esc(failed.detail || "Something did not start.")
+        .replace(/`([^`]+)`/g, "<code>$1</code>");
+    }
+  }
+
+  function detailFor(s) {
+    // Backticks mark a command for the panel below, where it is set as code. In the row
+    // itself they are just punctuation nobody asked for.
+    if (s.detail) return s.detail.replace(/`/g, "");
+    if (s.state === "active") return "···";
+    return "";
+  }
+
+  // A split-flap cell: characters tumble, then settle left to right. Short on purpose —
+  // it marks the moment a number lands, it is not a loading animation in its own right.
+  function flap(cell, text) {
+    if (reduced) { cell.textContent = text; return; }
+    const chars = [...text];
+    const done = chars.map(() => false);
+    let ticks = 0;
+    const id = setInterval(() => {
+      ticks++;
+      for (let i = 0; i < chars.length; i++) {
+        if (!done[i] && ticks > i * 0.7 + 3) done[i] = true;
+      }
+      cell.textContent = chars
+        .map((c, i) => (done[i] || c === " ") ? c
+             : GLYPHS[(Math.random() * GLYPHS.length) | 0])
+        .join("");
+      if (done.every(Boolean)) { clearInterval(id); cell.textContent = text; }
+    }, 34);
+  }
+
+  const t0 = performance.now() - (boot.elapsed || 0) * 1000;
+  setInterval(() => {
+    clockEl.textContent = ((performance.now() - t0) / 1000).toFixed(1) + " s";
+  }, 100);
+
+  async function poll() {
+    try {
+      const r = await fetch("/api/boot", { cache: "no-store" });
+      if (r.ok) {
+        boot = await r.json();
+        render();
+        // A failed start stays on screen. Reloading straight past the one line that says
+        // what to do would leave someone in the app with a search that cannot work and no
+        // idea why — so the remedy waits here until they choose to go on.
+        if (boot.ready && !boot.failed) {
+          // Let the last flap finish landing before the board turns over.
+          setTimeout(() => location.reload(), reduced ? 120 : 620);
+          return;
+        }
+        if (boot.failed) return;
+      }
+    } catch (_) {
+      /* the server is still coming up, or is restarting — just try again */
+    }
+    setTimeout(poll, 700);
+  }
+
+  render();
+  poll();
+})();
+</script>
+</body>
+</html>

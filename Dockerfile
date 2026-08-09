@@ -1,11 +1,12 @@
 # tripps — cheapest multimodal travel routing within Sweden.
 #
-# Installed EDITABLE on purpose: config.PROJECT_ROOT is `parents[2]` of the package, so an
-# editable install keeps it resolving to /app (and the data dir to /app/data). A regular
-# `pip install .` would relocate the package into site-packages and break that path.
+# The data dir is chosen by config._default_data_dir(), and TRIPPS_DATA_DIR below settles it
+# outright — so nothing depends on where the package itself ends up. The editable install is
+# kept only because it makes the layer cheap to rebuild during development.
 FROM python:3.12-slim
 
-ENV PYTHONUNBUFFERED=1 \
+ENV TRIPPS_DATA_DIR=/app/data \
+    PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 

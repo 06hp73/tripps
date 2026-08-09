@@ -16,6 +16,7 @@ import logging
 import time
 from collections import OrderedDict
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -75,6 +76,69 @@ log = logging.getLogger(__name__)
 TEMPLATES = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 
+@dataclass
+class BootStep:
+    """One visible stage of startup.
+
+    Named for what it gets the traveller, not for the machinery: someone waiting on a first
+    launch wants to know the timetables are loading, not that a pickle is being unpacked.
+    """
+
+    key: str
+    label: str
+    state: str = "pending"  # pending | active | done | failed
+    detail: str = ""
+
+
+class BootProgress:
+    """Startup as something you can watch, rather than a frozen window.
+
+    Warmup used to run inside the lifespan, so uvicorn accepted no connections until the feed
+    was parsed and two upstreams answered — tens of seconds of a browser saying it cannot
+    connect. Now the server is up immediately and this is what it serves meanwhile.
+    """
+
+    def __init__(self) -> None:
+        self.steps = [
+            BootStep("feed", "Reading the timetable"),
+            BootStep("cars", "Finding free cars"),
+            BootStep("fares", "Opening fare connections"),
+        ]
+        self.ready = False
+        self.failed = False
+        self.started = time.monotonic()
+
+    def _step(self, key: str) -> BootStep:
+        return next(s for s in self.steps if s.key == key)
+
+    def begin(self, key: str) -> None:
+        self._step(key).state = "active"
+
+    def finish(self, key: str, detail: str = "") -> None:
+        step = self._step(key)
+        step.state = "done"
+        step.detail = detail
+
+    def fail(self, key: str, detail: str) -> None:
+        step = self._step(key)
+        step.state = "failed"
+        step.detail = detail
+        self.failed = True
+
+    def payload(self) -> dict:
+        done = sum(1 for s in self.steps if s.state == "done")
+        return {
+            "ready": self.ready,
+            "failed": self.failed,
+            "elapsed": round(time.monotonic() - self.started, 1),
+            "progress": done / len(self.steps),
+            "steps": [
+                {"key": s.key, "label": s.label, "state": s.state, "detail": s.detail}
+                for s in self.steps
+            ],
+        }
+
+
 class AppState:
     """Holds the things that are expensive to build and cheap to share."""
 
@@ -95,6 +159,8 @@ class AppState:
             base_url=settings.freerider_base, user_agent=settings.user_agent
         )
         self.errors: list[str] = []
+        self.boot = BootProgress()
+        self._boot_task: asyncio.Task | None = None
         self._poller: asyncio.Task | None = None
         self._scheduler: asyncio.Task | None = None
 
@@ -388,6 +454,57 @@ def _fare_table(settings: Settings) -> StaticFareAdapter:
     return StaticFareAdapter.load(settings.data_dir / "fares.json")
 
 
+async def _warm_up(state: AppState) -> None:
+    """Everything the first search needs, done where it can be watched.
+
+    Each step still has to finish before a search is honest — a timetable that is not parsed
+    cannot route, and an empty car inventory silently drops the cheapest itineraries — but
+    none of it has to happen before the socket opens. Parsing is CPU-bound and synchronous,
+    so it goes to a thread; blocking the event loop here would stall the very requests that
+    are polling to see how it is going.
+    """
+    boot = state.boot
+    try:
+        boot.begin("feed")
+        try:
+            await asyncio.to_thread(state.planner_for, now_local().date())
+            tt = state._timetables.get(state.timetable_date)
+            boot.finish(
+                "feed",
+                f"{tt.num_stops:,} stops · {tt.num_trips:,} departures".replace(",", " ")
+                if tt
+                else "",
+            )
+        except FileNotFoundError as exc:
+            # The app must still run so /health and the boot screen can explain what is
+            # missing; a search will say the same thing rather than pretending.
+            log.error("%s", exc)
+            state.errors.append(str(exc))
+            boot.fail("feed", "No timetable feed yet — run `tripps fetch-gtfs`.")
+
+        boot.begin("cars")
+        await state.refresh_freerider()
+        boot.finish("cars", f"{len(state.freerider_offers)} free cars in Sweden")
+
+        # Resolve the SJ subscription key now, so the first search does not pay for
+        # extracting it from the site bundle mid-request.
+        boot.begin("fares")
+        await state.warm_sj_key()
+        boot.finish("fares", "live prices ready")
+
+        state.start_polling()
+    except asyncio.CancelledError:
+        raise
+    except Exception as exc:  # noqa: BLE001 - a failed warmup must still leave a usable app
+        log.exception("warmup failed")
+        state.errors.append(str(exc))
+        for step in boot.steps:
+            if step.state == "active":
+                boot.fail(step.key, str(exc))
+    finally:
+        boot.ready = True
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
@@ -395,23 +512,14 @@ async def lifespan(app: FastAPI):
     state = AppState(settings)
     app.state.app_state = state
 
-    try:
-        state.planner_for(now_local().date())
-    except FileNotFoundError as exc:
-        # The app must still start so /health can explain what is missing.
-        log.error("%s", exc)
-        state.errors.append(str(exc))
-
-    # Load the car inventory before serving: a search that runs in the gap before the first
-    # poll would report "no Freerider offers" and quietly drop the cheapest itineraries.
-    await state.refresh_freerider()
-    # Resolve the SJ subscription key now, so the first search does not pay for extracting
-    # it from the site bundle mid-request.
-    await state.warm_sj_key()
-    state.start_polling()
+    # Warm up behind the server rather than in front of it, so the first thing a person sees
+    # is the app telling them what it is doing instead of the browser refusing to connect.
+    state._boot_task = asyncio.create_task(_warm_up(state))
     try:
         yield
     finally:
+        if state._boot_task and not state._boot_task.done():
+            state._boot_task.cancel()
         await state.stop()
 
 
@@ -1143,9 +1251,27 @@ async def api_canary(request: Request) -> JSONResponse:
 # --- web UI ----------------------------------------------------------------
 
 
+@app.get("/api/boot")
+async def boot_status(request: Request) -> JSONResponse:
+    """What startup is doing right now. Polled by the boot screen, once a second."""
+    return JSONResponse(_state(request).boot.payload())
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
     state = _state(request)
+    # Before the timetable is in memory the planner cannot answer anything, so showing the
+    # search form would be a lie: every field would work and every search would fail. Show
+    # what is actually happening instead, and swap to the real thing when it is true.
+    # `?boot=skip` is the escape hatch the boot screen offers after a failed start: the app
+    # is then honest in its own way, with the error in the banner.
+    # `ready` only means warmup stopped running, not that it worked — a failed start sets it
+    # too, so gating on it alone served the search form over a planner that cannot route.
+    usable = state.boot.ready and not state.boot.failed
+    if not usable and request.query_params.get("boot") != "skip":
+        return TEMPLATES.TemplateResponse(
+            request, "boot.html", {"boot": state.boot.payload()}
+        )
     return TEMPLATES.TemplateResponse(
         request,
         "index.html",
