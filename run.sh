@@ -91,8 +91,22 @@ EOF
   rm -rf "$tmp"
 }
 
+# The packaging script needs the private interpreter specifically — not whatever Python this
+# machine happens to have — because that is what gets shipped. This is the seam for it.
+if [ "${TRIPPS_BOOTSTRAP_ONLY:-0}" = "1" ]; then
+  [ -x "$PY_DIR/bin/python3" ] || fetch_python
+  say "private Python ready at $PY_DIR"
+  exit 0
+fi
+
 # --- 2. the virtualenv ------------------------------------------------------
-if [ ! -x "$VENV/bin/python" ]; then
+#
+# A packaged download already has its dependencies inside .python, so it needs neither a
+# virtualenv nor pip nor a network. Skip straight to running.
+if [ -f ".tripps-packaged" ] && [ -x "$PY_DIR/bin/tripps" ]; then
+  VENV="$PY_DIR"
+  STAMP=""
+elif [ ! -x "$VENV/bin/python" ]; then
   if command -v uv >/dev/null 2>&1; then
     say "creating $VENV (uv)"
     uv venv --python 3.12 "$VENV" >/dev/null
@@ -104,7 +118,9 @@ if [ ! -x "$VENV/bin/python" ]; then
 fi
 
 # --- 3. dependencies, only when pyproject.toml is newer than the last install ---
-if [ ! -f "$STAMP" ] || [ pyproject.toml -nt "$STAMP" ]; then
+# An empty STAMP means a packaged folder: the dependencies shipped with it, so there is
+# nothing to install and no pip to install it with.
+if [ -n "$STAMP" ] && { [ ! -f "$STAMP" ] || [ pyproject.toml -nt "$STAMP" ]; }; then
   say "installing dependencies (a minute the first time)"
   if command -v uv >/dev/null 2>&1; then
     uv pip install --python "$VENV/bin/python" -q -e ".[dev]"
@@ -120,11 +136,25 @@ fi
 # skips the download and fails deep in the parser. Downloads are atomic now, so this only
 # catches files left by an older version or copied in by hand — but it costs milliseconds
 # and turns "delete this file yourself" into something the button just handles.
-FEED="${TRIPPS_GTFS_ZIP_PATH:-${TRIPPS_DATA_DIR:-data}/sweden.zip}"
+# Ask the app where its feed belongs rather than guessing: a checkout keeps it beside the
+# source, an installed copy keeps it in the user's data directory, and TRIPPS_DATA_DIR beats
+# both. Guessing here got that wrong for a packaged folder and re-downloaded 68 MB that was
+# already sitting in it.
+FEED="$("$VENV/bin/python" -c 'from tripps.config import get_settings; print(get_settings().gtfs_zip_path)')"
+
 if [ -f "$FEED" ] && ! "$VENV/bin/python" -c \
      'import sys, zipfile; sys.exit(0 if zipfile.is_zipfile(sys.argv[1]) else 1)' "$FEED"; then
   say "the timetable feed is incomplete — discarding it and fetching again"
   rm -f "$FEED"
+fi
+
+# A packaged download ships today's feed inside it. Seed the real data directory from that
+# copy instead of fetching: the feed is a cache, so it belongs where the app writes, and the
+# whole point of shipping it is that the first launch needs no network at all.
+if [ ! -f "$FEED" ] && [ -f "data/sweden.zip" ] && [ "$FEED" != "$PWD/data/sweden.zip" ]; then
+  say "unpacking the timetables that came with the download"
+  mkdir -p "$(dirname "$FEED")"
+  cp "data/sweden.zip" "$FEED.part" && mv "$FEED.part" "$FEED"
 fi
 
 if [ ! -f "$FEED" ]; then

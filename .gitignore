@@ -21,3 +21,4 @@ __pycache__/
 
 # built by ./build-app.sh
 tripps.app/
+dist/

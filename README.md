@@ -248,10 +248,26 @@ Two things this touches that are easy to miss:
 
 ## Install and run
 
-Needs **Python 3.12+** and nothing else — no accounts, no API keys.
+No accounts, no API keys, and — if you take the packaged download — nothing to install first,
+not even Python.
 
-**On a Mac, double-click `tripps` in the folder.** A Terminal window opens, the setup runs,
-and the browser lands on the planner. Nothing else to install first.
+### The download
+
+Grab `tripps-macos-arm64.zip` (Apple Silicon) or `tripps-macos-x86_64.zip` (Intel), unzip it,
+and double-click **tripps**. It carries its own Python, its dependencies and today's
+timetables, so the first launch needs no network and no toolchain: the browser opens on a
+board showing what it is loading, and lands on the planner when it is ready.
+
+Build one yourself with `./make-release.sh --with-feed` (~112 MB).
+
+### From source
+
+Needs **Python 3.12+**, or nothing at all — `run.sh` fetches its own interpreter if your Mac
+has none, since macOS ships Python 3.9 and typing `python3` on a clean Mac only offers to
+install Xcode.
+
+**Double-click `tripps` in the folder**, or run `./run.sh`. Setup happens once; the browser
+lands on the planner.
 
 > The first double-click on a folder you downloaded as a ZIP may say *"cannot be opened
 > because it is from an unidentified developer."* macOS quarantines anything that arrived via
