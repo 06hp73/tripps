@@ -101,6 +101,8 @@
   }
   .suggest li { padding:.45rem .55rem; cursor:pointer; font-size:.95rem; border-radius:2px; }
   .suggest li[aria-selected="true"], .suggest li:hover { background:var(--amber); color:var(--amber-ink); }
+  /* not a choice — a reason there are none */
+  .suggest li.note, .suggest li.note:hover { background:none; color:var(--dim); cursor:default; }
 
   .full { grid-column:1 / -1; }
   .checks { display:flex; gap:1.1rem; align-items:center; flex-wrap:wrap; }
@@ -499,6 +501,21 @@
       close();
     };
 
+    // A lookup that fails silently is indistinguishable from a station that does not exist,
+    // and the most common cause — a tab still pointing at a server that has been restarted —
+    // leaves the page looking perfectly healthy. Say which of the two it is.
+    const note = (text) => {
+      items = []; active = -1;
+      list.innerHTML = "";
+      const li = document.createElement("li");
+      li.className = "note";
+      li.textContent = text;
+      li.setAttribute("aria-disabled", "true");
+      list.appendChild(li);
+      list.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+    };
+
     let timer = null;
     input.addEventListener("input", () => {
       const q = input.value.trim();
@@ -508,13 +525,18 @@
         const mine = ++seq;
         try {
           const res = await fetch("/api/stops?q=" + encodeURIComponent(q));
-          if (!res.ok) return;
-          const data = await res.json();
           if (mine !== seq) return; // a newer keystroke already fired
+          if (!res.ok) { note("station lookup failed (" + res.status + ")"); return; }
+          const data = await res.json();
+          if (mine !== seq) return;
+          if (!data.length) { note("no station matches that"); return; }
           items = data.map((s) => s.name);
           active = -1;
           render();
-        } catch (_) { /* offline: no suggestions, typing still works */ }
+        } catch (_) {
+          if (mine !== seq) return;
+          note("can’t reach tripps — reload the page");
+        }
       }, 140);
     });
 
