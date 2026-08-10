@@ -31,6 +31,7 @@ from ..ingest.flights import GoogleFlightsProvider, NullFlightProvider
 from ..ingest.freerider import (
     FreeriderClient,
     FreeriderCostModel,
+    crossing_into,
     offers_to_log_rows,
     only_within,
     parse_offers,
@@ -155,6 +156,8 @@ class AppState:
         self._timetables: OrderedDict[date, Timetable] = OrderedDict()
         self.timetable_date: date | None = None
         self.freerider_offers: list = []
+        #: cars that end in Sweden but start abroad — not routable, but counted by Hertz
+        self.freerider_arriving: int = 0
         self.freerider_client = FreeriderClient(
             base_url=settings.freerider_base, user_agent=settings.user_agent
         )
@@ -286,7 +289,10 @@ class AppState:
     async def refresh_freerider(self) -> None:
         try:
             raw = await self.freerider_client.fetch_raw("SWEDEN")
-            offers = only_within(parse_offers(raw), "se")
+            all_offers = parse_offers(raw)
+            offers = only_within(all_offers, "se")
+            # Kept only to explain the gap against hertzfreerider.se's own Sweden count.
+            self.freerider_arriving = len(crossing_into(all_offers, "se"))
         except Exception as exc:  # noqa: BLE001 - an undocumented endpoint may vanish
             log.warning("freerider refresh failed: %s", exc)
             self.db.set_health("freerider-inventory", "down", str(exc))
@@ -484,7 +490,11 @@ async def _warm_up(state: AppState) -> None:
 
         boot.begin("cars")
         await state.refresh_freerider()
-        boot.finish("cars", f"{len(state.freerider_offers)} free cars in Sweden")
+        cars = f"{len(state.freerider_offers)} free cars in Sweden"
+        if state.freerider_arriving:
+            # Reconciles with hertzfreerider.se, which counts these on its Sweden page.
+            cars += f" · {state.freerider_arriving} more start abroad"
+        boot.finish("cars", cars)
 
         # Resolve the SJ subscription key now, so the first search does not pay for
         # extracting it from the site bundle mid-request.

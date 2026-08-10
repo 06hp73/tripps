@@ -321,6 +321,23 @@ def only_within(offers: list[FreeriderOffer], country: str = "se") -> list[Freer
     ]
 
 
+def crossing_into(offers: list[FreeriderOffer], country: str = "se") -> list[FreeriderOffer]:
+    """Offers that end in `country` but start outside it.
+
+    `only_within` drops these, which is right for routing — no Swedish timetable reaches
+    Sandnessjøen, so an itinerary starting there could never be built. But it leaves our car
+    count lower than the number on hertzfreerider.se, whose Sweden page lists them, and a
+    number that quietly disagrees with the operator's own site invites doubt about every
+    other number we print. So we count them and say so, rather than hiding the difference.
+    """
+    country = country.lower()
+    return [
+        o
+        for o in offers
+        if o.dropoff.country == country and o.pickup.country != country
+    ]
+
+
 def schema_drift(offers: list[FreeriderOffer]) -> list[str]:
     """Contract check: has the meaning of `distance` changed?
 

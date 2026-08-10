@@ -18,6 +18,7 @@ from .ingest.flights import GoogleFlightsProvider, NullFlightProvider
 from .ingest.freerider import (
     FreeriderClient,
     FreeriderCostModel,
+    crossing_into,
     offers_to_log_rows,
     only_within,
     parse_offers,
@@ -116,7 +117,9 @@ async def _freerider(as_json: bool) -> int:
     cost = FreeriderCostModel()
     try:
         raw = await client.fetch_raw("SWEDEN")
-        offers = only_within(parse_offers(raw), "se")
+        all_offers = parse_offers(raw)
+        offers = only_within(all_offers, "se")
+        arriving = crossing_into(all_offers, "se")
     finally:
         await client.aclose()
 
@@ -135,6 +138,14 @@ async def _freerider(as_json: bool) -> int:
         return 0
 
     print(f"{len(offers)} Freerider cars within Sweden\n")
+    if arriving:
+        # hertzfreerider.se's Sweden page counts these too, so without this line our number
+        # looks simply wrong next to theirs.
+        starts = ", ".join(sorted({o.pickup.city for o in arriving}))
+        print(
+            f"({len(arriving)} more end in Sweden but start abroad — {starts} — so they are "
+            "not routable from here and are left out of the count above.)\n"
+        )
     for offer in sorted(offers, key=lambda o: o.direct_km):
         estimate = cost.estimate_ore(offer) / 100
         price = "free" if estimate == 0 else f"~{estimate:.0f} SEK fuel"
