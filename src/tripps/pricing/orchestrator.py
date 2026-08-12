@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
@@ -179,6 +180,27 @@ class PricingOrchestrator:
 
     def _itinerary_priceable(self, itin: Itinerary) -> bool:
         return all(self._leg_priceable(leg) for leg in itin.legs)
+
+    def _blocking_operators(self, dropped: list[Itinerary], limit: int = 3) -> str:
+        """Name who we could not price, because a bare count is not actionable.
+
+        "46 route(s) skipped" tells a traveller nothing they can do. Naming the operator
+        does: an SL ferry is a leg their SL card would cover, and knowing that is the
+        difference between a dead end and registering a card.
+        """
+        tally: Counter[tuple[str, str]] = Counter()
+        for itin in dropped:
+            for leg in itin.legs:
+                if not self._leg_priceable(leg):
+                    tally[(leg.operator or "unknown operator", leg.mode.value)] += 1
+
+        if not tally:  # every leg priceable in isolation; the drop came from elsewhere
+            return "they use an operator with no available price source."
+
+        named = [f"{op} {mode}" for (op, mode), _ in tally.most_common(limit)]
+        rest = len(tally) - len(named)
+        listed = ", ".join(named) + (f" and {rest} more" if rest > 0 else "")
+        return f"no price source for {listed}."
 
     # --- one leg ----------------------------------------------------------
 
@@ -662,12 +684,15 @@ class PricingOrchestrator:
             # Oresundstag) can never be fully priced, so pricing its other legs is wasted
             # work - and on a route dominated by such operators, that waste is what makes the
             # whole search time out. Structural filter first, runtime filter after.
-            priceable = [itin for itin in feasible if self._itinerary_priceable(itin)]
+            priceable: list[Itinerary] = []
+            unpriceable: list[Itinerary] = []
+            for itin in feasible:
+                (priceable if self._itinerary_priceable(itin) else unpriceable).append(itin)
             if priceable:
-                if len(priceable) < len(feasible):
+                if unpriceable:
                     pre_warnings.append(
-                        f"{len(feasible) - len(priceable)} route(s) skipped: they use an "
-                        "operator with no available price source."
+                        f"{len(unpriceable)} route(s) skipped: "
+                        + self._blocking_operators(unpriceable)
                     )
                 feasible = priceable
 

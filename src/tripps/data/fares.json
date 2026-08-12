@@ -1,898 +1,2382 @@
 [
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740049185",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740049185",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740049185",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740049185",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020581",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020581",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740020581",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740020581",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740021661",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740021661",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740021661",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740021661",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740066545",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740066545",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066545",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066545",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740066610",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740066610",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066610",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066610",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740066544",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740066544",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066544",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066544",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740066542",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740066542",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066542",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066542",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740021658",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740021658",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740021658",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740021658",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740023254",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740023254",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740023254",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740023254",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740001179",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740001179",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740001179",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740001179",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740012883",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740012883",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740012883",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740012883",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016086",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016086",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740016086",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740016086",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740004046",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740004046",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740004046",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740004046",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016178",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016178",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740016178",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740016178",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740046187",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740046187",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046187",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046187",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740021665",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740021665",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740021665",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740021665",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000622",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000622",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740000622",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740000622",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740046073",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740046073",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046073",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046073",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740046154",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740046154",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046154",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046154",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740045571",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740045571",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740045571",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740045571",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740046074",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740046074",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046074",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740046074",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740066609",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740066609",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066609",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740066609",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740049197",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740049197",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740049197",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740049197",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020671",
-  "to_stop": "740050989",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740043310",
-  "to_stop": "740050989",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740050989",
-  "to_stop": "740020671",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740050989",
-  "to_stop": "740043310",
-  "amount_ore": 12900,
-  "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000554",
-  "to_stop": "740025610",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Berzeliigatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740025610",
-  "to_stop": "740000554",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Berzeliigatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000554",
-  "to_stop": "740015578",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Korsvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740015578",
-  "to_stop": "740000554",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Korsvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000554",
-  "to_stop": "740016358",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Kungsportsplatsen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016358",
-  "to_stop": "740000554",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Kungsportsplatsen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000554",
-  "to_stop": "740020483",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Nils Ericsonterminal). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740020483",
-  "to_stop": "740000554",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Nils Ericsonterminal). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000554",
-  "to_stop": "740061273",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Hangarvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740061273",
-  "to_stop": "740000554",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Hangarvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000554",
-  "to_stop": "740061277",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Landvetterhotellet). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740061277",
-  "to_stop": "740000554",
-  "amount_ore": 12900,
-  "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Landvetterhotellet). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740072050",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö C Norra Vallgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740072050",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö C Norra Vallgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740016779",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Jägersro Center). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016779",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Jägersro Center). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740001486",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Persborg station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740001486",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Persborg station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740015745",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Studentgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740015745",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Studentgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740016782",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Södervärn). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740016782",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Södervärn). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740001587",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Triangeln station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740001587",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Triangeln station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000953",
-  "to_stop": "740013614",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Svedala E65). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740013614",
-  "to_stop": "740000953",
-  "amount_ore": 13900,
-  "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Svedala E65). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000009",
-  "to_stop": "740011384",
-  "amount_ore": 22900,
-  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Linköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740011384",
-  "to_stop": "740000009",
-  "amount_ore": 22900,
-  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Linköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000007",
-  "to_stop": "740011384",
-  "amount_ore": 22900,
-  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Norrköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740011384",
-  "to_stop": "740000007",
-  "amount_ore": 22900,
-  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Norrköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740000622",
-  "to_stop": "740011384",
-  "amount_ore": 22900,
-  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- },
- {
-  "operator": "Vy flygbussarna",
-  "from_stop": "740011384",
-  "to_stop": "740000622",
-  "amount_ore": 22900,
-  "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
- }
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740049185",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740049185",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740049185",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740049185",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Bromma Mariehällskyrkan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020581",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020581",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740020581",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740020581",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Brommaplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740021661",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740021661",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740021661",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740021661",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Fridhemsplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740066545",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740066545",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066545",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066545",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Frösunda). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740066610",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740066610",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066610",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066610",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Gjuteribacken). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740066544",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740066544",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066544",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066544",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740066542",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740066542",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066542",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066542",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Haga södra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740021658",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740021658",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740021658",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740021658",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Hornstull T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740023254",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740023254",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740023254",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740023254",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Järva krog). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740001179",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740001179",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740001179",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740001179",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Karolinska sjukhuset norra). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740012883",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740012883",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740012883",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740012883",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kista T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016086",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016086",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740016086",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740016086",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Kistahöjden). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740004046",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740004046",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740004046",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740004046",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Liljeholmen T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016178",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016178",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740016178",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740016178",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norgegatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740046187",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740046187",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046187",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046187",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Norra Stationsgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740021665",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740021665",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740021665",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740021665",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (S:t Eriksplan T-bana). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000622",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000622",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740000622",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740000622",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740046073",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740046073",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046073",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046073",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Hagaplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740046154",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740046154",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046154",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046154",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Västerbroplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740045571",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740045571",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740045571",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740045571",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Sundbyberg torg). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740046074",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740046074",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046074",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740046074",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Torsplan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740066609",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740066609",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066609",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740066609",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Tritonvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740049197",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740049197",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740049197",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740049197",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Voltavägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020671",
+    "to_stop": "740050989",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740043310",
+    "to_stop": "740050989",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740050989",
+    "to_stop": "740020671",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740050989",
+    "to_stop": "740043310",
+    "amount_ore": 12900,
+    "note": "Arlanda coach, standard adult single - flat route fare, boarding at any listed city stop (Ärvingevägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000554",
+    "to_stop": "740025610",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Berzeliigatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740025610",
+    "to_stop": "740000554",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Berzeliigatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000554",
+    "to_stop": "740015578",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Korsvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740015578",
+    "to_stop": "740000554",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Korsvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000554",
+    "to_stop": "740016358",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Kungsportsplatsen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016358",
+    "to_stop": "740000554",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Kungsportsplatsen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000554",
+    "to_stop": "740020483",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Nils Ericsonterminal). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740020483",
+    "to_stop": "740000554",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Göteborg Nils Ericsonterminal). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000554",
+    "to_stop": "740061273",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Hangarvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740061273",
+    "to_stop": "740000554",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Hangarvägen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000554",
+    "to_stop": "740061277",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Landvetterhotellet). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740061277",
+    "to_stop": "740000554",
+    "amount_ore": 12900,
+    "note": "Landvetter coach, standard adult single - flat route fare, boarding at any listed city stop (Landvetterhotellet). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740072050",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö C Norra Vallgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740072050",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö C Norra Vallgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740016779",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Jägersro Center). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016779",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Jägersro Center). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740001486",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Persborg station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740001486",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Persborg station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740015745",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Studentgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740015745",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Studentgatan). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740016782",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Södervärn). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740016782",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Södervärn). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740001587",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Triangeln station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740001587",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Malmö Triangeln station). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000953",
+    "to_stop": "740013614",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Svedala E65). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740013614",
+    "to_stop": "740000953",
+    "amount_ore": 13900,
+    "note": "Malmö Airport coach, standard adult single - flat route fare, boarding at any listed city stop (Svedala E65). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000009",
+    "to_stop": "740011384",
+    "amount_ore": 22900,
+    "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Linköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740011384",
+    "to_stop": "740000009",
+    "amount_ore": 22900,
+    "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Linköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000007",
+    "to_stop": "740011384",
+    "amount_ore": 22900,
+    "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Norrköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740011384",
+    "to_stop": "740000007",
+    "amount_ore": 22900,
+    "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Norrköping Centralstation). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740000622",
+    "to_stop": "740011384",
+    "amount_ore": 22900,
+    "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "Vy flygbussarna",
+    "from_stop": "740011384",
+    "to_stop": "740000622",
+    "amount_ore": 22900,
+    "note": "Skavsta coach, standard adult single - flat route fare, boarding at any listed city stop (Stockholm Cityterminalen). flygbussarna.se, captured 2026-07-12; Malmö re-verified 2026-08-03. Online/app fares can be lower."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740001247",
+    "to_stop": "740077568",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740001276",
+    "to_stop": "740018092",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740015538",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740014648",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740015538",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740018092",
+    "to_stop": "740001276",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740018275",
+    "to_stop": "740020691",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740018275",
+    "to_stop": "740024222",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740018275",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740018275",
+    "to_stop": "740034626",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740018275",
+    "to_stop": "740077244",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740020691",
+    "to_stop": "740018275",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740020691",
+    "to_stop": "740024222",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740020691",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740020691",
+    "to_stop": "740034626",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740020691",
+    "to_stop": "740077244",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740024222",
+    "to_stop": "740018275",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740024222",
+    "to_stop": "740020691",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740024222",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740024222",
+    "to_stop": "740034626",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740024222",
+    "to_stop": "740077244",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034107",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034521",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034522",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034748",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034484",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740015538",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740018275",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740020691",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740024222",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740034626",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034486",
+    "to_stop": "740077244",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034522",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034521",
+    "to_stop": "740034748",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034522",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034522",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034522",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034522",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034522",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034522",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034523",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034523",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034523",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034523",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034523",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034526",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034526",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034526",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034526",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034626",
+    "to_stop": "740018275",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034626",
+    "to_stop": "740020691",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034626",
+    "to_stop": "740024222",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034626",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034626",
+    "to_stop": "740077244",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034521",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034522",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034633",
+    "to_stop": "740034748",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034521",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034522",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034636",
+    "to_stop": "740034748",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034521",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034522",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034637",
+    "to_stop": "740034748",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034657",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034743",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034744",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034521",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034522",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034523",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034526",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034633",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034636",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034748",
+    "to_stop": "740034637",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740034770",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740036005",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740044693",
+    "to_stop": "740061810",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740014648",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740034107",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740034484",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740034657",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740034743",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740034744",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740034770",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740036005",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740061810",
+    "to_stop": "740044693",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740064376",
+    "to_stop": "740071794",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740064376",
+    "to_stop": "740073452",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740064376",
+    "to_stop": "740073453",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740064376",
+    "to_stop": "740073454",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740071794",
+    "to_stop": "740064376",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740071794",
+    "to_stop": "740073452",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740071794",
+    "to_stop": "740073453",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740071794",
+    "to_stop": "740073454",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073452",
+    "to_stop": "740064376",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073452",
+    "to_stop": "740071794",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073452",
+    "to_stop": "740073453",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073452",
+    "to_stop": "740073454",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073453",
+    "to_stop": "740064376",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073453",
+    "to_stop": "740071794",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073453",
+    "to_stop": "740073452",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073453",
+    "to_stop": "740073454",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073454",
+    "to_stop": "740064376",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073454",
+    "to_stop": "740071794",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073454",
+    "to_stop": "740073452",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740073454",
+    "to_stop": "740073453",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740077244",
+    "to_stop": "740018275",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740077244",
+    "to_stop": "740020691",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740077244",
+    "to_stop": "740024222",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740077244",
+    "to_stop": "740034486",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740077244",
+    "to_stop": "740034626",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  },
+  {
+    "operator": "SL",
+    "from_stop": "740077568",
+    "to_stop": "740001247",
+    "amount_ore": 4300,
+    "note": "SL 75-minute single, adult full price (43 kr, sl.se, verified 2026-08-12). One flat fare across SL's own network, so any board/alight pair on an SL boat costs the same."
+  }
 ]
